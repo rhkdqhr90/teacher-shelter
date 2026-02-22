@@ -35,7 +35,7 @@ const nextConfig: NextConfig = {
       // 프로덕션 API 서버 (환경에 맞게 수정 필요)
       {
         protocol: 'https',
-        hostname: '*.teacher-shelter.com',
+        hostname: '*.teacherlounge.co.kr',
       },
     ],
   },

@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'ko_KR',
-    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://teacher-shelter.com',
+    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://teacherlounge.co.kr',
     title: '교사쉼터',
     description: '특수교사, 보육교사를 위한 커뮤니티. 고민을 나누고 정보를 공유하세요.',
     siteName: '교사쉼터',

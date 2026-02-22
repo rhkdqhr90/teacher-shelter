@@ -88,7 +88,7 @@ export function LoginForm() {
                 {t('password')}
               </label>
               <Link href="/forgot-password" className="text-xs text-primary hover:underline">
-                비밀번호 찾기
+                {t('forgotPassword')}
               </Link>
             </div>
             <Input id="password" name="password" type="password" required />

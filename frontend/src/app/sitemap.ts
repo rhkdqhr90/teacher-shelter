@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://teacher-shelter.com';
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://teacherlounge.co.kr';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 정적 페이지

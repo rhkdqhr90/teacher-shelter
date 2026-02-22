@@ -238,7 +238,7 @@ export default function PrivacyPage() {
             </p>
             <ul>
               <li>개인정보 보호책임자: 운영팀</li>
-              <li>이메일: privacy@teacher-shelter.com</li>
+              <li>이메일: privacy@teacherlounge.co.kr</li>
             </ul>
             <p>
               이용자는 서비스 이용 중 발생하는 모든 개인정보 보호 관련 문의, 불만처리, 피해구제 등에 관한 사항을

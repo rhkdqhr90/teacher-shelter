@@ -277,14 +277,14 @@ export function RegisterForm() {
           <label htmlFor="name" className="mb-2 block text-sm font-medium">
             {t('name')}
           </label>
-          <Input id="name" name="name" type="text" placeholder="John Doe" required />
+          <Input id="name" name="name" type="text" placeholder="이름을 입력하세요" required />
         </div>
 
         <div>
           <label htmlFor="email" className="mb-2 block text-sm font-medium">
             {t('email')}
           </label>
-          <Input id="email" name="email" type="email" placeholder="name@example.com" required />
+          <Input id="email" name="email" type="email" placeholder="이메일을 입력하세요" required />
         </div>
 
         <div>

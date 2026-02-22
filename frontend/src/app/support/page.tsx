@@ -198,8 +198,8 @@ export default function SupportPage() {
             <div className="flex items-center gap-2">
               <Mail className="h-4 w-4 text-muted-foreground" />
               <span className="text-muted-foreground">이메일:</span>
-              <a href="mailto:support@teacher-shelter.com" className="text-primary hover:underline">
-                support@teacher-shelter.com
+              <a href="mailto:support@teacherlounge.co.kr" className="text-primary hover:underline">
+                support@teacherlounge.co.kr
               </a>
             </div>
             <p className="text-xs text-muted-foreground">

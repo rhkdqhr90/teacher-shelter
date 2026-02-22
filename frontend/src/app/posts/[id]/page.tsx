@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
   // HTML 태그 제거하고 텍스트만 추출
   const plainContent = post.content.replace(/<[^>]*>/g, '').slice(0, 160);
   const categoryLabel = POST_CATEGORY_LABELS[post.category as keyof typeof POST_CATEGORY_LABELS] || '';
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://teacher-shelter.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://teacherlounge.co.kr';
 
   return {
     title: post.title,

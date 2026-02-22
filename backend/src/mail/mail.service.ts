@@ -32,7 +32,7 @@ export class MailService {
     private readonly logger: LoggerService,
   ) {
     this.fromEmail =
-      this.configService.get<string>('MAIL_FROM') || 'noreply@teacher-shelter.com';
+      this.configService.get<string>('MAIL_FROM') || 'noreply@teacherlounge.co.kr';
     this.fromName = this.configService.get<string>('MAIL_FROM_NAME') || '교사쉼터';
     this.frontendUrl =
       this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3001';
