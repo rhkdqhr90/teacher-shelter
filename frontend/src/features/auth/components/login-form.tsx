@@ -79,7 +79,7 @@ export function LoginForm() {
             <label htmlFor="email" className="mb-2 block text-sm font-medium">
               {t('email')}
             </label>
-            <Input id="email" name="email" type="email" placeholder="demo@example.com" required />
+            <Input id="email" name="email" type="email" placeholder="이메일을 입력하세요" required />
           </div>
 
           <div>
@@ -98,8 +98,6 @@ export function LoginForm() {
             {isPending ? t('signingIn') : t('login')}
           </Button>
         </form>
-
-        <p className="text-center text-xs text-muted-foreground">{t('demoCredentials')}</p>
 
         {/* 소셜 로그인 버튼 */}
         <SocialLoginButtons disabled={isPending} />

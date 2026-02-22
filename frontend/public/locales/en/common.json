@@ -20,19 +20,8 @@
     "register": "Register"
   },
   "home": {
-    "title": "Next.js Production Boilerplate",
-    "subtitle": "Build your next web application with confidence",
-    "features": {
-      "title": "Features",
-      "auth": "Authentication",
-      "authDesc": "Auth.js v5 with OAuth and Credentials",
-      "state": "State Management",
-      "stateDesc": "Zustand + TanStack Query",
-      "ui": "UI Components",
-      "uiDesc": "shadcn/ui with Tailwind CSS",
-      "test": "Testing",
-      "testDesc": "Vitest + Testing Library + Playwright"
-    }
+    "title": "Teacher Lounge",
+    "subtitle": "A community for teachers"
   },
   "auth": {
     "login": "Login",
@@ -62,8 +51,7 @@
     "accessDenied": "Access denied.",
     "tryAgain": "Try Again",
     "backToLogin": "Back to Login",
-    "demoCredentials": "Demo: demo@example.com / password123",
-    "loginSubtitle": "Enter your credentials to access your account",
-    "registerSubtitle": "Create your account to get started"
+    "loginSubtitle": "Welcome to Teacher Lounge",
+    "registerSubtitle": "Join the Teacher Lounge community"
   }
 }
