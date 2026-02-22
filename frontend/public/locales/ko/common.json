@@ -1,0 +1,69 @@
+{
+  "common": {
+    "loading": "로딩 중...",
+    "error": "오류",
+    "success": "성공",
+    "cancel": "취소",
+    "confirm": "확인",
+    "save": "저장",
+    "delete": "삭제",
+    "edit": "수정",
+    "close": "닫기",
+    "search": "검색",
+    "back": "뒤로"
+  },
+  "nav": {
+    "home": "홈",
+    "dashboard": "대시보드",
+    "login": "로그인",
+    "logout": "로그아웃",
+    "register": "회원가입"
+  },
+  "home": {
+    "title": "Next.js 프로덕션 보일러플레이트",
+    "subtitle": "자신감 있게 다음 웹 애플리케이션을 구축하세요",
+    "features": {
+      "title": "주요 기능",
+      "auth": "인증",
+      "authDesc": "Auth.js v5 (OAuth + 일반 로그인)",
+      "state": "상태 관리",
+      "stateDesc": "Zustand + TanStack Query",
+      "ui": "UI 컴포넌트",
+      "uiDesc": "shadcn/ui + Tailwind CSS",
+      "test": "테스팅",
+      "testDesc": "Vitest + Testing Library + Playwright"
+    }
+  },
+  "auth": {
+    "login": "로그인",
+    "register": "회원가입",
+    "email": "이메일",
+    "password": "비밀번호",
+    "name": "이름",
+    "confirmPassword": "비밀번호 확인",
+    "rememberMe": "로그인 상태 유지",
+    "forgotPassword": "비밀번호를 잊으셨나요?",
+    "noAccount": "계정이 없으신가요?",
+    "hasAccount": "이미 계정이 있으신가요?",
+    "orContinueWith": "또는 다음으로 계속",
+    "continueWithGoogle": "Google로 계속",
+    "continueWithGitHub": "GitHub로 계속",
+    "signingIn": "로그인 중...",
+    "registering": "가입 중...",
+    "signOut": "로그아웃",
+    "loginSuccess": "로그인 성공",
+    "loginError": "로그인 실패",
+    "registerSuccess": "계정이 생성되었습니다! 로그인해주세요.",
+    "registerError": "회원가입 실패",
+    "credentialsError": "이메일 또는 비밀번호가 올바르지 않습니다.",
+    "authError": "인증 오류",
+    "authErrorDesc": "인증 중 오류가 발생했습니다.",
+    "configurationError": "서버 설정에 문제가 있습니다.",
+    "accessDenied": "접근이 거부되었습니다.",
+    "tryAgain": "다시 시도",
+    "backToLogin": "로그인으로 돌아가기",
+    "demoCredentials": "데모: demo@example.com / password123",
+    "loginSubtitle": "계정에 접근하려면 자격 증명을 입력하세요",
+    "registerSubtitle": "시작하려면 계정을 만드세요"
+  }
+}

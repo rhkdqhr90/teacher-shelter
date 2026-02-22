@@ -1,0 +1,69 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "search": "Search",
+    "back": "Back"
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register"
+  },
+  "home": {
+    "title": "Next.js Production Boilerplate",
+    "subtitle": "Build your next web application with confidence",
+    "features": {
+      "title": "Features",
+      "auth": "Authentication",
+      "authDesc": "Auth.js v5 with OAuth and Credentials",
+      "state": "State Management",
+      "stateDesc": "Zustand + TanStack Query",
+      "ui": "UI Components",
+      "uiDesc": "shadcn/ui with Tailwind CSS",
+      "test": "Testing",
+      "testDesc": "Vitest + Testing Library + Playwright"
+    }
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "confirmPassword": "Confirm Password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "orContinueWith": "Or continue with",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithGitHub": "Continue with GitHub",
+    "signingIn": "Signing in...",
+    "registering": "Registering...",
+    "signOut": "Sign Out",
+    "loginSuccess": "Successfully logged in",
+    "loginError": "Login failed",
+    "registerSuccess": "Account created successfully! Please sign in.",
+    "registerError": "Registration failed",
+    "credentialsError": "Invalid email or password.",
+    "authError": "Authentication Error",
+    "authErrorDesc": "An error occurred during authentication.",
+    "configurationError": "There is a problem with the server configuration.",
+    "accessDenied": "Access denied.",
+    "tryAgain": "Try Again",
+    "backToLogin": "Back to Login",
+    "demoCredentials": "Demo: demo@example.com / password123",
+    "loginSubtitle": "Enter your credentials to access your account",
+    "registerSubtitle": "Create your account to get started"
+  }
+}
