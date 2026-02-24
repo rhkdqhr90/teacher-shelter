@@ -64,3 +64,4 @@ logs/*.log
 
 # Cookies
 cookies.txt
+/dist
