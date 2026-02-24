@@ -1,0 +1,106 @@
+import { PrismaService } from '../database/prisma.service';
+import { CreateBannerDto } from './dto/create-banner.dto';
+import { UpdateBannerDto } from './dto/update-banner.dto';
+import { BannerType } from '@prisma/client';
+export declare class BannersService {
+    private prisma;
+    constructor(prisma: PrismaService);
+    create(dto: CreateBannerDto): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        title: string;
+        type: import("@prisma/client").$Enums.BannerType;
+        priority: number;
+        alt: string;
+        imageUrl: string;
+        linkUrl: string | null;
+        isActive: boolean;
+        startDate: Date | null;
+        endDate: Date | null;
+    }>;
+    findAll(type?: BannerType): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        title: string;
+        type: import("@prisma/client").$Enums.BannerType;
+        priority: number;
+        alt: string;
+        imageUrl: string;
+        linkUrl: string | null;
+        isActive: boolean;
+        startDate: Date | null;
+        endDate: Date | null;
+    }[]>;
+    findActive(type: BannerType): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        title: string;
+        type: import("@prisma/client").$Enums.BannerType;
+        priority: number;
+        alt: string;
+        imageUrl: string;
+        linkUrl: string | null;
+        isActive: boolean;
+        startDate: Date | null;
+        endDate: Date | null;
+    }[]>;
+    findOne(id: string): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        title: string;
+        type: import("@prisma/client").$Enums.BannerType;
+        priority: number;
+        alt: string;
+        imageUrl: string;
+        linkUrl: string | null;
+        isActive: boolean;
+        startDate: Date | null;
+        endDate: Date | null;
+    }>;
+    update(id: string, dto: UpdateBannerDto): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        title: string;
+        type: import("@prisma/client").$Enums.BannerType;
+        priority: number;
+        alt: string;
+        imageUrl: string;
+        linkUrl: string | null;
+        isActive: boolean;
+        startDate: Date | null;
+        endDate: Date | null;
+    }>;
+    remove(id: string): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        title: string;
+        type: import("@prisma/client").$Enums.BannerType;
+        priority: number;
+        alt: string;
+        imageUrl: string;
+        linkUrl: string | null;
+        isActive: boolean;
+        startDate: Date | null;
+        endDate: Date | null;
+    }>;
+    toggleActive(id: string): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        title: string;
+        type: import("@prisma/client").$Enums.BannerType;
+        priority: number;
+        alt: string;
+        imageUrl: string;
+        linkUrl: string | null;
+        isActive: boolean;
+        startDate: Date | null;
+        endDate: Date | null;
+    }>;
+}

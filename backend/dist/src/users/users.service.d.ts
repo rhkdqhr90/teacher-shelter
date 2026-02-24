@@ -1,0 +1,231 @@
+import { PrismaService } from '../database/prisma.service';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+export declare class UsersService {
+    private prisma;
+    private readonly SALT_ROUNDS;
+    constructor(prisma: PrismaService);
+    findOne(id: string): Promise<{
+        id: string;
+        email: string;
+        nickname: string;
+        role: import("@prisma/client").$Enums.UserRole;
+        isVerified: boolean;
+        jobType: import("@prisma/client").$Enums.JobType | null;
+        career: number | null;
+        profileImage: string | null;
+        isExpert: boolean;
+        expertType: import("@prisma/client").$Enums.ExpertType | null;
+        expertVerifiedAt: Date | null;
+        lastLoginAt: Date | null;
+        isBanned: boolean;
+        bannedAt: Date | null;
+        bannedUntil: Date | null;
+        banReason: string | null;
+        provider: string | null;
+        providerId: string | null;
+        termsAgreedAt: Date | null;
+        privacyAgreedAt: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    private findOneWithPassword;
+    update(id: string, updateUserDto: UpdateUserDto): Promise<{
+        id: string;
+        email: string;
+        nickname: string;
+        role: import("@prisma/client").$Enums.UserRole;
+        isVerified: boolean;
+        jobType: import("@prisma/client").$Enums.JobType | null;
+        career: number | null;
+        profileImage: string | null;
+        isExpert: boolean;
+        expertType: import("@prisma/client").$Enums.ExpertType | null;
+        expertVerifiedAt: Date | null;
+        lastLoginAt: Date | null;
+        isBanned: boolean;
+        bannedAt: Date | null;
+        bannedUntil: Date | null;
+        banReason: string | null;
+        provider: string | null;
+        providerId: string | null;
+        termsAgreedAt: Date | null;
+        privacyAgreedAt: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    changePassword(id: string, changePasswordDto: ChangePasswordDto): Promise<void>;
+    getMyPosts(id: string, options?: {
+        page?: number;
+        limit?: number;
+    }): Promise<{
+        data: {
+            likeCount: number;
+            commentCount: number;
+            _count: undefined;
+            author: {
+                id: string;
+                nickname: string;
+                isVerified: boolean;
+                jobType: import("@prisma/client").$Enums.JobType | null;
+                career: number | null;
+            } | null;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            title: string;
+            content: string;
+            category: import("@prisma/client").$Enums.PostCategory;
+            isAnonymous: boolean;
+            ipHash: string | null;
+            anonymousAuthorId: string | null;
+            viewCount: number;
+            jobSubCategory: import("@prisma/client").$Enums.JobSubCategory | null;
+            region: import("@prisma/client").$Enums.Region | null;
+            salaryType: import("@prisma/client").$Enums.SalaryType | null;
+            salaryMin: number | null;
+            salaryMax: number | null;
+            isRecruiting: boolean;
+            organizationName: string | null;
+            contactPhone: string | null;
+            contactEmail: string | null;
+            contactKakao: string | null;
+            deadline: Date | null;
+            isAutoClose: boolean;
+            recruitCount: number | null;
+            workingHours: string | null;
+            employmentType: import("@prisma/client").$Enums.EmploymentType | null;
+            benefits: string | null;
+            requirements: string | null;
+            detailAddress: string | null;
+            therapyTags: import("@prisma/client").$Enums.TherapyTag[];
+            authorId: string | null;
+        }[];
+        meta: {
+            page: number;
+            limit: number;
+            total: number;
+            totalPages: number;
+        };
+    }>;
+    getMyComments(id: string, options?: {
+        page?: number;
+        limit?: number;
+    }): Promise<{
+        data: ({
+            post: {
+                id: string;
+                title: string;
+                category: import("@prisma/client").$Enums.PostCategory;
+            };
+        } & {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            content: string;
+            authorId: string;
+            postId: string;
+            parentCommentId: string | null;
+            mentionedUserId: string | null;
+        })[];
+        meta: {
+            page: number;
+            limit: number;
+            total: number;
+            totalPages: number;
+        };
+    }>;
+    getMyBookmarks(id: string, options?: {
+        page?: number;
+        limit?: number;
+    }): Promise<{
+        data: {
+            id: string;
+            title: string;
+            content: string;
+            category: import("@prisma/client").$Enums.PostCategory;
+            isAnonymous: boolean;
+            viewCount: number;
+            likeCount: number;
+            commentCount: number;
+            createdAt: Date;
+            author: {
+                id: string;
+                nickname: string;
+                isVerified: boolean;
+                jobType: import("@prisma/client").$Enums.JobType | null;
+                career: number | null;
+            } | null;
+            bookmarkedAt: Date;
+        }[];
+        meta: {
+            page: number;
+            limit: number;
+            total: number;
+            totalPages: number;
+        };
+    }>;
+    getMyLikes(id: string, options?: {
+        page?: number;
+        limit?: number;
+    }): Promise<{
+        data: {
+            id: string;
+            title: string;
+            content: string;
+            category: import("@prisma/client").$Enums.PostCategory;
+            isAnonymous: boolean;
+            viewCount: number;
+            likeCount: number;
+            commentCount: number;
+            createdAt: Date;
+            author: {
+                id: string;
+                nickname: string;
+                isVerified: boolean;
+                jobType: import("@prisma/client").$Enums.JobType | null;
+                career: number | null;
+            } | null;
+            likedAt: Date;
+        }[];
+        meta: {
+            page: number;
+            limit: number;
+            total: number;
+            totalPages: number;
+        };
+    }>;
+    searchUsers(query: string, limit?: number): Promise<{
+        id: string;
+        nickname: string;
+        isVerified: boolean;
+        jobType: import("@prisma/client").$Enums.JobType | null;
+    }[]>;
+    getDashboardStats(userId: string): Promise<{
+        postCount: number;
+        commentCount: number;
+        receivedLikeCount: number;
+        bookmarkCount: number;
+    }>;
+    getRecentActivity(userId: string, limit?: number): Promise<{
+        recentPosts: {
+            likeCount: number;
+            commentCount: number;
+            _count: undefined;
+            id: string;
+            createdAt: Date;
+            title: string;
+            category: import("@prisma/client").$Enums.PostCategory;
+        }[];
+        recentComments: {
+            id: string;
+            createdAt: Date;
+            post: {
+                id: string;
+                title: string;
+            };
+            content: string;
+        }[];
+    }>;
+    remove(id: string, password: string): Promise<void>;
+}
