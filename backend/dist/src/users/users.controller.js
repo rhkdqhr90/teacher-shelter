@@ -98,8 +98,15 @@ let UsersController = class UsersController {
 exports.UsersController = UsersController;
 __decorate([
     (0, common_1.Get)('me'),
-    (0, swagger_1.ApiOperation)({ summary: '내 프로필 조회', description: '로그인한 사용자의 프로필을 조회합니다.' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: '프로필 조회 성공', type: user_response_dto_1.UserResponseDto }),
+    (0, swagger_1.ApiOperation)({
+        summary: '내 프로필 조회',
+        description: '로그인한 사용자의 프로필을 조회합니다.',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: '프로필 조회 성공',
+        type: user_response_dto_1.UserResponseDto,
+    }),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),

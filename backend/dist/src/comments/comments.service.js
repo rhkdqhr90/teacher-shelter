@@ -78,7 +78,8 @@ let CommentsService = class CommentsService {
                 where: { id: postId },
                 select: { commentCount: true },
             });
-            if (currentPost && currentPost.commentCount >= this.MAX_COMMENTS_PER_POST) {
+            if (currentPost &&
+                currentPost.commentCount >= this.MAX_COMMENTS_PER_POST) {
                 throw new common_1.BadRequestException(`이 게시글에는 더 이상 댓글을 작성할 수 없습니다 (최대 ${this.MAX_COMMENTS_PER_POST}개)`);
             }
             const newComment = await tx.comment.create({

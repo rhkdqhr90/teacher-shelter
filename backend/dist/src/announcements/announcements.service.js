@@ -29,10 +29,7 @@ let AnnouncementsService = class AnnouncementsService {
         const where = includeUnpublished ? {} : { isPublished: true };
         return this.prisma.announcement.findMany({
             where,
-            orderBy: [
-                { isPinned: 'desc' },
-                { createdAt: 'desc' },
-            ],
+            orderBy: [{ isPinned: 'desc' }, { createdAt: 'desc' }],
         });
     }
     async findOne(id) {

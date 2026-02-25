@@ -24,7 +24,9 @@ let CsrfMiddleware = class CsrfMiddleware {
         this.configService = configService;
         this.logger = logger;
         const corsOrigins = this.configService.get('cors.origins') || [];
-        this.allowedOrigins = Array.isArray(corsOrigins) ? corsOrigins : [corsOrigins];
+        this.allowedOrigins = Array.isArray(corsOrigins)
+            ? corsOrigins
+            : [corsOrigins];
     }
     use(req, _res, next) {
         const safeMethods = ['GET', 'HEAD', 'OPTIONS'];
@@ -78,7 +80,7 @@ let CsrfMiddleware = class CsrfMiddleware {
                 const domain = allowed.slice(2);
                 try {
                     const originHostname = new URL(origin).hostname;
-                    return originHostname.endsWith('.' + domain) || originHostname === domain;
+                    return (originHostname.endsWith('.' + domain) || originHostname === domain);
                 }
                 catch {
                     return false;

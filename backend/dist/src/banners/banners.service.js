@@ -76,8 +76,12 @@ let BannersService = class BannersService {
                 ...(dto.type !== undefined && { type: dto.type }),
                 ...(dto.isActive !== undefined && { isActive: dto.isActive }),
                 ...(dto.priority !== undefined && { priority: dto.priority }),
-                ...(dto.startDate !== undefined && { startDate: dto.startDate ? new Date(dto.startDate) : null }),
-                ...(dto.endDate !== undefined && { endDate: dto.endDate ? new Date(dto.endDate) : null }),
+                ...(dto.startDate !== undefined && {
+                    startDate: dto.startDate ? new Date(dto.startDate) : null,
+                }),
+                ...(dto.endDate !== undefined && {
+                    endDate: dto.endDate ? new Date(dto.endDate) : null,
+                }),
             },
         });
     }

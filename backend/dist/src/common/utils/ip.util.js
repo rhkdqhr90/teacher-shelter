@@ -7,8 +7,6 @@ function hashIp(ip) {
     if (!salt) {
         throw new Error('IP_HASH_SALT environment variable is required');
     }
-    return (0, crypto_1.createHash)('sha256')
-        .update(`${salt}:${ip}`)
-        .digest('hex');
+    return (0, crypto_1.createHash)('sha256').update(`${salt}:${ip}`).digest('hex');
 }
 //# sourceMappingURL=ip.util.js.map

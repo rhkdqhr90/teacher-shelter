@@ -71,8 +71,10 @@ let MailService = class MailService {
         this.configService = configService;
         this.logger = logger;
         this.fromEmail =
-            this.configService.get('MAIL_FROM') || 'noreply@teacherlounge.co.kr';
-        this.fromName = this.configService.get('MAIL_FROM_NAME') || '교사쉼터';
+            this.configService.get('MAIL_FROM') ||
+                'noreply@teacherlounge.co.kr';
+        this.fromName =
+            this.configService.get('MAIL_FROM_NAME') || '교사쉼터';
         this.frontendUrl =
             this.configService.get('FRONTEND_URL') || 'http://localhost:3001';
         const smtpHost = this.configService.get('SMTP_HOST');

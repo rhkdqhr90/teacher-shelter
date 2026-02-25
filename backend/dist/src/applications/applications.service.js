@@ -64,12 +64,14 @@ let ApplicationsService = class ApplicationsService {
             },
         });
         if (post.authorId) {
-            this.notificationsService.create({
+            this.notificationsService
+                .create({
                 userId: post.authorId,
                 actorId: userId,
                 type: client_1.NotificationType.NEW_APPLICATION,
                 postId: post.id,
-            }).catch(() => {
+            })
+                .catch(() => {
             });
         }
         return new dto_1.ApplicationResponseDto(application);

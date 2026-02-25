@@ -20,14 +20,20 @@ class CreateAnnouncementDto {
 }
 exports.CreateAnnouncementDto = CreateAnnouncementDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: '서비스 업데이트 안내', description: '공지사항 제목' }),
+    (0, swagger_1.ApiProperty)({
+        example: '서비스 업데이트 안내',
+        description: '공지사항 제목',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(2),
     (0, class_validator_1.MaxLength)(200),
     __metadata("design:type", String)
 ], CreateAnnouncementDto.prototype, "title", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: '새로운 기능이 추가되었습니다.', description: '공지사항 내용' }),
+    (0, swagger_1.ApiProperty)({
+        example: '새로운 기능이 추가되었습니다.',
+        description: '공지사항 내용',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(10),
     (0, class_validator_1.MaxLength)(10000),

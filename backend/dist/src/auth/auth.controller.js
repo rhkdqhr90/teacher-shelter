@@ -61,12 +61,30 @@ let AuthController = class AuthController {
         else {
             await this.authService.blacklistFromAccessToken(req.headers.authorization);
         }
-        res.clearCookie('refreshToken', {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            path: '/',
-        });
+        const isProduction = process.env.NODE_ENV === 'production';
+        if (isProduction) {
+            res.clearCookie('refreshToken', {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none',
+                path: '/',
+            });
+            res.clearCookie('refreshToken', {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none',
+                path: '/',
+                domain: '.teacherlounge.co.kr',
+            });
+        }
+        else {
+            res.clearCookie('refreshToken', {
+                httpOnly: true,
+                secure: false,
+                sameSite: 'lax',
+                path: '/',
+            });
+        }
     }
     async forgotPassword(forgotPasswordDto) {
         await this.authService.forgotPassword(forgotPasswordDto.email);
@@ -102,7 +120,7 @@ let AuthController = class AuthController {
     async naverCallback(req, res) {
         return this.handleOAuthCallback(req, res);
     }
-    async exchangeOAuthCode(dto, res) {
+    async exchangeOAuthCode(dto) {
         const accessToken = await this.authService.exchangeOAuthCode(dto.code);
         return { accessToken };
     }
@@ -152,15 +170,22 @@ let AuthController = class AuthController {
         }
     }
     setRefreshTokenCookie(res, refreshToken) {
+        const isProduction = process.env.NODE_ENV === 'production';
+        if (isProduction) {
+            res.clearCookie('refreshToken', {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none',
+                path: '/',
+            });
+        }
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            secure: isProduction,
+            sameSite: isProduction ? 'none' : 'lax',
             path: '/',
             maxAge: 7 * 24 * 60 * 60 * 1000,
-            domain: process.env.NODE_ENV === 'production'
-                ? '.teacherlounge.co.kr'
-                : undefined,
+            domain: isProduction ? '.teacherlounge.co.kr' : undefined,
         });
     }
 };
@@ -348,9 +373,8 @@ __decorate([
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, throttler_1.Throttle)({ default: { ttl: 60000, limit: 10 } }),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.Res)({ passthrough: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [exchange_oauth_code_dto_1.ExchangeOAuthCodeDto, Object]),
+    __metadata("design:paramtypes", [exchange_oauth_code_dto_1.ExchangeOAuthCodeDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "exchangeOAuthCode", null);
 exports.AuthController = AuthController = __decorate([

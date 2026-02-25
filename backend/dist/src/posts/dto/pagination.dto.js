@@ -85,7 +85,9 @@ __decorate([
             return undefined;
         if (Array.isArray(value))
             return value;
-        return typeof value === 'string' ? value.split(',').filter(Boolean) : undefined;
+        return typeof value === 'string'
+            ? value.split(',').filter(Boolean)
+            : undefined;
     }),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsEnum)(client_1.TherapyTag, { each: true }),

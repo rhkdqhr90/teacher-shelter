@@ -41,7 +41,7 @@ export declare class AuthController {
     kakaoCallback(req: Request, res: Response): Promise<void>;
     naverLogin(): void;
     naverCallback(req: Request, res: Response): Promise<void>;
-    exchangeOAuthCode(dto: ExchangeOAuthCodeDto, res: Response): Promise<{
+    exchangeOAuthCode(dto: ExchangeOAuthCodeDto): Promise<{
         accessToken: string;
     }>;
     private readonly ALLOWED_REDIRECT_ORIGINS;

@@ -82,14 +82,16 @@ __decorate([
     (0, class_validator_1.IsInt)(),
     (0, class_validator_1.Min)(0),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.ValidateIf)((o) => o.category === client_1.PostCategory.JOB_POSTING && o.salaryType !== client_1.SalaryType.NEGOTIABLE),
+    (0, class_validator_1.ValidateIf)((o) => o.category === client_1.PostCategory.JOB_POSTING &&
+        o.salaryType !== client_1.SalaryType.NEGOTIABLE),
     __metadata("design:type", Number)
 ], UpdatePostDto.prototype, "salaryMin", void 0);
 __decorate([
     (0, class_validator_1.IsInt)(),
     (0, class_validator_1.Min)(0),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.ValidateIf)((o) => o.category === client_1.PostCategory.JOB_POSTING && o.salaryType !== client_1.SalaryType.NEGOTIABLE),
+    (0, class_validator_1.ValidateIf)((o) => o.category === client_1.PostCategory.JOB_POSTING &&
+        o.salaryType !== client_1.SalaryType.NEGOTIABLE),
     __metadata("design:type", Number)
 ], UpdatePostDto.prototype, "salaryMax", void 0);
 __decorate([

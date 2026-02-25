@@ -137,7 +137,9 @@ let ReportsService = class ReportsService {
                     reporter: { select: { id: true, nickname: true, email: true } },
                     targetUser: { select: { id: true, nickname: true, email: true } },
                     targetPost: { select: { id: true, title: true, authorId: true } },
-                    targetComment: { select: { id: true, content: true, authorId: true, postId: true } },
+                    targetComment: {
+                        select: { id: true, content: true, authorId: true, postId: true },
+                    },
                     processedBy: { select: { id: true, nickname: true } },
                 },
             }),

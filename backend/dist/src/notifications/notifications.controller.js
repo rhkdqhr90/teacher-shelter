@@ -25,7 +25,9 @@ let NotificationsController = class NotificationsController {
     async findAll(req, page, limit) {
         const user = req.user;
         const parsedPage = page ? Math.max(1, parseInt(page, 10) || 1) : 1;
-        const parsedLimit = limit ? Math.min(100, Math.max(1, parseInt(limit, 10) || 20)) : 20;
+        const parsedLimit = limit
+            ? Math.min(100, Math.max(1, parseInt(limit, 10) || 20))
+            : 20;
         return this.notificationsService.findAllByUser(user.sub, parsedPage, parsedLimit);
     }
     async getUnreadCount(req) {

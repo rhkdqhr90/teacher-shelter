@@ -36,7 +36,9 @@ let InquiriesController = class InquiriesController {
     }
     async findAll(page, limit, status) {
         const parsedPage = page ? Math.max(1, parseInt(page, 10) || 1) : 1;
-        const parsedLimit = limit ? Math.min(100, Math.max(1, parseInt(limit, 10) || 20)) : 20;
+        const parsedLimit = limit
+            ? Math.min(100, Math.max(1, parseInt(limit, 10) || 20))
+            : 20;
         return this.inquiriesService.findAll(parsedPage, parsedLimit, status);
     }
     async findOne(id) {
@@ -52,7 +54,10 @@ let InquiriesController = class InquiriesController {
 exports.InquiriesController = InquiriesController;
 __decorate([
     (0, common_1.Post)(),
-    (0, swagger_1.ApiOperation)({ summary: '문의 접수', description: '고객 문의를 접수합니다. 비회원도 가능합니다.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: '문의 접수',
+        description: '고객 문의를 접수합니다. 비회원도 가능합니다.',
+    }),
     (0, swagger_1.ApiResponse)({ status: 201, description: '문의 접수 성공' }),
     (0, throttler_1.Throttle)({ strict: { ttl: 900000, limit: 5 } }),
     __param(0, (0, common_1.Body)()),

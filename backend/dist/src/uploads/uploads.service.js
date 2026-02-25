@@ -233,7 +233,12 @@ let UploadsService = class UploadsService {
         if (!userId || !/^[a-zA-Z0-9_-]+$/.test(userId)) {
             throw new common_1.BadRequestException('유효하지 않은 사용자 ID입니다');
         }
-        const validTypes = ['profile', 'post', 'verification', 'banner'];
+        const validTypes = [
+            'profile',
+            'post',
+            'verification',
+            'banner',
+        ];
         if (!validTypes.includes(type)) {
             throw new common_1.BadRequestException('유효하지 않은 업로드 타입입니다');
         }

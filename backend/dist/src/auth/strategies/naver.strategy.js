@@ -25,7 +25,7 @@ let NaverStrategy = class NaverStrategy extends NaverStrategyBase {
         });
         this.configService = configService;
     }
-    async validate(accessToken, refreshToken, profile, done) {
+    validate(accessToken, refreshToken, profile, done) {
         const { id, email, nickname, profileImage } = profile;
         const user = {
             provider: 'naver',

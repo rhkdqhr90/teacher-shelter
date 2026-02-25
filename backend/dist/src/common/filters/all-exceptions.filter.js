@@ -27,7 +27,10 @@ let AllExceptionsFilter = AllExceptionsFilter_1 = class AllExceptionsFilter {
             message = '서버 오류가 발생했습니다';
         }
         else {
-            message = exception instanceof Error ? exception.message : 'Internal server error';
+            message =
+                exception instanceof Error
+                    ? exception.message
+                    : 'Internal server error';
         }
         if (exception instanceof Error) {
             this.logger.error(`${request.method} ${request.url} | Status: ${status} | Error: ${exception.message}`, exception.stack);

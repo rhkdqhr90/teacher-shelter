@@ -33,7 +33,9 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MaxLength)(2000),
-    (0, class_validator_1.Matches)(/^(https?:\/\/|\/)/i, { message: 'imageUrl must be a valid URL or relative path' }),
+    (0, class_validator_1.Matches)(/^(https?:\/\/|\/)/i, {
+        message: 'imageUrl must be a valid URL or relative path',
+    }),
     __metadata("design:type", String)
 ], CreateBannerDto.prototype, "imageUrl", void 0);
 __decorate([

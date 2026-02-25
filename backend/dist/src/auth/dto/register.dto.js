@@ -58,7 +58,10 @@ __decorate([
     __metadata("design:type", String)
 ], RegisterDto.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Password1!', description: '비밀번호 (8자 이상, 영문+숫자+특수문자)' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Password1!',
+        description: '비밀번호 (8자 이상, 영문+숫자+특수문자)',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(8),
     (0, class_validator_1.MaxLength)(100),

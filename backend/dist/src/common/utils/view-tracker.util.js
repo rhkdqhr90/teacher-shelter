@@ -9,7 +9,9 @@ class ViewTracker {
     cleanupTimer = null;
     constructor() {
         this.cleanupTimer = setInterval(() => this.cleanup(), this.CLEANUP_INTERVAL_MS);
-        if (this.cleanupTimer && typeof this.cleanupTimer === 'object' && 'unref' in this.cleanupTimer) {
+        if (this.cleanupTimer &&
+            typeof this.cleanupTimer === 'object' &&
+            'unref' in this.cleanupTimer) {
             this.cleanupTimer.unref();
         }
     }

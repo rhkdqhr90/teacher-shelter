@@ -24,7 +24,7 @@ let KakaoStrategy = class KakaoStrategy extends (0, passport_1.PassportStrategy)
         });
         this.configService = configService;
     }
-    async validate(accessToken, refreshToken, profile, done) {
+    validate(accessToken, refreshToken, profile, done) {
         const { id, _json } = profile;
         const kakaoAccount = _json?.kakao_account;
         const properties = _json?.properties;

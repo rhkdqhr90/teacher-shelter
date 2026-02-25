@@ -30,7 +30,8 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
         this.prisma = prisma;
     }
     async validate(req, payload) {
-        if (!payload.sub || !Object.values(client_1.UserRole).includes(payload.role)) {
+        if (!payload.sub ||
+            !Object.values(client_1.UserRole).includes(payload.role)) {
             throw new common_1.UnauthorizedException('유효하지 않은 토큰입니다');
         }
         const tokenIssuedAt = new Date((payload.iat || 0) * 1000);
