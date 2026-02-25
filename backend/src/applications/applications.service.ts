@@ -200,13 +200,15 @@ export class ApplicationsService {
       },
     });
 
-    // 지원자에게 상태 변경 알림
-    await this.notificationsService.create({
-      userId: application.applicantId,
-      actorId: userId,
-      type: NotificationType.APPLICATION_STATUS,
-      postId: application.postId,
-    });
+    // 지원자에게 상태 변경 알림 (fire-and-forget: 알림 실패가 상태 변경에 영향 주지 않도록)
+    this.notificationsService
+      .create({
+        userId: application.applicantId,
+        actorId: userId,
+        type: NotificationType.APPLICATION_STATUS,
+        postId: application.postId,
+      })
+      .catch(() => {});
 
     return new ApplicationResponseDto(updated);
   }

@@ -226,11 +226,13 @@ export class VerificationsService {
         ? NotificationType.VERIFICATION_APPROVED
         : NotificationType.VERIFICATION_REJECTED;
 
-    await this.notificationsService.create({
-      type: notificationType,
-      userId: request.userId,
-      actorId: adminId,
-    });
+    this.notificationsService
+      .create({
+        type: notificationType,
+        userId: request.userId,
+        actorId: adminId,
+      })
+      .catch(() => {});
 
     return result;
   }

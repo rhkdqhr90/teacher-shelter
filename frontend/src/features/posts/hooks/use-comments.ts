@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/query-config';
 import { commentsApi } from '../services/comments-api';
 
 export function useComments(postId: string) {
@@ -19,7 +20,7 @@ export function useCreateComment(postId: string) {
       commentsApi.createComment(postId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', postId] });
-      queryClient.invalidateQueries({ queryKey: ['posts', postId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts.detail(postId) });
     },
   });
 }
@@ -43,7 +44,7 @@ export function useDeleteComment(postId: string) {
     mutationFn: (commentId: string) => commentsApi.deleteComment(commentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', postId] });
-      queryClient.invalidateQueries({ queryKey: ['posts', postId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts.detail(postId) });
     },
   });
 }

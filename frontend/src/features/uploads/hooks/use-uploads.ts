@@ -9,7 +9,7 @@ export function useUploadProfileImage() {
   return useMutation({
     mutationFn: (file: File) => uploadsApi.uploadProfileImage(file),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
     },
   });
 }
@@ -20,7 +20,7 @@ export function useDeleteProfileImage() {
   return useMutation({
     mutationFn: () => uploadsApi.deleteProfileImage(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
     },
   });
 }
