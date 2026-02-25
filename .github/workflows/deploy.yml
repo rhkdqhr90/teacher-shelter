@@ -122,7 +122,7 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           debug: true
           script: |
-            cd ~/teacher-shelter
+            cd /app
 
             # Git pull
             git pull origin main
