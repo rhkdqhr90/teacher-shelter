@@ -73,8 +73,9 @@ services:
       DOMAIN: ${DOMAIN:-api.teacherlounge.co.kr}
     volumes:
       - ./nginx/nginx.conf.template:/etc/nginx/nginx.conf.template:ro
-      - uploads_data:/app/uploads:ro
-      - certbot_data:/etc/letsencrypt:ro
+      - uploads_data:/app/uploads
+      - /app/backend/logs:/app/logs:ro
+      - certbot_data:/etc/letsencrypt
       - certbot_www:/var/www/certbot:ro
     depends_on:
       - backend
@@ -134,6 +135,7 @@ services:
       ALLOWED_REDIRECT_ORIGINS: ${ALLOWED_REDIRECT_ORIGINS:-https://teacherlounge.co.kr,https://www.teacherlounge.co.kr}
     volumes:
       - uploads_data:/app/uploads
+      - /app/backend/logs:/app/logs
     depends_on:
       postgres:
         condition: service_healthy

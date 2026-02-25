@@ -65,7 +65,7 @@ export function middleware(request: NextRequest) {
         "default-src 'self'",
         `script-src 'self' 'unsafe-inline' 'unsafe-eval'`, // Next.js 호환성을 위해 임시 완화
         "style-src 'self' 'unsafe-inline'",
-        `img-src 'self' data: blob: ${appUrl} ${apiOrigin} https://images.unsplash.com https://lh3.googleusercontent.com https://avatars.githubusercontent.com`,
+        `img-src 'self' data: blob: ${appUrl} ${apiOrigin} https://api.teacherlounge.co.kr https://images.unsplash.com https://lh3.googleusercontent.com https://avatars.githubusercontent.com`,
         "font-src 'self'",
         `connect-src 'self' ${apiOrigin}`,
         "frame-src 'none'",

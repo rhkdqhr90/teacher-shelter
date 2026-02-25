@@ -161,8 +161,12 @@ export function PostForm({ mode = 'create', postId, defaultCategory }: PostFormP
       title,
       content,
       category,
-      isAnonymous,
     };
+
+    // isAnonymous는 생성 시에만 설정 가능 (수정 시 변경 불가 - 책임 회피 방지)
+    if (mode === 'create') {
+      formData.isAnonymous = isAnonymous;
+    }
 
     // 구인공고일 경우 추가 필드
     if (category === PostCategory.JOB_POSTING) {
