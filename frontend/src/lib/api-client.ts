@@ -180,7 +180,7 @@ const createApiClient = (): AxiosInstance => {
         try {
           // Call refresh token endpoint (Cookie의 refreshToken 사용)
           const response = await axios.post<{ accessToken: string }>(
-            `${baseURL}/auth/refresh`,
+            `${API_URL}/auth/refresh`,
             {},
             { withCredentials: true }
           );
