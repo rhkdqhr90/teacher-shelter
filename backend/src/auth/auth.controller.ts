@@ -17,7 +17,12 @@ import { Throttle } from '@nestjs/throttler';
 import { AuthGuard } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -40,7 +45,10 @@ export class AuthController {
   ) {}
 
   @Post('register')
-  @ApiOperation({ summary: '회원가입', description: '이메일과 비밀번호로 새 계정을 생성합니다.' })
+  @ApiOperation({
+    summary: '회원가입',
+    description: '이메일과 비밀번호로 새 계정을 생성합니다.',
+  })
   @ApiResponse({ status: 201, description: '회원가입 성공, accessToken 반환' })
   @ApiResponse({ status: 400, description: '유효하지 않은 입력' })
   @ApiResponse({ status: 409, description: '이미 존재하는 이메일' })
@@ -60,7 +68,10 @@ export class AuthController {
   }
 
   @Post('login')
-  @ApiOperation({ summary: '로그인', description: '이메일과 비밀번호로 로그인합니다.' })
+  @ApiOperation({
+    summary: '로그인',
+    description: '이메일과 비밀번호로 로그인합니다.',
+  })
   @ApiResponse({ status: 200, description: '로그인 성공, accessToken 반환' })
   @ApiResponse({ status: 401, description: '잘못된 이메일 또는 비밀번호' })
   @HttpCode(HttpStatus.OK)
@@ -79,7 +90,10 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @ApiOperation({ summary: '토큰 갱신', description: 'refreshToken으로 새 accessToken을 발급받습니다.' })
+  @ApiOperation({
+    summary: '토큰 갱신',
+    description: 'refreshToken으로 새 accessToken을 발급받습니다.',
+  })
   @ApiResponse({ status: 200, description: '토큰 갱신 성공' })
   @ApiResponse({ status: 401, description: '유효하지 않은 refreshToken' })
   @HttpCode(HttpStatus.OK)
@@ -109,7 +123,11 @@ export class AuthController {
   }
 
   @Post('logout')
-  @ApiOperation({ summary: '로그아웃', description: 'refreshToken을 무효화하고 accessToken을 블랙리스트에 추가합니다.' })
+  @ApiOperation({
+    summary: '로그아웃',
+    description:
+      'refreshToken을 무효화하고 accessToken을 블랙리스트에 추가합니다.',
+  })
   @ApiResponse({ status: 204, description: '로그아웃 성공' })
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
@@ -137,21 +155,29 @@ export class AuthController {
   }
 
   @Post('forgot-password')
-  @ApiOperation({ summary: '비밀번호 찾기', description: '비밀번호 재설정 이메일을 발송합니다.' })
-  @ApiResponse({ status: 200, description: '이메일 발송 완료 (존재 여부 무관)' })
+  @ApiOperation({
+    summary: '비밀번호 찾기',
+    description: '비밀번호 재설정 이메일을 발송합니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '이메일 발송 완료 (존재 여부 무관)',
+  })
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { ttl: 60000, limit: 3 } }) // 1분에 3번 (스팸 방지)
   async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     await this.authService.forgotPassword(forgotPasswordDto.email);
     // 보안: 이메일 존재 여부와 관계없이 동일한 응답
     return {
-      message:
-        '이메일이 등록되어 있다면 비밀번호 재설정 링크가 발송됩니다.',
+      message: '이메일이 등록되어 있다면 비밀번호 재설정 링크가 발송됩니다.',
     };
   }
 
   @Post('reset-password')
-  @ApiOperation({ summary: '비밀번호 재설정', description: '토큰으로 비밀번호를 재설정합니다.' })
+  @ApiOperation({
+    summary: '비밀번호 재설정',
+    description: '토큰으로 비밀번호를 재설정합니다.',
+  })
   @ApiResponse({ status: 200, description: '비밀번호 변경 성공' })
   @ApiResponse({ status: 400, description: '유효하지 않거나 만료된 토큰' })
   @HttpCode(HttpStatus.OK)
@@ -165,20 +191,29 @@ export class AuthController {
   }
 
   @Post('verify-email')
-  @ApiOperation({ summary: '이메일 인증', description: '인증 코드로 이메일을 인증합니다.' })
+  @ApiOperation({
+    summary: '이메일 인증',
+    description: '인증 코드로 이메일을 인증합니다.',
+  })
   @ApiResponse({ status: 200, description: '이메일 인증 성공' })
   @ApiResponse({ status: 400, description: '유효하지 않거나 만료된 코드' })
   @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
   @Throttle({ strict: { ttl: 900000, limit: 10 } }) // 15분에 10번 (브루트포스 방지)
-  async verifyEmail(@Req() req: Request, @Body() verifyEmailDto: VerifyEmailDto) {
+  async verifyEmail(
+    @Req() req: Request,
+    @Body() verifyEmailDto: VerifyEmailDto,
+  ) {
     const user = req.user as { sub: string };
     return await this.authService.verifyEmail(user.sub, verifyEmailDto.code);
   }
 
   @Post('resend-verification')
-  @ApiOperation({ summary: '인증 이메일 재발송', description: '이메일 인증 메일을 재발송합니다.' })
+  @ApiOperation({
+    summary: '인증 이메일 재발송',
+    description: '이메일 인증 메일을 재발송합니다.',
+  })
   @ApiResponse({ status: 200, description: '이메일 재발송 성공' })
   @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.OK)
@@ -202,10 +237,7 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleCallback(
-    @Req() req: Request,
-    @Res() res: Response,
-  ) {
+  async googleCallback(@Req() req: Request, @Res() res: Response) {
     return this.handleOAuthCallback(req, res);
   }
 
@@ -221,10 +253,7 @@ export class AuthController {
 
   @Get('kakao/callback')
   @UseGuards(AuthGuard('kakao'))
-  async kakaoCallback(
-    @Req() req: Request,
-    @Res() res: Response,
-  ) {
+  async kakaoCallback(@Req() req: Request, @Res() res: Response) {
     return this.handleOAuthCallback(req, res);
   }
 
@@ -240,10 +269,7 @@ export class AuthController {
 
   @Get('naver/callback')
   @UseGuards(AuthGuard('naver'))
-  async naverCallback(
-    @Req() req: Request,
-    @Res() res: Response,
-  ) {
+  async naverCallback(@Req() req: Request, @Res() res: Response) {
     return this.handleOAuthCallback(req, res);
   }
 
@@ -295,7 +321,10 @@ export class AuthController {
 
       // 화이트리스트 검증
       if (!allowedOrigins.includes(origin)) {
-        this.logger.warn(`Blocked redirect to untrusted origin: ${origin}`, 'AuthController');
+        this.logger.warn(
+          `Blocked redirect to untrusted origin: ${origin}`,
+          'AuthController',
+        );
         // 기본 프론트엔드 URL로 폴백
         return frontendUrl || 'http://localhost:3001';
       }
@@ -303,18 +332,23 @@ export class AuthController {
       return url;
     } catch {
       // URL 파싱 실패 시 기본값
-      return this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3001';
+      return (
+        this.configService.get<string>('FRONTEND_URL') ||
+        'http://localhost:3001'
+      );
     }
   }
 
   private async handleOAuthCallback(req: Request, res: Response) {
-    const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3001';
+    const frontendUrl =
+      this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3001';
     // 보안: 리다이렉트 URL 검증
     const safeRedirectBase = this.validateRedirectUrl(frontendUrl);
 
     try {
       const oauthUser = req.user as OAuthUserDto;
-      const { accessToken, refreshToken } = await this.authService.oauthLogin(oauthUser);
+      const { accessToken, refreshToken } =
+        await this.authService.oauthLogin(oauthUser);
 
       // refreshToken을 httpOnly Cookie에 저장
       this.setRefreshTokenCookie(res, refreshToken);
@@ -331,8 +365,11 @@ export class AuthController {
         'AuthController',
       );
       // 보안: 사용자에게는 일반적인 에러 코드만 전달 (내부 메시지 노출 방지)
-      const errorCode = error instanceof ConflictException ? 'account_exists' : 'login_failed';
-      return res.redirect(`${safeRedirectBase}/login/callback?error=${errorCode}`);
+      const errorCode =
+        error instanceof ConflictException ? 'account_exists' : 'login_failed';
+      return res.redirect(
+        `${safeRedirectBase}/login/callback?error=${errorCode}`,
+      );
     }
   }
 
@@ -343,6 +380,10 @@ export class AuthController {
       sameSite: 'lax', // 'lax' allows cookies on top-level navigations (OAuth redirects)
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      domain:
+        process.env.NODE_ENV === 'production'
+          ? '.teacherlounge.co.kr'
+          : undefined, // 서브도메인 간 쿠키 공유
     });
   }
 }
