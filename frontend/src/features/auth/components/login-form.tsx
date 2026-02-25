@@ -99,8 +99,8 @@ export function LoginForm() {
           </Button>
         </form>
 
-        {/* 소셜 로그인 버튼 */}
-        <SocialLoginButtons disabled={isPending} />
+        {/* 소셜 로그인 버튼 - 임시 비활성화 */}
+        {/* <SocialLoginButtons disabled={isPending} /> */}
 
         <p className="text-center text-sm text-muted-foreground">
           {t('noAccount')}{' '}
