@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import type { LoggerService } from '@nestjs/common';
 import type { Response, Request } from 'express';
-import { Throttle } from '@nestjs/throttler';
+import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import { AuthGuard } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
@@ -98,7 +98,7 @@ export class AuthController {
   @ApiResponse({ status: 401, description: '유효하지 않은 refreshToken' })
   @HttpCode(HttpStatus.OK)
   @UseGuards(RefreshAuthGuard)
-  @Throttle({ default: { ttl: 60000, limit: 60 } }) // 1분에 60번 (다중 탭, 빠른 새로고침 고려)
+  @SkipThrottle() // 페이지 이동마다 호출되므로 쓰로틀 제외
   async refresh(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,

@@ -225,7 +225,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 401, description: '유효하지 않은 refreshToken' }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, common_1.UseGuards)(refresh_auth_guard_1.RefreshAuthGuard),
-    (0, throttler_1.Throttle)({ default: { ttl: 60000, limit: 10 } }),
+    (0, throttler_1.SkipThrottle)(),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Res)({ passthrough: true })),
     __metadata("design:type", Function),

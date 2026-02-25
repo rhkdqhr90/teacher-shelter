@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NotificationsController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
+const throttler_1 = require("@nestjs/throttler");
 const notifications_service_1 = require("./notifications.service");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 let NotificationsController = class NotificationsController {
@@ -62,6 +63,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], NotificationsController.prototype, "findAll", null);
 __decorate([
+    (0, throttler_1.Throttle)({ default: { limit: 120, ttl: 60000 } }),
     (0, common_1.Get)('unread-count'),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
