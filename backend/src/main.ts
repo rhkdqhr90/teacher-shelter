@@ -1,4 +1,4 @@
-// Deploy trigger v2
+// Deploy trigger v3
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
