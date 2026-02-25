@@ -142,8 +142,8 @@ jobs:
             # Cleanup old images
             docker image prune -f
 
-            # Health check
-            sleep 10
+            # Health check (wait for backend to start)
+            sleep 30
             curl -f http://localhost:3000/health || exit 1
 
             echo "Backend deployment completed successfully!"
