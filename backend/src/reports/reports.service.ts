@@ -63,7 +63,7 @@ export class ReportsService {
    */
   private async validateReportTarget(dto: CreateReportDto, reporterId: string) {
     switch (dto.type) {
-      case ReportType.USER:
+      case ReportType.USER: {
         if (!dto.targetUserId) {
           throw new BadRequestException('신고할 사용자를 선택해주세요');
         }
@@ -74,8 +74,9 @@ export class ReportsService {
           throw new NotFoundException('신고할 사용자를 찾을 수 없습니다');
         }
         break;
+      }
 
-      case ReportType.POST:
+      case ReportType.POST: {
         if (!dto.targetPostId) {
           throw new BadRequestException('신고할 게시글을 선택해주세요');
         }
@@ -90,8 +91,9 @@ export class ReportsService {
           throw new BadRequestException('자신의 게시글은 신고할 수 없습니다');
         }
         break;
+      }
 
-      case ReportType.COMMENT:
+      case ReportType.COMMENT: {
         if (!dto.targetCommentId) {
           throw new BadRequestException('신고할 댓글을 선택해주세요');
         }
@@ -106,6 +108,7 @@ export class ReportsService {
           throw new BadRequestException('자신의 댓글은 신고할 수 없습니다');
         }
         break;
+      }
     }
   }
 
@@ -409,7 +412,7 @@ export class ReportsService {
     await this.prisma.$transaction(async (tx) => {
       // 1. 사용자 정지 처리
       await tx.user.update({
-        where: { id: targetUserId! },
+        where: { id: targetUserId },
         data: {
           isBanned: true,
           bannedAt: now,
@@ -420,13 +423,13 @@ export class ReportsService {
 
       // 2. 모든 리프레시 토큰 삭제 (강제 로그아웃)
       await tx.refreshToken.deleteMany({
-        where: { userId: targetUserId! },
+        where: { userId: targetUserId },
       });
 
       // 3. Access Token 블랙리스트에 추가 (기존 토큰 즉시 무효화)
       await tx.tokenBlacklist.create({
         data: {
-          userId: targetUserId!,
+          userId: targetUserId,
           expiresAt: accessTokenExpiry,
           reason: 'user_ban',
         },

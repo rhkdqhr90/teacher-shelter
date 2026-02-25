@@ -37,7 +37,7 @@ export class AnnouncementsController {
   @ApiResponse({ status: 201, description: '공지사항 작성 성공' })
   create(
     @Body() createAnnouncementDto: CreateAnnouncementDto,
-    @Request() req: any,
+    @Request() req: { user: { sub: string } },
   ) {
     return this.announcementsService.create(
       createAnnouncementDto,

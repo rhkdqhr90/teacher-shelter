@@ -345,7 +345,9 @@ export class AuthController {
       return url;
     } catch {
       // URL 파싱 실패 시 기본값
-      return this.configService.get<string>('frontendUrl') || 'http://localhost:3001';
+      return (
+        this.configService.get<string>('frontendUrl') || 'http://localhost:3001'
+      );
     }
   }
 

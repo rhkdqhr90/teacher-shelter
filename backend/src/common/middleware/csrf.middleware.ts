@@ -43,7 +43,9 @@ export class CsrfMiddleware implements NestMiddleware {
     const referer = req.headers.referer;
 
     // Origin 헤더가 있으면 Origin으로 검증 (배열인 경우 첫 번째 값 사용)
-    const origin = Array.isArray(originHeader) ? originHeader[0] : originHeader;
+    const origin: string | undefined = Array.isArray(originHeader)
+      ? originHeader[0]
+      : originHeader;
     if (origin) {
       if (this.isAllowedOrigin(origin)) {
         return next();

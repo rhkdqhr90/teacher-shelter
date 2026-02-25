@@ -25,10 +25,9 @@ export default () => {
       db: parseInt(process.env.REDIS_DB || '0', 10),
     },
     cors: {
-      origins:
-        process.env.ALLOWED_ORIGINS?.split(',')
-          .map((o) => o.trim())
-          .filter(Boolean) || ['http://localhost:3000'],
+      origins: process.env.ALLOWED_ORIGINS?.split(',')
+        .map((o) => o.trim())
+        .filter(Boolean) || ['http://localhost:3000'],
     },
     throttle: {
       ttl: parseInt(process.env.THROTTLE_TTL || '60', 10),
@@ -50,9 +49,8 @@ export default () => {
     frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3001',
 
     // 허용된 리다이렉트 Origin (Open Redirect 방지)
-    allowedRedirectOrigins:
-      process.env.ALLOWED_REDIRECT_ORIGINS?.split(',')
-        .map((o) => o.trim())
-        .filter(Boolean) || ['http://localhost:3001', 'http://127.0.0.1:3001'],
+    allowedRedirectOrigins: process.env.ALLOWED_REDIRECT_ORIGINS?.split(',')
+      .map((o) => o.trim())
+      .filter(Boolean) || ['http://localhost:3001', 'http://127.0.0.1:3001'],
   };
 };

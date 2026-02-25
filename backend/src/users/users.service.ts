@@ -109,8 +109,9 @@ export class UsersService {
       // OAuth 사용자는 비밀번호 없이 이메일 변경 가능 (이미 OAuth 인증됨)
     }
 
-    // currentPassword는 DB에 저장하지 않음
-    const { currentPassword: _, ...updateData } = updateUserDto;
+    // currentPassword는 DB에 저장하지 않음 (eslint-disable-next-line 불필요)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { currentPassword: _unusedPassword, ...updateData } = updateUserDto;
 
     // 업데이트
     const updatedUser = await this.prisma.user.update({

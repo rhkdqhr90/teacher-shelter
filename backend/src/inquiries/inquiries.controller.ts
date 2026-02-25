@@ -16,6 +16,7 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
+import { InquiryStatus } from '@prisma/client';
 import { InquiriesService } from './inquiries.service';
 import { CreateInquiryDto } from './dto/create-inquiry.dto';
 import { RespondInquiryDto } from './dto/respond-inquiry.dto';
@@ -38,7 +39,7 @@ export class InquiriesController {
   @Throttle({ strict: { ttl: 900000, limit: 5 } }) // 15분에 5번 (스팸 방지)
   async create(
     @Body() createInquiryDto: CreateInquiryDto,
-    @Request() req: any,
+    @Request() req: { user?: { sub: string } },
   ) {
     // JWT 토큰이 있으면 userId 추출 (선택)
     if (req.user?.sub) {
@@ -65,7 +66,7 @@ export class InquiriesController {
     return this.inquiriesService.findAll(
       parsedPage,
       parsedLimit,
-      status as any,
+      status as InquiryStatus | undefined,
     );
   }
 
@@ -88,7 +89,7 @@ export class InquiriesController {
   async respond(
     @Param('id') id: string,
     @Body() dto: RespondInquiryDto,
-    @Request() req: any,
+    @Request() req: { user: { sub: string } },
   ) {
     return this.inquiriesService.respond(id, dto.response, req.user.sub);
   }
