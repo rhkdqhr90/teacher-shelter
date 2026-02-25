@@ -19,9 +19,16 @@ class ViewTracker {
 
   constructor() {
     // 주기적으로 만료된 레코드 정리
-    this.cleanupTimer = setInterval(() => this.cleanup(), this.CLEANUP_INTERVAL_MS);
+    this.cleanupTimer = setInterval(
+      () => this.cleanup(),
+      this.CLEANUP_INTERVAL_MS,
+    );
     // unref: 이 타이머만 남았을 때 프로세스 종료 허용 (graceful shutdown 지원)
-    if (this.cleanupTimer && typeof this.cleanupTimer === 'object' && 'unref' in this.cleanupTimer) {
+    if (
+      this.cleanupTimer &&
+      typeof this.cleanupTimer === 'object' &&
+      'unref' in this.cleanupTimer
+    ) {
       this.cleanupTimer.unref();
     }
   }

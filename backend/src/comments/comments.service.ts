@@ -49,7 +49,9 @@ export class CommentsService {
       post.category === PostCategory.JOB_POSTING ||
       post.category === PostCategory.LEGAL_QNA
     ) {
-      throw new BadRequestException('이 게시판에서는 댓글을 작성할 수 없습니다');
+      throw new BadRequestException(
+        '이 게시판에서는 댓글을 작성할 수 없습니다',
+      );
     }
 
     // 스팸 방지: 사용자당 분당 댓글 수 확인 (트랜잭션 밖에서 사전 체크 - 정확한 체크는 아래 트랜잭션에서)
@@ -107,7 +109,10 @@ export class CommentsService {
         where: { id: postId },
         select: { commentCount: true },
       });
-      if (currentPost && currentPost.commentCount >= this.MAX_COMMENTS_PER_POST) {
+      if (
+        currentPost &&
+        currentPost.commentCount >= this.MAX_COMMENTS_PER_POST
+      ) {
         throw new BadRequestException(
           `이 게시글에는 더 이상 댓글을 작성할 수 없습니다 (최대 ${this.MAX_COMMENTS_PER_POST}개)`,
         );
@@ -149,8 +154,18 @@ export class CommentsService {
     });
 
     // 알림 생성 (비동기, 실패해도 댓글 작성은 성공)
-    this.createNotifications(post, comment, parentCommentId, mentionedUserId, userId).catch((err) => {
-      this.logger.error('Failed to create notification', err, 'CommentsService');
+    this.createNotifications(
+      post,
+      comment,
+      parentCommentId,
+      mentionedUserId,
+      userId,
+    ).catch((err) => {
+      this.logger.error(
+        'Failed to create notification',
+        err,
+        'CommentsService',
+      );
     });
 
     return new CommentResponseDto(comment);

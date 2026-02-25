@@ -1,4 +1,9 @@
-import { Injectable, NestMiddleware, ForbiddenException, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  NestMiddleware,
+  ForbiddenException,
+  Inject,
+} from '@nestjs/common';
 import type { LoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
@@ -21,7 +26,9 @@ export class CsrfMiddleware implements NestMiddleware {
   ) {
     // CORS origins 설정에서 허용된 origin 가져오기
     const corsOrigins = this.configService.get('cors.origins') || [];
-    this.allowedOrigins = Array.isArray(corsOrigins) ? corsOrigins : [corsOrigins];
+    this.allowedOrigins = Array.isArray(corsOrigins)
+      ? corsOrigins
+      : [corsOrigins];
   }
 
   use(req: Request, _res: Response, next: NextFunction) {
@@ -80,7 +87,10 @@ export class CsrfMiddleware implements NestMiddleware {
       // 보안: 프로덕션에서 '*' 와일드카드 사용 금지
       if (allowed === '*') {
         if (process.env.NODE_ENV === 'production') {
-          this.logger.warn('Wildcard origin "*" is not allowed in production', 'CsrfMiddleware');
+          this.logger.warn(
+            'Wildcard origin "*" is not allowed in production',
+            'CsrfMiddleware',
+          );
           return false;
         }
         return true;
@@ -91,7 +101,9 @@ export class CsrfMiddleware implements NestMiddleware {
         const domain = allowed.slice(2);
         try {
           const originHostname = new URL(origin).hostname;
-          return originHostname.endsWith('.' + domain) || originHostname === domain;
+          return (
+            originHostname.endsWith('.' + domain) || originHostname === domain
+          );
         } catch {
           return false;
         }

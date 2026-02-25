@@ -15,7 +15,11 @@ export class AnswersService {
   // ========================================
   // 1. 답변 작성 (전문가만)
   // ========================================
-  async create(postId: string, userId: string, createAnswerDto: CreateAnswerDto) {
+  async create(
+    postId: string,
+    userId: string,
+    createAnswerDto: CreateAnswerDto,
+  ) {
     // 게시글 확인
     const post = await this.prisma.post.findUnique({
       where: { id: postId },
@@ -93,7 +97,11 @@ export class AnswersService {
   // ========================================
   // 3. 답변 수정 (작성자만)
   // ========================================
-  async update(answerId: string, userId: string, updateAnswerDto: UpdateAnswerDto) {
+  async update(
+    answerId: string,
+    userId: string,
+    updateAnswerDto: UpdateAnswerDto,
+  ) {
     const answer = await this.prisma.answer.findUnique({
       where: { id: answerId },
       select: { authorId: true },
@@ -166,7 +174,9 @@ export class AnswersService {
     // 질문 작성자 확인
     const postAuthorId = answer.post.authorId || answer.post.anonymousAuthorId;
     if (postAuthorId !== userId) {
-      throw new ForbiddenException('질문 작성자만 베스트 답변을 선택할 수 있습니다');
+      throw new ForbiddenException(
+        '질문 작성자만 베스트 답변을 선택할 수 있습니다',
+      );
     }
 
     // 트랜잭션으로 기존 베스트 해제 + 새 베스트 선택

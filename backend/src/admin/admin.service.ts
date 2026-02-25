@@ -1,12 +1,26 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { ReportsService } from '../reports/reports.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { UploadsService } from '../uploads/uploads.service';
 import { UpdateReportDto } from '../reports/dto/update-report.dto';
 import { ProcessVerificationDto } from '../verifications/dto/process-verification.dto';
-import { ReportStatus, ReportType, UserRole, VerificationStatus, NotificationType, PostCategory } from '@prisma/client';
-import { safeDecrementCommentCount, safeDecrementLikeCount } from '../common/utils/counter.util';
+import {
+  ReportStatus,
+  ReportType,
+  UserRole,
+  VerificationStatus,
+  NotificationType,
+  PostCategory,
+} from '@prisma/client';
+import {
+  safeDecrementCommentCount,
+  safeDecrementLikeCount,
+} from '../common/utils/counter.util';
 
 @Injectable()
 export class AdminService {
@@ -93,12 +107,7 @@ export class AdminService {
   /**
    * 사용자 목록 조회
    */
-  async getUsers(
-    page = 1,
-    limit = 20,
-    search?: string,
-    role?: UserRole,
-  ) {
+  async getUsers(page = 1, limit = 20, search?: string, role?: UserRole) {
     const skip = (page - 1) * limit;
     const where = {
       ...(search && {
@@ -300,7 +309,12 @@ export class AdminService {
   /**
    * 게시글 목록 조회 (관리자)
    */
-  async getPosts(page = 1, limit = 20, search?: string, category?: PostCategory) {
+  async getPosts(
+    page = 1,
+    limit = 20,
+    search?: string,
+    category?: PostCategory,
+  ) {
     const skip = (page - 1) * limit;
     const where: any = {};
 
@@ -403,11 +417,7 @@ export class AdminService {
   /**
    * 인증 요청 목록 조회
    */
-  async getVerifications(
-    page = 1,
-    limit = 20,
-    status?: VerificationStatus,
-  ) {
+  async getVerifications(page = 1, limit = 20, status?: VerificationStatus) {
     const skip = (page - 1) * limit;
     const where = status ? { status } : {};
 

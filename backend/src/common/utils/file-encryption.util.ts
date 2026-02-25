@@ -69,7 +69,10 @@ export function decryptBuffer(encryptedBuffer: Buffer): Buffer {
 
   if (version === FILE_FORMAT_VERSION) {
     // V2: 랜덤 salt 사용
-    const salt = encryptedBuffer.subarray(VERSION_LENGTH, VERSION_LENGTH + SALT_LENGTH);
+    const salt = encryptedBuffer.subarray(
+      VERSION_LENGTH,
+      VERSION_LENGTH + SALT_LENGTH,
+    );
     const key = deriveKey(salt);
 
     const ivStart = VERSION_LENGTH + SALT_LENGTH;
@@ -78,7 +81,9 @@ export function decryptBuffer(encryptedBuffer: Buffer): Buffer {
       ivStart + IV_LENGTH,
       ivStart + IV_LENGTH + AUTH_TAG_LENGTH,
     );
-    const encrypted = encryptedBuffer.subarray(ivStart + IV_LENGTH + AUTH_TAG_LENGTH);
+    const encrypted = encryptedBuffer.subarray(
+      ivStart + IV_LENGTH + AUTH_TAG_LENGTH,
+    );
 
     const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
     decipher.setAuthTag(authTag);
@@ -91,7 +96,10 @@ export function decryptBuffer(encryptedBuffer: Buffer): Buffer {
     const key = crypto.scryptSync(masterKey, legacySalt, KEY_LENGTH);
 
     const iv = encryptedBuffer.subarray(0, IV_LENGTH);
-    const authTag = encryptedBuffer.subarray(IV_LENGTH, IV_LENGTH + AUTH_TAG_LENGTH);
+    const authTag = encryptedBuffer.subarray(
+      IV_LENGTH,
+      IV_LENGTH + AUTH_TAG_LENGTH,
+    );
     const encrypted = encryptedBuffer.subarray(IV_LENGTH + AUTH_TAG_LENGTH);
 
     const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);

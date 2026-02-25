@@ -1,4 +1,15 @@
-import { IsString, IsOptional, IsBoolean, IsInt, IsEnum, IsDateString, MaxLength, MinLength, IsUrl, Matches } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsBoolean,
+  IsInt,
+  IsEnum,
+  IsDateString,
+  MaxLength,
+  MinLength,
+  IsUrl,
+  Matches,
+} from 'class-validator';
 import { BannerType } from '@prisma/client';
 
 export class CreateBannerDto {
@@ -9,7 +20,9 @@ export class CreateBannerDto {
 
   @IsString()
   @MaxLength(2000)
-  @Matches(/^(https?:\/\/|\/)/i, { message: 'imageUrl must be a valid URL or relative path' })
+  @Matches(/^(https?:\/\/|\/)/i, {
+    message: 'imageUrl must be a valid URL or relative path',
+  })
   imageUrl: string;
 
   @IsOptional()

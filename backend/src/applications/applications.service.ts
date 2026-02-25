@@ -12,7 +12,11 @@ import {
   UpdateApplicationStatusDto,
   ApplicationResponseDto,
 } from './dto';
-import { ApplicationStatus, PostCategory, NotificationType } from '@prisma/client';
+import {
+  ApplicationStatus,
+  PostCategory,
+  NotificationType,
+} from '@prisma/client';
 
 @Injectable()
 export class ApplicationsService {
@@ -45,7 +49,9 @@ export class ApplicationsService {
 
     // 자기 공고에 지원 불가
     if (post.authorId === userId) {
-      throw new BadRequestException('본인이 작성한 공고에는 지원할 수 없습니다.');
+      throw new BadRequestException(
+        '본인이 작성한 공고에는 지원할 수 없습니다.',
+      );
     }
 
     // 중복 지원 확인
@@ -79,14 +85,16 @@ export class ApplicationsService {
 
     // 채용 담당자에게 알림
     if (post.authorId) {
-      this.notificationsService.create({
-        userId: post.authorId,
-        actorId: userId,
-        type: NotificationType.NEW_APPLICATION,
-        postId: post.id,
-      }).catch(() => {
-        // 알림 생성 실패는 지원 프로세스에 영향을 주지 않도록 무시
-      });
+      this.notificationsService
+        .create({
+          userId: post.authorId,
+          actorId: userId,
+          type: NotificationType.NEW_APPLICATION,
+          postId: post.id,
+        })
+        .catch(() => {
+          // 알림 생성 실패는 지원 프로세스에 영향을 주지 않도록 무시
+        });
     }
 
     return new ApplicationResponseDto(application);

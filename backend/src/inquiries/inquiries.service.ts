@@ -32,7 +32,11 @@ export class InquiriesService {
       await this.mailService.sendInquiryNotification(inquiry);
     } catch (error) {
       // 알림 실패해도 문의는 정상 저장됨
-      this.logger.error('Failed to send inquiry notification email', error, 'InquiriesService');
+      this.logger.error(
+        'Failed to send inquiry notification email',
+        error,
+        'InquiriesService',
+      );
     }
 
     this.logger.log(`New inquiry created: ${inquiry.id}`, 'InquiriesService');
@@ -89,7 +93,11 @@ export class InquiriesService {
     try {
       await this.mailService.sendInquiryResponse(inquiry);
     } catch (error) {
-      this.logger.error('Failed to send inquiry response email', error, 'InquiriesService');
+      this.logger.error(
+        'Failed to send inquiry response email',
+        error,
+        'InquiriesService',
+      );
     }
 
     return inquiry;

@@ -29,7 +29,10 @@ export class SanitizePipe implements PipeTransform {
     for (const key in sanitized) {
       if (typeof sanitized[key] === 'string') {
         sanitized[key] = this.sanitizeString(sanitized[key]);
-      } else if (typeof sanitized[key] === 'object' && sanitized[key] !== null) {
+      } else if (
+        typeof sanitized[key] === 'object' &&
+        sanitized[key] !== null
+      ) {
         sanitized[key] = this.sanitizeObject(sanitized[key]);
       }
     }

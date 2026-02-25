@@ -21,7 +21,10 @@ export class JobAutoCloseService {
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async handleCron() {
     if (this.isRunning) {
-      this.logger.warn('Job auto-close already running, skipping...', 'JobAutoCloseService');
+      this.logger.warn(
+        'Job auto-close already running, skipping...',
+        'JobAutoCloseService',
+      );
       return;
     }
     this.isRunning = true;

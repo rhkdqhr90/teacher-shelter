@@ -32,7 +32,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message = '서버 오류가 발생했습니다';
     } else {
       // 개발: 상세 메시지 반환
-      message = exception instanceof Error ? exception.message : 'Internal server error';
+      message =
+        exception instanceof Error
+          ? exception.message
+          : 'Internal server error';
     }
 
     // 에러 로깅 (개발/프로덕션 모두)

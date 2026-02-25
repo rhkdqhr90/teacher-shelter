@@ -82,8 +82,9 @@ export default function VerificationPage() {
       setNote('');
       setSelectedFile(null);
     },
-    onError: (error: any) => {
-      toast.error('인증 요청 실패', error?.response?.data?.message || '인증 요청에 실패했습니다.');
+    onError: (error: unknown) => {
+      const errorMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      toast.error('인증 요청 실패', errorMessage || '인증 요청에 실패했습니다.');
     },
   });
 

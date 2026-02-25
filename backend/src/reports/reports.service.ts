@@ -166,7 +166,9 @@ export class ReportsService {
           reporter: { select: { id: true, nickname: true, email: true } },
           targetUser: { select: { id: true, nickname: true, email: true } },
           targetPost: { select: { id: true, title: true, authorId: true } },
-          targetComment: { select: { id: true, content: true, authorId: true, postId: true } },
+          targetComment: {
+            select: { id: true, content: true, authorId: true, postId: true },
+          },
           processedBy: { select: { id: true, nickname: true } },
         },
       }),
@@ -272,7 +274,9 @@ export class ReportsService {
   private validateActionForReportType(type: ReportType, action: ReportAction) {
     // 게시글 삭제는 POST 타입에서만
     if (action === ReportAction.POST_DELETE && type !== ReportType.POST) {
-      throw new BadRequestException('게시글 삭제는 게시글 신고에서만 가능합니다');
+      throw new BadRequestException(
+        '게시글 삭제는 게시글 신고에서만 가능합니다',
+      );
     }
 
     // 댓글 삭제는 COMMENT 타입에서만
@@ -329,7 +333,11 @@ export class ReportsService {
                 where: { id: report.targetComment!.id },
               });
               // 안전 차감 (음수 방지)
-              await safeDecrementCommentCount(tx, commentToDelete.postId, 1 + replyCount);
+              await safeDecrementCommentCount(
+                tx,
+                commentToDelete.postId,
+                1 + replyCount,
+              );
             });
           }
         }

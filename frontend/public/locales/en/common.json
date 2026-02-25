@@ -45,6 +45,7 @@
     "registerSuccess": "Account created successfully! Please sign in.",
     "registerError": "Registration failed",
     "credentialsError": "Invalid email or password.",
+    "invalidCredentials": "Invalid email or password.",
     "authError": "Authentication Error",
     "authErrorDesc": "An error occurred during authentication.",
     "configurationError": "There is a problem with the server configuration.",

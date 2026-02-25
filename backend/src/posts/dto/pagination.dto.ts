@@ -10,7 +10,12 @@ import {
   IsArray,
   MaxLength,
 } from 'class-validator';
-import { PostCategory, JobSubCategory, Region, TherapyTag } from '@prisma/client';
+import {
+  PostCategory,
+  JobSubCategory,
+  Region,
+  TherapyTag,
+} from '@prisma/client';
 
 export class PaginationDto {
   @Type(() => Number)
@@ -62,7 +67,9 @@ export class PaginationDto {
   @Transform(({ value }) => {
     if (!value) return undefined;
     if (Array.isArray(value)) return value;
-    return typeof value === 'string' ? value.split(',').filter(Boolean) : undefined;
+    return typeof value === 'string'
+      ? value.split(',').filter(Boolean)
+      : undefined;
   })
   @IsArray()
   @IsEnum(TherapyTag, { each: true })

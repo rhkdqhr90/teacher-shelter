@@ -130,7 +130,10 @@ async function bootstrap() {
   logger.log(`🚀 Server running on http://localhost:${port}/api`, 'Bootstrap');
   logger.log(`📝 Environment: ${process.env.NODE_ENV}`, 'Bootstrap');
   if (process.env.NODE_ENV !== 'production') {
-    logger.log(`📚 Swagger docs: http://localhost:${port}/api/docs`, 'Bootstrap');
+    logger.log(
+      `📚 Swagger docs: http://localhost:${port}/api/docs`,
+      'Bootstrap',
+    );
   }
 }
 

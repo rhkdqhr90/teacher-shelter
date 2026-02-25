@@ -27,8 +27,9 @@ export function MyApplications() {
     try {
       await cancelApplication.mutateAsync(cancelId);
       toast.success('지원이 취소되었습니다');
-    } catch (error: any) {
-      toast.error('취소 실패', error?.response?.data?.message || '지원 취소에 실패했습니다.');
+    } catch (error: unknown) {
+      const errorMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      toast.error('취소 실패', errorMessage || '지원 취소에 실패했습니다.');
     }
     setCancelId(null);
   };

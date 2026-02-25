@@ -17,12 +17,12 @@ export class NaverStrategy extends NaverStrategyBase {
     });
   }
 
-  async validate(
+  validate(
     accessToken: string,
     refreshToken: string,
     profile: Profile,
     done: (error: any, user?: any) => void,
-  ): Promise<void> {
+  ): void {
     const { id, email, nickname, profileImage } = profile;
 
     const user: OAuthUserDto = {

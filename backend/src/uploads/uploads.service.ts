@@ -278,7 +278,12 @@ export class UploadsService {
     }
 
     // type 검증
-    const validTypes: UploadType[] = ['profile', 'post', 'verification', 'banner'];
+    const validTypes: UploadType[] = [
+      'profile',
+      'post',
+      'verification',
+      'banner',
+    ];
     if (!validTypes.includes(type)) {
       throw new BadRequestException('유효하지 않은 업로드 타입입니다');
     }

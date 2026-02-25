@@ -92,7 +92,11 @@ export class UploadsController {
     }
 
     const user = req.user as { sub: string };
-    const imageUrl = await this.uploadsService.saveFile(file, 'banner', user.sub);
+    const imageUrl = await this.uploadsService.saveFile(
+      file,
+      'banner',
+      user.sub,
+    );
     return { imageUrl };
   }
 }

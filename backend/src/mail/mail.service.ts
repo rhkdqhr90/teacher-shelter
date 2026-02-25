@@ -32,8 +32,10 @@ export class MailService {
     private readonly logger: LoggerService,
   ) {
     this.fromEmail =
-      this.configService.get<string>('MAIL_FROM') || 'noreply@teacherlounge.co.kr';
-    this.fromName = this.configService.get<string>('MAIL_FROM_NAME') || '교사쉼터';
+      this.configService.get<string>('MAIL_FROM') ||
+      'noreply@teacherlounge.co.kr';
+    this.fromName =
+      this.configService.get<string>('MAIL_FROM_NAME') || '교사쉼터';
     this.frontendUrl =
       this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3001';
 
@@ -66,7 +68,10 @@ export class MailService {
       });
 
       if (process.env.NODE_ENV === 'development') {
-        this.logger.log('Using development mode - emails will be logged', 'MailService');
+        this.logger.log(
+          'Using development mode - emails will be logged',
+          'MailService',
+        );
       }
     }
   }
@@ -129,7 +134,10 @@ export class MailService {
 
     // 개발 환경에서는 로그 출력
     if (process.env.NODE_ENV === 'development') {
-      this.logger.log(`[DEBUG] Password Reset Email - To: ${email}, Reset URL: ${resetUrl}`, 'MailService');
+      this.logger.log(
+        `[DEBUG] Password Reset Email - To: ${email}, Reset URL: ${resetUrl}`,
+        'MailService',
+      );
     }
 
     try {
@@ -145,7 +153,10 @@ export class MailService {
     } catch (error) {
       // 개발 환경에서는 이메일 전송 실패해도 로깅만
       if (process.env.NODE_ENV === 'development') {
-        this.logger.warn?.(`Failed to send email: ${error}. Continuing anyway in development mode`, 'MailService');
+        this.logger.warn?.(
+          `Failed to send email: ${error}. Continuing anyway in development mode`,
+          'MailService',
+        );
       } else {
         throw error;
       }
@@ -210,7 +221,10 @@ export class MailService {
 
     // 개발 환경에서는 로그 출력
     if (process.env.NODE_ENV === 'development') {
-      this.logger.log(`[DEBUG] Email Verification Code - To: ${email}, Code: ${code}`, 'MailService');
+      this.logger.log(
+        `[DEBUG] Email Verification Code - To: ${email}, Code: ${code}`,
+        'MailService',
+      );
     }
 
     try {
@@ -224,7 +238,10 @@ export class MailService {
       }
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        this.logger.warn?.(`Failed to send email: ${error}. Continuing anyway in development mode`, 'MailService');
+        this.logger.warn?.(
+          `Failed to send email: ${error}. Continuing anyway in development mode`,
+          'MailService',
+        );
       } else {
         throw error;
       }
@@ -241,7 +258,8 @@ export class MailService {
     subject: string;
     content: string;
   }): Promise<void> {
-    const adminEmail = this.configService.get<string>('ADMIN_EMAIL') || this.fromEmail;
+    const adminEmail =
+      this.configService.get<string>('ADMIN_EMAIL') || this.fromEmail;
     const inquiryTypeLabels: Record<string, string> = {
       GENERAL: '일반 문의',
       ACCOUNT: '계정 관련',
@@ -299,14 +317,20 @@ export class MailService {
     };
 
     if (process.env.NODE_ENV === 'development') {
-      this.logger.log(`[DEBUG] New Inquiry - ID: ${inquiry.id}, Type: ${inquiry.type}, From: ${inquiry.email}, Subject: ${inquiry.subject}`, 'MailService');
+      this.logger.log(
+        `[DEBUG] New Inquiry - ID: ${inquiry.id}, Type: ${inquiry.type}, From: ${inquiry.email}, Subject: ${inquiry.subject}`,
+        'MailService',
+      );
     }
 
     try {
       await this.transporter.sendMail(mailOptions);
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        this.logger.warn?.(`Failed to send inquiry notification: ${error}`, 'MailService');
+        this.logger.warn?.(
+          `Failed to send inquiry notification: ${error}`,
+          'MailService',
+        );
       } else {
         throw error;
       }
@@ -377,14 +401,20 @@ export class MailService {
     };
 
     if (process.env.NODE_ENV === 'development') {
-      this.logger.log(`[DEBUG] Inquiry Response - To: ${inquiry.email}, Subject: ${inquiry.subject}`, 'MailService');
+      this.logger.log(
+        `[DEBUG] Inquiry Response - To: ${inquiry.email}, Subject: ${inquiry.subject}`,
+        'MailService',
+      );
     }
 
     try {
       await this.transporter.sendMail(mailOptions);
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        this.logger.warn?.(`Failed to send inquiry response: ${error}`, 'MailService');
+        this.logger.warn?.(
+          `Failed to send inquiry response: ${error}`,
+          'MailService',
+        );
       } else {
         throw error;
       }

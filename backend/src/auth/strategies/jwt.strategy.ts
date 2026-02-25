@@ -21,7 +21,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(req: Request, payload: JwtPayload): Promise<JwtPayload> {
-    if (!payload.sub || !Object.values(UserRole).includes(payload.role as UserRole)) {
+    if (
+      !payload.sub ||
+      !Object.values(UserRole).includes(payload.role as UserRole)
+    ) {
       throw new UnauthorizedException('유효하지 않은 토큰입니다');
     }
 

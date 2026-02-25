@@ -12,7 +12,5 @@ export function hashIp(ip: string): string {
   if (!salt) {
     throw new Error('IP_HASH_SALT environment variable is required');
   }
-  return createHash('sha256')
-    .update(`${salt}:${ip}`)
-    .digest('hex');
+  return createHash('sha256').update(`${salt}:${ip}`).digest('hex');
 }

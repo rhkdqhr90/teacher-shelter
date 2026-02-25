@@ -4,14 +4,15 @@ import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tansta
 import { CACHE_TIME, queryKeys } from '@/lib/query-config';
 import { postsApi } from '../services/posts-api';
 import {
-  PostCategory,
-  JobSubCategory,
-  Region,
-  TherapyTag,
+  type PostCategory,
+  type JobSubCategory,
+  type Region,
+  type TherapyTag,
   COMMUNITY_CATEGORIES,
   INFO_CATEGORIES,
   TEACHING_LIFE_CATEGORIES,
   type CreatePostInput,
+  type Post,
 } from '../types';
 
 interface UsePostsOptions {
@@ -150,7 +151,7 @@ export function useCategoryPreviews() {
       return results.reduce((acc, { category, posts }) => {
         acc[category as PostCategory] = posts;
         return acc;
-      }, {} as Record<PostCategory, any[]>);
+      }, {} as Record<PostCategory, Post[]>);
     },
     staleTime: CACHE_TIME.CATEGORY_PREVIEW,
   });

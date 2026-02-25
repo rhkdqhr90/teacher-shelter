@@ -44,8 +44,9 @@ export function ApplicationForm({
       });
       toast.success('지원이 완료되었습니다');
       setShowForm(false);
-    } catch (error: any) {
-      toast.error('지원 실패', error?.response?.data?.message || '지원에 실패했습니다.');
+    } catch (error: unknown) {
+      const errorMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      toast.error('지원 실패', errorMessage || '지원에 실패했습니다.');
     }
   };
 

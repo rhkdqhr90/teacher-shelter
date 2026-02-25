@@ -1,4 +1,11 @@
-import { IsEmail, IsString, IsEnum, MinLength, MaxLength, IsOptional } from 'class-validator';
+import {
+  IsEmail,
+  IsString,
+  IsEnum,
+  MinLength,
+  MaxLength,
+  IsOptional,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { InquiryType } from '@prisma/client';
 

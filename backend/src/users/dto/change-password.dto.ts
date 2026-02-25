@@ -47,8 +47,7 @@ export class ChangePasswordDto {
   @MinLength(8)
   @MaxLength(100)
   @Matches(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/, {
-    message:
-      '비밀번호는 영문, 숫자, 특수문자를 각각 1개 이상 포함해야 합니다',
+    message: '비밀번호는 영문, 숫자, 특수문자를 각각 1개 이상 포함해야 합니다',
   })
   @Validate(IsNotCommonPassword)
   newPassword: string;

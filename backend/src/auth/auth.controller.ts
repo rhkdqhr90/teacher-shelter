@@ -146,12 +146,34 @@ export class AuthController {
     }
 
     // Cookie 삭제
-    res.clearCookie('refreshToken', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-    });
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    if (isProduction) {
+      // 프로덕션: 두 가지 쿠키 모두 삭제 (이전 배포 호환)
+      // 1. domain 없는 쿠키 (api.teacherlounge.co.kr로 설정됨)
+      res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        path: '/',
+      });
+      // 2. domain 있는 쿠키 (.teacherlounge.co.kr)
+      res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        path: '/',
+        domain: '.teacherlounge.co.kr',
+      });
+    } else {
+      // 개발: 단일 쿠키 삭제
+      res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+        path: '/',
+      });
+    }
   }
 
   @Post('forgot-password')
@@ -280,10 +302,7 @@ export class AuthController {
   @Post('oauth/exchange')
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { ttl: 60000, limit: 10 } })
-  async exchangeOAuthCode(
-    @Body() dto: ExchangeOAuthCodeDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async exchangeOAuthCode(@Body() dto: ExchangeOAuthCodeDto) {
     const accessToken = await this.authService.exchangeOAuthCode(dto.code);
     return { accessToken };
   }
@@ -374,16 +393,31 @@ export class AuthController {
   }
 
   private setRefreshTokenCookie(res: Response, refreshToken: string) {
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    // 프로덕션: 이전 배포에서 생성된 api.teacherlounge.co.kr 도메인 쿠키 삭제
+    // (domain 없이 설정된 쿠키는 api.teacherlounge.co.kr로 설정됨)
+    // 이 쿠키가 남아있으면 브라우저에 2개의 refreshToken 쿠키가 공존하게 됨
+    if (isProduction) {
+      res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        path: '/',
+        // domain 없이 clearCookie → api.teacherlounge.co.kr 쿠키 삭제
+      });
+    }
+
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-      sameSite: 'lax', // 'lax' allows cookies on top-level navigations (OAuth redirects)
+      secure: isProduction, // HTTPS only in production
+      // 크로스 도메인 쿠키 전송:
+      // - 프로덕션: 'none' (www.teacherlounge.co.kr → api.teacherlounge.co.kr)
+      // - 개발: 'lax' (same-origin)
+      sameSite: isProduction ? 'none' : 'lax',
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      domain:
-        process.env.NODE_ENV === 'production'
-          ? '.teacherlounge.co.kr'
-          : undefined, // 서브도메인 간 쿠키 공유
+      domain: isProduction ? '.teacherlounge.co.kr' : undefined, // 서브도메인 간 쿠키 공유
     });
   }
 }

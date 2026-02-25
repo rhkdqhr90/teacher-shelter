@@ -23,21 +23,33 @@ export function sanitizeContent({ value }: TransformFnParams): string {
   return sanitizeHtml(value, {
     allowedTags: [
       // 텍스트 포맷팅
-      'b', 'i', 'u', 'strong', 'em', 's', 'strike',
+      'b',
+      'i',
+      'u',
+      'strong',
+      'em',
+      's',
+      'strike',
       // 구조
-      'p', 'br', 'div',
+      'p',
+      'br',
+      'div',
       // 제목
-      'h1', 'h2', 'h3',
+      'h1',
+      'h2',
+      'h3',
       // 리스트
-      'ul', 'ol', 'li',
+      'ul',
+      'ol',
+      'li',
       // 링크
       'a',
       // 이미지
       'img',
     ],
     allowedAttributes: {
-      'a': ['href', 'target', 'rel'],
-      'img': ['src', 'alt', 'class', 'loading'],
+      a: ['href', 'target', 'rel'],
+      img: ['src', 'alt', 'class', 'loading'],
       // text-align 스타일 허용 (정렬 기능)
       '*': ['style'],
     },
@@ -54,7 +66,7 @@ export function sanitizeContent({ value }: TransformFnParams): string {
     },
     // 외부 링크는 새 탭에서 열기
     transformTags: {
-      'a': (tagName, attribs) => {
+      a: (tagName, attribs) => {
         return {
           tagName,
           attribs: {

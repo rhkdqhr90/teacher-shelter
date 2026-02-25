@@ -28,7 +28,10 @@ export class OrphanCleanupService {
   @Cron(CronExpression.EVERY_DAY_AT_3AM)
   async handleCron() {
     if (this.isRunning) {
-      this.logger.warn('Orphan cleanup already running, skipping...', 'OrphanCleanupService');
+      this.logger.warn(
+        'Orphan cleanup already running, skipping...',
+        'OrphanCleanupService',
+      );
       return;
     }
     this.logger.log('Starting orphan file cleanup...', 'OrphanCleanupService');

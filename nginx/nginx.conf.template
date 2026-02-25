@@ -43,9 +43,9 @@ http {
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
 
-    # Rate Limiting
-    limit_req_zone $binary_remote_addr zone=api_limit:10m rate=10r/s;
-    limit_req_zone $binary_remote_addr zone=auth_limit:10m rate=5r/m;
+    # Rate Limiting (DDoS 방어용 - 세부 rate limit는 NestJS에서 관리)
+    # 100r/s = 분당 6000회 - 정상 사용에서는 도달하지 않는 높은 임계값
+    limit_req_zone $binary_remote_addr zone=ddos_protection:10m rate=100r/s;
 
     # Upstream
     upstream backend {
@@ -89,8 +89,11 @@ http {
         add_header Strict-Transport-Security "max-age=63072000" always;
 
         # CORS Headers (Vercel frontend 허용)
+        # 허용 도메인: teacherlounge.co.kr, www.teacherlounge.co.kr
+        # Vercel: teacher-shelter 프로젝트 + 프리뷰 URL (rhkdqhr90s-projects)
+        # 예: teacher-shelter.vercel.app, teacher-shelter-f3g1c6irc-rhkdqhr90s-projects.vercel.app
         set $cors_origin "";
-        if ($http_origin ~* "^https://(teacherlounge\.co\.kr|.*\.vercel\.app)$") {
+        if ($http_origin ~* "^https://((www\.)?teacherlounge\.co\.kr|teacher-shelter(-[a-z0-9]+-rhkdqhr90s-projects)?\.vercel\.app)$") {
             set $cors_origin $http_origin;
         }
 
@@ -121,8 +124,8 @@ http {
             add_header 'Access-Control-Allow-Origin' $cors_origin always;
             add_header 'Access-Control-Allow-Credentials' 'true' always;
 
-            # Rate Limiting
-            limit_req zone=api_limit burst=20 nodelay;
+            # DDoS Protection (세부 rate limit는 NestJS @Throttle에서 처리)
+            limit_req zone=ddos_protection burst=200 nodelay;
 
             # Proxy to Backend
             proxy_pass http://backend;
@@ -138,17 +141,8 @@ http {
             proxy_connect_timeout 60s;
         }
 
-        # Auth endpoints - stricter rate limiting
-        location ~ ^/(auth/login|auth/register) {
-            limit_req zone=auth_limit burst=3 nodelay;
-
-            proxy_pass http://backend;
-            proxy_http_version 1.1;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-        }
+        # Auth endpoints - NestJS @Throttle에서 rate limit 처리
+        # 별도 location 블록 제거 - 일반 API endpoint와 동일하게 처리
 
         # Static uploads
         location /uploads/ {

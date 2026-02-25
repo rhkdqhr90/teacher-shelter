@@ -7,7 +7,10 @@ import {
 import { PrismaService } from '../database/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { safeDecrementCommentCount, safeDecrementLikeCount } from '../common/utils/counter.util';
+import {
+  safeDecrementCommentCount,
+  safeDecrementLikeCount,
+} from '../common/utils/counter.util';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()

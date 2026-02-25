@@ -1,4 +1,11 @@
-import { Post, PostCategory, JobSubCategory, Region, SalaryType, EmploymentType } from '@prisma/client';
+import {
+  Post,
+  PostCategory,
+  JobSubCategory,
+  Region,
+  SalaryType,
+  EmploymentType,
+} from '@prisma/client';
 
 export class PostResponseDto {
   id: string;
@@ -47,7 +54,9 @@ export class PostResponseDto {
   createdAt: Date;
   updatedAt: Date;
 
-  constructor(post: Post & { author?: any; _count?: { applications?: number } }) {
+  constructor(
+    post: Post & { author?: any; _count?: { applications?: number } },
+  ) {
     this.id = post.id;
     this.title = post.title;
     this.content = post.content;

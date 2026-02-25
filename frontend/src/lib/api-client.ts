@@ -53,6 +53,9 @@ const processQueue = (error: unknown, token: string | null = null) => {
  * Create Axios instance with default configuration
  */
 const createApiClient = (): AxiosInstance => {
+  // NEXT_PUBLIC_API_URL 환경 변수 사용
+  // - 프로덕션: https://api.teacherlounge.co.kr/api (Vercel 환경변수)
+  // - 개발: http://localhost:3000/api
   const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
   const instance = axios.create({

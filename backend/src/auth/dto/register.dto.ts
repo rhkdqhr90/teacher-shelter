@@ -53,13 +53,15 @@ export class RegisterDto {
   @MaxLength(255)
   email: string;
 
-  @ApiProperty({ example: 'Password1!', description: '비밀번호 (8자 이상, 영문+숫자+특수문자)' })
+  @ApiProperty({
+    example: 'Password1!',
+    description: '비밀번호 (8자 이상, 영문+숫자+특수문자)',
+  })
   @IsString()
   @MinLength(8)
   @MaxLength(100)
   @Matches(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/, {
-    message:
-      '비밀번호는 영문, 숫자, 특수문자를 각각 1개 이상 포함해야 합니다',
+    message: '비밀번호는 영문, 숫자, 특수문자를 각각 1개 이상 포함해야 합니다',
   })
   @Validate(IsNotCommonPassword)
   password: string;

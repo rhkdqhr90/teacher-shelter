@@ -12,7 +12,12 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { Throttle } from '@nestjs/throttler';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
@@ -27,7 +32,11 @@ function sanitizePage(page?: string): number {
   return Number.isNaN(parsed) || parsed < 1 ? 1 : parsed;
 }
 
-function sanitizeLimit(limit?: string, defaultLimit = 20, maxLimit = 100): number {
+function sanitizeLimit(
+  limit?: string,
+  defaultLimit = 20,
+  maxLimit = 100,
+): number {
   const parsed = limit ? parseInt(limit, 10) : defaultLimit;
   if (Number.isNaN(parsed) || parsed < 1) return defaultLimit;
   return Math.min(parsed, maxLimit);
@@ -44,8 +53,15 @@ export class UsersController {
   // 1. 내 프로필 조회
   // ========================================
   @Get('me')
-  @ApiOperation({ summary: '내 프로필 조회', description: '로그인한 사용자의 프로필을 조회합니다.' })
-  @ApiResponse({ status: 200, description: '프로필 조회 성공', type: UserResponseDto })
+  @ApiOperation({
+    summary: '내 프로필 조회',
+    description: '로그인한 사용자의 프로필을 조회합니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '프로필 조회 성공',
+    type: UserResponseDto,
+  })
   async getProfile(@Req() req: Request): Promise<UserResponseDto> {
     const user = req.user as JwtPayload;
     const profile = await this.usersService.findOne(user.sub);
@@ -149,10 +165,7 @@ export class UsersController {
   // ========================================
   @Get('search')
   @Throttle({ default: { ttl: 60000, limit: 30 } }) // 1분에 30번
-  async searchUsers(
-    @Query('q') query: string,
-    @Query('limit') limit?: string,
-  ) {
+  async searchUsers(@Query('q') query: string, @Query('limit') limit?: string) {
     return this.usersService.searchUsers(
       query || '',
       sanitizeLimit(limit, 10, 20), // 기본 10, 최대 20
@@ -172,10 +185,7 @@ export class UsersController {
   // 9. 최근 활동
   // ========================================
   @Get('me/recent-activity')
-  async getRecentActivity(
-    @Req() req: Request,
-    @Query('limit') limit?: string,
-  ) {
+  async getRecentActivity(@Req() req: Request, @Query('limit') limit?: string) {
     const user = req.user as JwtPayload;
     return this.usersService.getRecentActivity(
       user.sub,

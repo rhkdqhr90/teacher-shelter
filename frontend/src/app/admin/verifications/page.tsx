@@ -91,8 +91,9 @@ export default function AdminVerificationsPage() {
       setShowRejectDialog(false);
       setRejectionReason('');
     },
-    onError: (error: any) => {
-      toast.error('처리 실패', error?.response?.data?.message || '처리에 실패했습니다.');
+    onError: (error: unknown) => {
+      const errorMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      toast.error('처리 실패', errorMessage || '처리에 실패했습니다.');
     },
   });
 

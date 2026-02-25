@@ -45,6 +45,7 @@
     "registerSuccess": "계정이 생성되었습니다! 로그인해주세요.",
     "registerError": "회원가입 실패",
     "credentialsError": "이메일 또는 비밀번호가 올바르지 않습니다.",
+    "invalidCredentials": "이메일 또는 비밀번호가 올바르지 않습니다.",
     "authError": "인증 오류",
     "authErrorDesc": "인증 중 오류가 발생했습니다.",
     "configurationError": "서버 설정에 문제가 있습니다.",

@@ -27,7 +27,13 @@ import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { BulkDeletePostsDto } from './dto/bulk-delete-posts.dto';
 import { ProcessVerificationDto } from '../verifications/dto/process-verification.dto';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
-import { UserRole, ReportStatus, ReportType, VerificationStatus, PostCategory } from '@prisma/client';
+import {
+  UserRole,
+  ReportStatus,
+  ReportType,
+  VerificationStatus,
+  PostCategory,
+} from '@prisma/client';
 
 const MAX_LIMIT = 100;
 

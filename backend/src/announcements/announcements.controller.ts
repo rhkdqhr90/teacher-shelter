@@ -8,10 +8,14 @@ import {
   Delete,
   UseGuards,
   Request,
-  Query,
 } from '@nestjs/common';
-import { Throttle, SkipThrottle } from '@nestjs/throttler';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { SkipThrottle } from '@nestjs/throttler';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { AnnouncementsService } from './announcements.service';
 import { CreateAnnouncementDto } from './dto/create-announcement.dto';
 import { UpdateAnnouncementDto } from './dto/update-announcement.dto';
@@ -31,8 +35,14 @@ export class AnnouncementsController {
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: '[관리자] 공지사항 작성' })
   @ApiResponse({ status: 201, description: '공지사항 작성 성공' })
-  create(@Body() createAnnouncementDto: CreateAnnouncementDto, @Request() req: any) {
-    return this.announcementsService.create(createAnnouncementDto, req.user.sub);
+  create(
+    @Body() createAnnouncementDto: CreateAnnouncementDto,
+    @Request() req: any,
+  ) {
+    return this.announcementsService.create(
+      createAnnouncementDto,
+      req.user.sub,
+    );
   }
 
   @Get()
@@ -68,7 +78,10 @@ export class AnnouncementsController {
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: '[관리자] 공지사항 수정' })
   @ApiResponse({ status: 200, description: '공지사항 수정 성공' })
-  update(@Param('id') id: string, @Body() updateAnnouncementDto: UpdateAnnouncementDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateAnnouncementDto: UpdateAnnouncementDto,
+  ) {
     return this.announcementsService.update(id, updateAnnouncementDto);
   }
 

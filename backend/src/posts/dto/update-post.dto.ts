@@ -15,7 +15,14 @@ import {
   ValidateIf,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { PostCategory, JobSubCategory, Region, SalaryType, EmploymentType, TherapyTag } from '@prisma/client';
+import {
+  PostCategory,
+  JobSubCategory,
+  Region,
+  SalaryType,
+  EmploymentType,
+  TherapyTag,
+} from '@prisma/client';
 import {
   sanitizeTitle,
   sanitizeContent,
@@ -61,13 +68,21 @@ export class UpdatePostDto {
   @IsInt()
   @Min(0)
   @IsOptional()
-  @ValidateIf((o) => o.category === PostCategory.JOB_POSTING && o.salaryType !== SalaryType.NEGOTIABLE)
+  @ValidateIf(
+    (o) =>
+      o.category === PostCategory.JOB_POSTING &&
+      o.salaryType !== SalaryType.NEGOTIABLE,
+  )
   salaryMin?: number;
 
   @IsInt()
   @Min(0)
   @IsOptional()
-  @ValidateIf((o) => o.category === PostCategory.JOB_POSTING && o.salaryType !== SalaryType.NEGOTIABLE)
+  @ValidateIf(
+    (o) =>
+      o.category === PostCategory.JOB_POSTING &&
+      o.salaryType !== SalaryType.NEGOTIABLE,
+  )
   salaryMax?: number;
 
   @IsBoolean()

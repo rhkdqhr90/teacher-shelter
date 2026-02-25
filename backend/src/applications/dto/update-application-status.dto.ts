@@ -1,9 +1,4 @@
-import {
-  IsEnum,
-  IsString,
-  IsOptional,
-  MaxLength,
-} from 'class-validator';
+import { IsEnum, IsString, IsOptional, MaxLength } from 'class-validator';
 import { ApplicationStatus } from '@prisma/client';
 
 export class UpdateApplicationStatusDto {

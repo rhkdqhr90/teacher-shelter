@@ -1,9 +1,4 @@
-import {
-  IsString,
-  IsOptional,
-  IsEmail,
-  MaxLength,
-} from 'class-validator';
+import { IsString, IsOptional, IsEmail, MaxLength } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { sanitizeTitle } from '../../common/utils/sanitize.util';
 

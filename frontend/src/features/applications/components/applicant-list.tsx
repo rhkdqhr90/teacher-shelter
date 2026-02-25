@@ -32,8 +32,9 @@ export function ApplicantList({ postId }: ApplicantListProps) {
         data: { status: newStatus },
       });
       toast.success(`상태가 "${APPLICATION_STATUS_LABELS[newStatus]}"(으)로 변경되었습니다`);
-    } catch (error: any) {
-      toast.error('상태 변경 실패', error?.response?.data?.message || '상태 변경에 실패했습니다.');
+    } catch (error: unknown) {
+      const errorMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      toast.error('상태 변경 실패', errorMessage || '상태 변경에 실패했습니다.');
     }
   };
 
