@@ -173,11 +173,13 @@ let VerificationsService = class VerificationsService {
         const notificationType = dto.status === client_1.VerificationStatus.APPROVED
             ? client_1.NotificationType.VERIFICATION_APPROVED
             : client_1.NotificationType.VERIFICATION_REJECTED;
-        await this.notificationsService.create({
+        this.notificationsService
+            .create({
             type: notificationType,
             userId: request.userId,
             actorId: adminId,
-        });
+        })
+            .catch(() => { });
         return result;
     }
     getPendingCount() {

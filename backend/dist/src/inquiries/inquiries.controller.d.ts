@@ -5,7 +5,11 @@ import { UpdateInquiryStatusDto } from './dto/update-inquiry-status.dto';
 export declare class InquiriesController {
     private readonly inquiriesService;
     constructor(inquiriesService: InquiriesService);
-    create(createInquiryDto: CreateInquiryDto, req: any): Promise<{
+    create(createInquiryDto: CreateInquiryDto, req: {
+        user?: {
+            sub: string;
+        };
+    }): Promise<{
         id: string;
         message: string;
     }>;
@@ -45,7 +49,11 @@ export declare class InquiriesController {
         respondedAt: Date | null;
         respondedById: string | null;
     } | null>;
-    respond(id: string, dto: RespondInquiryDto, req: any): Promise<{
+    respond(id: string, dto: RespondInquiryDto, req: {
+        user: {
+            sub: string;
+        };
+    }): Promise<{
         id: string;
         email: string;
         createdAt: Date;

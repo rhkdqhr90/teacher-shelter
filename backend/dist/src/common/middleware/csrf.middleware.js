@@ -35,7 +35,9 @@ let CsrfMiddleware = class CsrfMiddleware {
         }
         const originHeader = req.headers.origin;
         const referer = req.headers.referer;
-        const origin = Array.isArray(originHeader) ? originHeader[0] : originHeader;
+        const origin = Array.isArray(originHeader)
+            ? originHeader[0]
+            : originHeader;
         if (origin) {
             if (this.isAllowedOrigin(origin)) {
                 return next();

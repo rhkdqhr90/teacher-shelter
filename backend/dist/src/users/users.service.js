@@ -115,7 +115,7 @@ let UsersService = class UsersService {
                 throw new common_1.UnauthorizedException('이메일 변경 시 현재 비밀번호가 필요합니다');
             }
         }
-        const { currentPassword: _, ...updateData } = updateUserDto;
+        const { currentPassword: _unusedPassword, ...updateData } = updateUserDto;
         const updatedUser = await this.prisma.user.update({
             where: { id },
             data: {

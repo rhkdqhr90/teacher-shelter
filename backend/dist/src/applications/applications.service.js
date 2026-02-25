@@ -150,12 +150,14 @@ let ApplicationsService = class ApplicationsService {
                 applicant: true,
             },
         });
-        await this.notificationsService.create({
+        this.notificationsService
+            .create({
             userId: application.applicantId,
             actorId: userId,
             type: client_1.NotificationType.APPLICATION_STATUS,
             postId: application.postId,
-        });
+        })
+            .catch(() => { });
         return new dto_1.ApplicationResponseDto(updated);
     }
     async cancel(id, userId) {

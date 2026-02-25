@@ -4,7 +4,11 @@ import { UpdateAnnouncementDto } from './dto/update-announcement.dto';
 export declare class AnnouncementsController {
     private readonly announcementsService;
     constructor(announcementsService: AnnouncementsService);
-    create(createAnnouncementDto: CreateAnnouncementDto, req: any): Promise<{
+    create(createAnnouncementDto: CreateAnnouncementDto, req: {
+        user: {
+            sub: string;
+        };
+    }): Promise<{
         id: string;
         createdAt: Date;
         updatedAt: Date;

@@ -141,7 +141,7 @@ let AuthController = class AuthController {
             return url;
         }
         catch {
-            return this.configService.get('frontendUrl') || 'http://localhost:3001';
+            return (this.configService.get('frontendUrl') || 'http://localhost:3001');
         }
     }
     async handleOAuthCallback(req, res) {

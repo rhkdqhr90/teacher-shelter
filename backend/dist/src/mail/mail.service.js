@@ -70,9 +70,12 @@ let MailService = class MailService {
     constructor(configService, logger) {
         this.configService = configService;
         this.logger = logger;
-        this.fromEmail = this.configService.get('MAIL_FROM') || 'noreply@example.com';
-        this.fromName = this.configService.get('MAIL_FROM_NAME') || 'Service';
-        this.frontendUrl = this.configService.get('frontendUrl') || 'http://localhost:3001';
+        this.fromEmail =
+            this.configService.get('MAIL_FROM') || 'noreply@example.com';
+        this.fromName =
+            this.configService.get('MAIL_FROM_NAME') || 'Service';
+        this.frontendUrl =
+            this.configService.get('frontendUrl') || 'http://localhost:3001';
         const smtpHost = this.configService.get('SMTP_HOST');
         const smtpPort = this.configService.get('SMTP_PORT') || 587;
         const smtpUser = this.configService.get('SMTP_USER');

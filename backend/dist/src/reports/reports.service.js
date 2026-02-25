@@ -54,7 +54,7 @@ let ReportsService = class ReportsService {
     }
     async validateReportTarget(dto, reporterId) {
         switch (dto.type) {
-            case client_1.ReportType.USER:
+            case client_1.ReportType.USER: {
                 if (!dto.targetUserId) {
                     throw new common_1.BadRequestException('신고할 사용자를 선택해주세요');
                 }
@@ -65,7 +65,8 @@ let ReportsService = class ReportsService {
                     throw new common_1.NotFoundException('신고할 사용자를 찾을 수 없습니다');
                 }
                 break;
-            case client_1.ReportType.POST:
+            }
+            case client_1.ReportType.POST: {
                 if (!dto.targetPostId) {
                     throw new common_1.BadRequestException('신고할 게시글을 선택해주세요');
                 }
@@ -79,7 +80,8 @@ let ReportsService = class ReportsService {
                     throw new common_1.BadRequestException('자신의 게시글은 신고할 수 없습니다');
                 }
                 break;
-            case client_1.ReportType.COMMENT:
+            }
+            case client_1.ReportType.COMMENT: {
                 if (!dto.targetCommentId) {
                     throw new common_1.BadRequestException('신고할 댓글을 선택해주세요');
                 }
@@ -93,6 +95,7 @@ let ReportsService = class ReportsService {
                     throw new common_1.BadRequestException('자신의 댓글은 신고할 수 없습니다');
                 }
                 break;
+            }
         }
     }
     async findMyReports(userId, page = 1, limit = 10) {
