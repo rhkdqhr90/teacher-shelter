@@ -61,10 +61,10 @@ export function middleware(request: NextRequest) {
         "object-src 'none'",
       ].join('; ')
     : [
-        // === 프로덕션 환경 CSP (엄격함) ===
+        // === 프로덕션 환경 CSP ===
         "default-src 'self'",
-        `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
-        "style-src 'self' 'unsafe-inline'", // Tailwind/Next.js 인라인 스타일 호환
+        `script-src 'self' 'unsafe-inline' 'unsafe-eval'`, // Next.js 호환성을 위해 임시 완화
+        "style-src 'self' 'unsafe-inline'",
         `img-src 'self' data: blob: ${appUrl} https://images.unsplash.com https://lh3.googleusercontent.com https://avatars.githubusercontent.com`,
         "font-src 'self'",
         `connect-src 'self' ${apiOrigin}`,
