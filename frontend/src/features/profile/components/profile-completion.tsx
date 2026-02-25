@@ -19,22 +19,22 @@ export function ProfileCompletion() {
     {
       label: '이메일 인증',
       completed: !!user.isVerified,
-      href: user.isVerified ? undefined : '/settings/verify-email',
+      href: user.isVerified ? undefined : '/profile/verification',
     },
     {
       label: '프로필 이미지',
       completed: !!user.profileImage,
-      href: user.profileImage ? undefined : '/settings/profile',
+      href: user.profileImage ? undefined : '/profile/edit',
     },
     {
       label: '직종 선택',
       completed: !!user.jobType,
-      href: user.jobType ? undefined : '/settings/profile',
+      href: user.jobType ? undefined : '/profile/edit',
     },
     {
       label: '경력 입력',
       completed: user.career !== undefined && user.career !== null,
-      href: user.career !== undefined ? undefined : '/settings/profile',
+      href: user.career !== undefined ? undefined : '/profile/edit',
     },
   ];
 
