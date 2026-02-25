@@ -25,7 +25,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://api.teacherlounge.co.kr/:path*"
+      "destination": "https://api.teacherlounge.co.kr/api/:path*"
     }
   ]
 }
