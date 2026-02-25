@@ -131,7 +131,8 @@ let AuthController = class AuthController {
             return url;
         }
         catch {
-            return this.configService.get('FRONTEND_URL') || 'http://localhost:3001';
+            return (this.configService.get('FRONTEND_URL') ||
+                'http://localhost:3001');
         }
     }
     async handleOAuthCallback(req, res) {
@@ -157,13 +158,19 @@ let AuthController = class AuthController {
             sameSite: 'lax',
             path: '/',
             maxAge: 7 * 24 * 60 * 60 * 1000,
+            domain: process.env.NODE_ENV === 'production'
+                ? '.teacherlounge.co.kr'
+                : undefined,
         });
     }
 };
 exports.AuthController = AuthController;
 __decorate([
     (0, common_1.Post)('register'),
-    (0, swagger_1.ApiOperation)({ summary: '회원가입', description: '이메일과 비밀번호로 새 계정을 생성합니다.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: '회원가입',
+        description: '이메일과 비밀번호로 새 계정을 생성합니다.',
+    }),
     (0, swagger_1.ApiResponse)({ status: 201, description: '회원가입 성공, accessToken 반환' }),
     (0, swagger_1.ApiResponse)({ status: 400, description: '유효하지 않은 입력' }),
     (0, swagger_1.ApiResponse)({ status: 409, description: '이미 존재하는 이메일' }),
@@ -177,7 +184,10 @@ __decorate([
 ], AuthController.prototype, "register", null);
 __decorate([
     (0, common_1.Post)('login'),
-    (0, swagger_1.ApiOperation)({ summary: '로그인', description: '이메일과 비밀번호로 로그인합니다.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: '로그인',
+        description: '이메일과 비밀번호로 로그인합니다.',
+    }),
     (0, swagger_1.ApiResponse)({ status: 200, description: '로그인 성공, accessToken 반환' }),
     (0, swagger_1.ApiResponse)({ status: 401, description: '잘못된 이메일 또는 비밀번호' }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
@@ -190,7 +200,10 @@ __decorate([
 ], AuthController.prototype, "login", null);
 __decorate([
     (0, common_1.Post)('refresh'),
-    (0, swagger_1.ApiOperation)({ summary: '토큰 갱신', description: 'refreshToken으로 새 accessToken을 발급받습니다.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: '토큰 갱신',
+        description: 'refreshToken으로 새 accessToken을 발급받습니다.',
+    }),
     (0, swagger_1.ApiResponse)({ status: 200, description: '토큰 갱신 성공' }),
     (0, swagger_1.ApiResponse)({ status: 401, description: '유효하지 않은 refreshToken' }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
@@ -204,7 +217,10 @@ __decorate([
 ], AuthController.prototype, "refresh", null);
 __decorate([
     (0, common_1.Post)('logout'),
-    (0, swagger_1.ApiOperation)({ summary: '로그아웃', description: 'refreshToken을 무효화하고 accessToken을 블랙리스트에 추가합니다.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: '로그아웃',
+        description: 'refreshToken을 무효화하고 accessToken을 블랙리스트에 추가합니다.',
+    }),
     (0, swagger_1.ApiResponse)({ status: 204, description: '로그아웃 성공' }),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
     __param(0, (0, common_1.Req)()),
@@ -215,8 +231,14 @@ __decorate([
 ], AuthController.prototype, "logout", null);
 __decorate([
     (0, common_1.Post)('forgot-password'),
-    (0, swagger_1.ApiOperation)({ summary: '비밀번호 찾기', description: '비밀번호 재설정 이메일을 발송합니다.' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: '이메일 발송 완료 (존재 여부 무관)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: '비밀번호 찾기',
+        description: '비밀번호 재설정 이메일을 발송합니다.',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: '이메일 발송 완료 (존재 여부 무관)',
+    }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, throttler_1.Throttle)({ default: { ttl: 60000, limit: 3 } }),
     __param(0, (0, common_1.Body)()),
@@ -226,7 +248,10 @@ __decorate([
 ], AuthController.prototype, "forgotPassword", null);
 __decorate([
     (0, common_1.Post)('reset-password'),
-    (0, swagger_1.ApiOperation)({ summary: '비밀번호 재설정', description: '토큰으로 비밀번호를 재설정합니다.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: '비밀번호 재설정',
+        description: '토큰으로 비밀번호를 재설정합니다.',
+    }),
     (0, swagger_1.ApiResponse)({ status: 200, description: '비밀번호 변경 성공' }),
     (0, swagger_1.ApiResponse)({ status: 400, description: '유효하지 않거나 만료된 토큰' }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
@@ -238,7 +263,10 @@ __decorate([
 ], AuthController.prototype, "resetPassword", null);
 __decorate([
     (0, common_1.Post)('verify-email'),
-    (0, swagger_1.ApiOperation)({ summary: '이메일 인증', description: '인증 코드로 이메일을 인증합니다.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: '이메일 인증',
+        description: '인증 코드로 이메일을 인증합니다.',
+    }),
     (0, swagger_1.ApiResponse)({ status: 200, description: '이메일 인증 성공' }),
     (0, swagger_1.ApiResponse)({ status: 400, description: '유효하지 않거나 만료된 코드' }),
     (0, swagger_1.ApiBearerAuth)('access-token'),
@@ -253,7 +281,10 @@ __decorate([
 ], AuthController.prototype, "verifyEmail", null);
 __decorate([
     (0, common_1.Post)('resend-verification'),
-    (0, swagger_1.ApiOperation)({ summary: '인증 이메일 재발송', description: '이메일 인증 메일을 재발송합니다.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: '인증 이메일 재발송',
+        description: '이메일 인증 메일을 재발송합니다.',
+    }),
     (0, swagger_1.ApiResponse)({ status: 200, description: '이메일 재발송 성공' }),
     (0, swagger_1.ApiBearerAuth)('access-token'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
