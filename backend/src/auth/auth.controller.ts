@@ -98,7 +98,7 @@ export class AuthController {
   @ApiResponse({ status: 401, description: '유효하지 않은 refreshToken' })
   @HttpCode(HttpStatus.OK)
   @UseGuards(RefreshAuthGuard)
-  @Throttle({ default: { ttl: 60000, limit: 10 } }) // 1분에 10번
+  @Throttle({ default: { ttl: 60000, limit: 60 } }) // 1분에 60번 (다중 탭, 빠른 새로고침 고려)
   async refresh(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,

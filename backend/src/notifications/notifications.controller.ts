@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { NotificationsService } from './notifications.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -43,7 +44,9 @@ export class NotificationsController {
 
   /**
    * 읽지 않은 알림 개수
+   * 프론트엔드에서 30초마다 polling하므로 rate limit 완화
    */
+  @Throttle({ default: { limit: 120, ttl: 60000 } }) // 1분에 120회 (polling 고려)
   @Get('unread-count')
   async getUnreadCount(@Req() req: Request) {
     const user = req.user as { sub: string };
