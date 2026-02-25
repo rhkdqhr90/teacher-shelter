@@ -128,6 +128,8 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
       FILE_ENCRYPTION_KEY: ${FILE_ENCRYPTION_KEY}
       FRONTEND_URL: ${FRONTEND_URL:-https://teacherlounge.co.kr}
+      COOKIE_DOMAIN: ${COOKIE_DOMAIN:-.teacherlounge.co.kr}
+      ALLOWED_REDIRECT_ORIGINS: ${ALLOWED_REDIRECT_ORIGINS:-https://teacherlounge.co.kr,https://www.teacherlounge.co.kr}
     volumes:
       - uploads_data:/app/uploads
     depends_on:
