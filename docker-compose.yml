@@ -106,7 +106,9 @@ services:
   # Backend API (NestJS)
   # ========================================
   backend:
-    image: ghcr.io/${GITHUB_REPOSITORY:-teacher-shelter}/backend:latest
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: teacher-shelter-api
     restart: always
     expose:
@@ -143,7 +145,7 @@ services:
       resources:
         limits:
           memory: 768M
-          cpus: '2.0'
+          cpus: '1.0'
     security_opt:
       - no-new-privileges:true
 
