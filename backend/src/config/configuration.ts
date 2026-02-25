@@ -1,3 +1,11 @@
+/**
+ * 환경 설정 중앙화
+ *
+ * 주의: 환경변수를 추가/변경할 때 반드시 다음 파일들도 함께 수정:
+ * - docker-compose.yml (프로덕션 환경변수)
+ * - .env.example (루트, 프로덕션용)
+ * - backend/.env.example (개발용)
+ */
 export default () => {
   const isProduction = process.env.NODE_ENV === 'production';
 
@@ -28,8 +36,10 @@ export default () => {
     },
 
     // 쿠키 설정 (환경별 분기 중앙화)
+    // ⚠️ COOKIE_DOMAIN 미설정 시 쿠키가 api 서브도메인에만 설정되어
+    //    프론트엔드에서 쿠키 접근 불가 → 로그인 유지 실패
     cookie: {
-      domain: process.env.COOKIE_DOMAIN || undefined, // 프로덕션: '.teacherlounge.co.kr'
+      domain: process.env.COOKIE_DOMAIN || undefined, // 프로덕션 필수: '.teacherlounge.co.kr'
       secure: isProduction,
       sameSite: isProduction ? ('none' as const) : ('lax' as const),
       httpOnly: true,
