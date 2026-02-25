@@ -31,13 +31,10 @@ export class MailService {
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private readonly logger: LoggerService,
   ) {
-    this.fromEmail =
-      this.configService.get<string>('MAIL_FROM') ||
-      'noreply@teacherlounge.co.kr';
-    this.fromName =
-      this.configService.get<string>('MAIL_FROM_NAME') || '교사쉼터';
-    this.frontendUrl =
-      this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3001';
+    // 환경변수에서 메일 설정 로드 (하드코딩 제거)
+    this.fromEmail = this.configService.get<string>('MAIL_FROM') || 'noreply@example.com';
+    this.fromName = this.configService.get<string>('MAIL_FROM_NAME') || 'Service';
+    this.frontendUrl = this.configService.get<string>('frontendUrl') || 'http://localhost:3001';
 
     // SMTP 설정 (개발/프로덕션 환경별 분기)
     const smtpHost = this.configService.get<string>('SMTP_HOST');
@@ -67,7 +64,7 @@ export class MailService {
         },
       });
 
-      if (process.env.NODE_ENV === 'development') {
+      if (this.configService.get<boolean>('isDevelopment')) {
         this.logger.log(
           'Using development mode - emails will be logged',
           'MailService',

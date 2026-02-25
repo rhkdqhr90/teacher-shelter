@@ -23,6 +23,7 @@ export declare class AuthController {
         accessToken: string;
     }>;
     logout(req: Request, res: Response): Promise<void>;
+    private clearRefreshTokenCookie;
     forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<{
         message: string;
     }>;
@@ -44,7 +45,6 @@ export declare class AuthController {
     exchangeOAuthCode(dto: ExchangeOAuthCodeDto): Promise<{
         accessToken: string;
     }>;
-    private readonly ALLOWED_REDIRECT_ORIGINS;
     private validateRedirectUrl;
     private handleOAuthCallback;
     private setRefreshTokenCookie;

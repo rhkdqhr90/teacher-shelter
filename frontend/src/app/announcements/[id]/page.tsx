@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Pin, Megaphone } from 'lucide-react';
 import { MainLayout } from '@/components/layout';
 import { Button } from '@/components/ui/button';
+import { API_URL } from '@/lib/constants';
 
 interface Announcement {
   id: string;
@@ -20,8 +21,7 @@ interface PageProps {
 
 async function getAnnouncement(id: string): Promise<Announcement | null> {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
-    const response = await fetch(`${apiUrl}/announcements/${id}`, {
+    const response = await fetch(`${API_URL}/announcements/${id}`, {
       next: { revalidate: 60 },
     });
 

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { MainLayout } from '@/components/layout';
 import { PostDetail } from '@/features/posts/components';
 import { POST_CATEGORY_LABELS } from '@/features/posts/types';
+import { API_URL } from '@/lib/constants';
 
 interface PostPageProps {
   params: Promise<{
@@ -12,8 +13,7 @@ interface PostPageProps {
 // 서버에서 게시글 데이터 가져오기
 async function getPost(id: string) {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
-    const res = await fetch(`${apiUrl}/posts/${id}`, {
+    const res = await fetch(`${API_URL}/posts/${id}`, {
       next: { revalidate: 60 }, // 60초 캐시
     });
     if (!res.ok) return null;

@@ -14,6 +14,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { API_URL } from '@/lib/constants';
 import {
   adminVerificationsApi,
   VerificationRequest,
@@ -127,11 +128,8 @@ export default function AdminVerificationsPage() {
     setShowRejectDialog(true);
   };
 
-  // 보안: 인증 파일은 관리자 전용 API 엔드포인트를 통해 접근
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
-
   // 파일 보기/다운로드 URL 생성 (인증된 API 엔드포인트)
-  const getFileUrl = (requestId: string) => `${apiUrl}/admin/verifications/${requestId}/file`;
+  const getFileUrl = (requestId: string) => `${API_URL}/admin/verifications/${requestId}/file`;
 
   return (
     <div className="space-y-6">

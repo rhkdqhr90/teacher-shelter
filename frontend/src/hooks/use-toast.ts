@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { getErrorMessage } from '@/lib/error';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -86,24 +87,11 @@ export const toast = {
     useToastStore.getState().addToast({ type: 'info', title, description }),
 };
 
-// API 에러 메시지 추출 유틸리티
-export function getErrorMessage(error: unknown, fallback = '오류가 발생했습니다'): string {
-  if (error instanceof Error) {
-    // API 에러 응답에서 메시지 추출
-    const apiError = error as Error & { response?: { data?: { message?: string } } };
-    if (apiError.response?.data?.message) {
-      return apiError.response.data.message;
-    }
-    return error.message || fallback;
-  }
-  if (typeof error === 'string') {
-    return error;
-  }
-  return fallback;
-}
+// lib/error.ts의 getErrorMessage 재export (중복 제거)
+export { getErrorMessage } from '@/lib/error';
 
 // API 에러를 토스트로 표시하는 헬퍼
 export function showErrorToast(error: unknown, title = '오류') {
-  const message = getErrorMessage(error);
+  const message = getErrorMessage(error, '오류가 발생했습니다');
   toast.error(title, message);
 }

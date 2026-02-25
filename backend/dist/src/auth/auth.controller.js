@@ -61,27 +61,31 @@ let AuthController = class AuthController {
         else {
             await this.authService.blacklistFromAccessToken(req.headers.authorization);
         }
-        const isProduction = process.env.NODE_ENV === 'production';
+        this.clearRefreshTokenCookie(res);
+    }
+    clearRefreshTokenCookie(res) {
+        const cookieConfig = this.configService.get('cookie');
+        const isProduction = this.configService.get('isProduction');
         if (isProduction) {
             res.clearCookie('refreshToken', {
-                httpOnly: true,
-                secure: true,
-                sameSite: 'none',
+                httpOnly: cookieConfig.httpOnly,
+                secure: cookieConfig.secure,
+                sameSite: cookieConfig.sameSite,
                 path: '/',
             });
             res.clearCookie('refreshToken', {
-                httpOnly: true,
-                secure: true,
-                sameSite: 'none',
+                httpOnly: cookieConfig.httpOnly,
+                secure: cookieConfig.secure,
+                sameSite: cookieConfig.sameSite,
                 path: '/',
-                domain: '.teacherlounge.co.kr',
+                domain: cookieConfig.domain,
             });
         }
         else {
             res.clearCookie('refreshToken', {
-                httpOnly: true,
-                secure: false,
-                sameSite: 'lax',
+                httpOnly: cookieConfig.httpOnly,
+                secure: cookieConfig.secure,
+                sameSite: cookieConfig.sameSite,
                 path: '/',
             });
         }
@@ -124,24 +128,12 @@ let AuthController = class AuthController {
         const accessToken = await this.authService.exchangeOAuthCode(dto.code);
         return { accessToken };
     }
-    ALLOWED_REDIRECT_ORIGINS = [
-        'http://localhost:3001',
-        'http://127.0.0.1:3001',
-    ];
     validateRedirectUrl(url) {
         try {
             const parsedUrl = new URL(url);
             const origin = parsedUrl.origin;
-            const frontendUrl = this.configService.get('FRONTEND_URL');
-            const allowedOrigins = [...this.ALLOWED_REDIRECT_ORIGINS];
-            if (frontendUrl) {
-                try {
-                    const frontendOrigin = new URL(frontendUrl).origin;
-                    allowedOrigins.push(frontendOrigin);
-                }
-                catch {
-                }
-            }
+            const frontendUrl = this.configService.get('frontendUrl');
+            const allowedOrigins = this.configService.get('allowedRedirectOrigins') || [];
             if (!allowedOrigins.includes(origin)) {
                 this.logger.warn(`Blocked redirect to untrusted origin: ${origin}`, 'AuthController');
                 return frontendUrl || 'http://localhost:3001';
@@ -149,12 +141,11 @@ let AuthController = class AuthController {
             return url;
         }
         catch {
-            return (this.configService.get('FRONTEND_URL') ||
-                'http://localhost:3001');
+            return this.configService.get('frontendUrl') || 'http://localhost:3001';
         }
     }
     async handleOAuthCallback(req, res) {
-        const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:3001';
+        const frontendUrl = this.configService.get('frontendUrl') || 'http://localhost:3001';
         const safeRedirectBase = this.validateRedirectUrl(frontendUrl);
         try {
             const oauthUser = req.user;
@@ -170,22 +161,23 @@ let AuthController = class AuthController {
         }
     }
     setRefreshTokenCookie(res, refreshToken) {
-        const isProduction = process.env.NODE_ENV === 'production';
+        const cookieConfig = this.configService.get('cookie');
+        const isProduction = this.configService.get('isProduction');
         if (isProduction) {
             res.clearCookie('refreshToken', {
-                httpOnly: true,
-                secure: true,
-                sameSite: 'none',
+                httpOnly: cookieConfig.httpOnly,
+                secure: cookieConfig.secure,
+                sameSite: cookieConfig.sameSite,
                 path: '/',
             });
         }
         res.cookie('refreshToken', refreshToken, {
-            httpOnly: true,
-            secure: isProduction,
-            sameSite: isProduction ? 'none' : 'lax',
+            httpOnly: cookieConfig.httpOnly,
+            secure: cookieConfig.secure,
+            sameSite: cookieConfig.sameSite,
             path: '/',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-            domain: isProduction ? '.teacherlounge.co.kr' : undefined,
+            maxAge: cookieConfig.maxAge,
+            domain: cookieConfig.domain,
         });
     }
 };

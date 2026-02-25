@@ -1,5 +1,6 @@
 import axios, { type AxiosError, type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '@/stores/auth-store';
+import { API_URL } from './constants';
 
 /**
  * Custom API Error class
@@ -53,13 +54,8 @@ const processQueue = (error: unknown, token: string | null = null) => {
  * Create Axios instance with default configuration
  */
 const createApiClient = (): AxiosInstance => {
-  // NEXT_PUBLIC_API_URL 환경 변수 사용
-  // - 프로덕션: https://api.teacherlounge.co.kr/api (Vercel 환경변수)
-  // - 개발: http://localhost:3000/api
-  const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
-
   const instance = axios.create({
-    baseURL,
+    baseURL: API_URL,
     timeout: 30000,
     withCredentials: true, // Cookie 전송을 위해 필수
     headers: {

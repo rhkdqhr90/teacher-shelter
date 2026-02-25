@@ -70,13 +70,9 @@ let MailService = class MailService {
     constructor(configService, logger) {
         this.configService = configService;
         this.logger = logger;
-        this.fromEmail =
-            this.configService.get('MAIL_FROM') ||
-                'noreply@teacherlounge.co.kr';
-        this.fromName =
-            this.configService.get('MAIL_FROM_NAME') || '교사쉼터';
-        this.frontendUrl =
-            this.configService.get('FRONTEND_URL') || 'http://localhost:3001';
+        this.fromEmail = this.configService.get('MAIL_FROM') || 'noreply@example.com';
+        this.fromName = this.configService.get('MAIL_FROM_NAME') || 'Service';
+        this.frontendUrl = this.configService.get('frontendUrl') || 'http://localhost:3001';
         const smtpHost = this.configService.get('SMTP_HOST');
         const smtpPort = this.configService.get('SMTP_PORT') || 587;
         const smtpUser = this.configService.get('SMTP_USER');
@@ -101,7 +97,7 @@ let MailService = class MailService {
                     pass: 'ethereal.pass',
                 },
             });
-            if (process.env.NODE_ENV === 'development') {
+            if (this.configService.get('isDevelopment')) {
                 this.logger.log('Using development mode - emails will be logged', 'MailService');
             }
         }

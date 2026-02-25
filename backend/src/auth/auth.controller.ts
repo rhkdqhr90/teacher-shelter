@@ -146,31 +146,39 @@ export class AuthController {
     }
 
     // Cookie 삭제
-    const isProduction = process.env.NODE_ENV === 'production';
+    this.clearRefreshTokenCookie(res);
+  }
+
+  /**
+   * refreshToken 쿠키 삭제 (환경별 처리)
+   */
+  private clearRefreshTokenCookie(res: Response): void {
+    const cookieConfig = this.configService.get('cookie');
+    const isProduction = this.configService.get<boolean>('isProduction');
 
     if (isProduction) {
       // 프로덕션: 두 가지 쿠키 모두 삭제 (이전 배포 호환)
-      // 1. domain 없는 쿠키 (api.teacherlounge.co.kr로 설정됨)
+      // 1. domain 없는 쿠키 (api.xxx.com으로 설정됨)
       res.clearCookie('refreshToken', {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none',
+        httpOnly: cookieConfig.httpOnly,
+        secure: cookieConfig.secure,
+        sameSite: cookieConfig.sameSite,
         path: '/',
       });
-      // 2. domain 있는 쿠키 (.teacherlounge.co.kr)
+      // 2. domain 있는 쿠키 (.xxx.com)
       res.clearCookie('refreshToken', {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none',
+        httpOnly: cookieConfig.httpOnly,
+        secure: cookieConfig.secure,
+        sameSite: cookieConfig.sameSite,
         path: '/',
-        domain: '.teacherlounge.co.kr',
+        domain: cookieConfig.domain,
       });
     } else {
       // 개발: 단일 쿠키 삭제
       res.clearCookie('refreshToken', {
-        httpOnly: true,
-        secure: false,
-        sameSite: 'lax',
+        httpOnly: cookieConfig.httpOnly,
+        secure: cookieConfig.secure,
+        sameSite: cookieConfig.sameSite,
         path: '/',
       });
     }
@@ -311,12 +319,6 @@ export class AuthController {
   // OAuth 공통 콜백 처리
   // ========================================
 
-  // 허용된 리다이렉트 URL 화이트리스트
-  private readonly ALLOWED_REDIRECT_ORIGINS = [
-    'http://localhost:3001',
-    'http://127.0.0.1:3001',
-  ];
-
   /**
    * 리다이렉트 URL 검증 (Open Redirect 방지)
    */
@@ -325,18 +327,10 @@ export class AuthController {
       const parsedUrl = new URL(url);
       const origin = parsedUrl.origin;
 
-      // 프로덕션에서는 환경변수에서 허용된 도메인 확인
-      const frontendUrl = this.configService.get<string>('FRONTEND_URL');
-      const allowedOrigins = [...this.ALLOWED_REDIRECT_ORIGINS];
-
-      if (frontendUrl) {
-        try {
-          const frontendOrigin = new URL(frontendUrl).origin;
-          allowedOrigins.push(frontendOrigin);
-        } catch {
-          // 잘못된 FRONTEND_URL 무시
-        }
-      }
+      // 설정에서 허용된 도메인 가져오기
+      const frontendUrl = this.configService.get<string>('frontendUrl');
+      const allowedOrigins =
+        this.configService.get<string[]>('allowedRedirectOrigins') || [];
 
       // 화이트리스트 검증
       if (!allowedOrigins.includes(origin)) {
@@ -351,16 +345,13 @@ export class AuthController {
       return url;
     } catch {
       // URL 파싱 실패 시 기본값
-      return (
-        this.configService.get<string>('FRONTEND_URL') ||
-        'http://localhost:3001'
-      );
+      return this.configService.get<string>('frontendUrl') || 'http://localhost:3001';
     }
   }
 
   private async handleOAuthCallback(req: Request, res: Response) {
     const frontendUrl =
-      this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3001';
+      this.configService.get<string>('frontendUrl') || 'http://localhost:3001';
     // 보안: 리다이렉트 URL 검증
     const safeRedirectBase = this.validateRedirectUrl(frontendUrl);
 
@@ -392,32 +383,33 @@ export class AuthController {
     }
   }
 
-  private setRefreshTokenCookie(res: Response, refreshToken: string) {
-    const isProduction = process.env.NODE_ENV === 'production';
+  /**
+   * refreshToken 쿠키 설정 (환경별 처리)
+   */
+  private setRefreshTokenCookie(res: Response, refreshToken: string): void {
+    const cookieConfig = this.configService.get('cookie');
+    const isProduction = this.configService.get<boolean>('isProduction');
 
-    // 프로덕션: 이전 배포에서 생성된 api.teacherlounge.co.kr 도메인 쿠키 삭제
-    // (domain 없이 설정된 쿠키는 api.teacherlounge.co.kr로 설정됨)
-    // 이 쿠키가 남아있으면 브라우저에 2개의 refreshToken 쿠키가 공존하게 됨
+    // 프로덕션: 이전 배포에서 생성된 도메인 없는 쿠키 삭제
+    // (domain 없이 설정된 쿠키는 api.xxx.com으로 설정됨)
+    // 이 쿠키가 남아있으면 브라우저에 2개의 refreshToken 쿠키가 공존
     if (isProduction) {
       res.clearCookie('refreshToken', {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none',
+        httpOnly: cookieConfig.httpOnly,
+        secure: cookieConfig.secure,
+        sameSite: cookieConfig.sameSite,
         path: '/',
-        // domain 없이 clearCookie → api.teacherlounge.co.kr 쿠키 삭제
+        // domain 없이 clearCookie → api.xxx.com 쿠키 삭제
       });
     }
 
     res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: isProduction, // HTTPS only in production
-      // 크로스 도메인 쿠키 전송:
-      // - 프로덕션: 'none' (www.teacherlounge.co.kr → api.teacherlounge.co.kr)
-      // - 개발: 'lax' (same-origin)
-      sameSite: isProduction ? 'none' : 'lax',
+      httpOnly: cookieConfig.httpOnly,
+      secure: cookieConfig.secure,
+      sameSite: cookieConfig.sameSite,
       path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      domain: isProduction ? '.teacherlounge.co.kr' : undefined, // 서브도메인 간 쿠키 공유
+      maxAge: cookieConfig.maxAge,
+      domain: cookieConfig.domain,
     });
   }
 }

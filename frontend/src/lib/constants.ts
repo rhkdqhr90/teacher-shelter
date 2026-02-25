@@ -6,7 +6,8 @@
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
 // 서버 베이스 URL (이미지 등 정적 파일용, /api 미포함)
-export const SERVER_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:3000';
+// NEXT_PUBLIC_SERVER_URL을 명시적으로 설정하거나, API_URL에서 /api 제거
+export const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000';
 
 // 앱 이름
 export const APP_NAME = '교사쉼터';

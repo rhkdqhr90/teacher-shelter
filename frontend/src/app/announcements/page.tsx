@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { AnnouncementsContent } from './announcements-content';
+import { API_URL } from '@/lib/constants';
 
 export const metadata: Metadata = {
   title: '공지사항',
@@ -17,8 +18,7 @@ interface Announcement {
 
 async function getAnnouncements(): Promise<Announcement[]> {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
-    const response = await fetch(`${apiUrl}/announcements`, {
+    const response = await fetch(`${API_URL}/announcements`, {
       next: { revalidate: 60 }, // 1분마다 재검증
     });
 
