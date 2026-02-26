@@ -250,4 +250,10 @@ export const createPostSchema = z.object({
   therapyTags: z.array(z.nativeEnum(TherapyTag)).max(8).optional(),
 });
 
+// 수정용 스키마 - isAnonymous 제외 (백엔드 UpdatePostDto와 일치)
+// 익명 설정은 생성 시에만 가능하며 수정 불가 (책임 회피 방지)
+// .partial()로 모든 필드를 optional로 변환 (부분 업데이트 지원)
+export const updatePostSchema = createPostSchema.omit({ isAnonymous: true }).partial();
+
 export type CreatePostInput = z.infer<typeof createPostSchema>;
+export type UpdatePostInput = z.infer<typeof updatePostSchema>;

@@ -15,6 +15,7 @@ import {
   INFO_CATEGORIES,
   TEACHING_LIFE_CATEGORIES,
   createPostSchema,
+  updatePostSchema,
   JobSubCategory,
   JOB_SUB_CATEGORY_LABELS,
   Region,
@@ -50,7 +51,7 @@ const CATEGORY_GROUPS = [
     categories: [PostCategory.JOB_POSTING] as const,
   },
 ] as const;
-import { useIsAuthenticated, useUser } from '@/stores/auth-store';
+import { useIsAuthenticated, useUser, useAuthStore } from '@/stores/auth-store';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface PostFormProps {
@@ -63,6 +64,7 @@ export function PostForm({ mode = 'create', postId, defaultCategory }: PostFormP
   const router = useRouter();
   const isAuthenticated = useIsAuthenticated();
   const user = useUser();
+  const isAuthInitialized = useAuthStore((state) => state.isInitialized);
   const createPost = useCreatePost();
   const updatePost = useUpdatePost();
 
@@ -204,18 +206,25 @@ export function PostForm({ mode = 'create', postId, defaultCategory }: PostFormP
       if (therapyTags.length > 0) formData.therapyTags = therapyTags;
     }
 
-    const result = createPostSchema.safeParse(formData);
-    if (!result.success) {
-      isSubmitting.current = false;
-      setError(result.error.errors[0]?.message || '입력을 확인해주세요.');
-      return;
-    }
-
     try {
       if (mode === 'edit' && postId) {
+        // 수정용 스키마 사용 - isAnonymous 필드가 포함되지 않음
+        const result = updatePostSchema.safeParse(formData);
+        if (!result.success) {
+          isSubmitting.current = false;
+          setError(result.error.errors[0]?.message || '입력을 확인해주세요.');
+          return;
+        }
         await updatePost.mutateAsync({ id: postId, data: result.data });
         router.push(`/posts/${postId}`);
       } else {
+        // 생성용 스키마 사용 - isAnonymous 필드 포함
+        const result = createPostSchema.safeParse(formData);
+        if (!result.success) {
+          isSubmitting.current = false;
+          setError(result.error.errors[0]?.message || '입력을 확인해주세요.');
+          return;
+        }
         const newPost = await createPost.mutateAsync(result.data);
         router.push(`/posts/${newPost.id}`);
       }
@@ -225,8 +234,8 @@ export function PostForm({ mode = 'create', postId, defaultCategory }: PostFormP
     }
   };
 
-  // 수정 모드에서 게시글 로딩 중
-  if (mode === 'edit' && isLoadingPost) {
+  // 인증 상태 초기화 중이거나 수정 모드에서 게시글 로딩 중
+  if (!isAuthInitialized || (mode === 'edit' && isLoadingPost)) {
     return (
       <div className="space-y-6">
         <Skeleton className="h-10 w-full" />
@@ -236,8 +245,11 @@ export function PostForm({ mode = 'create', postId, defaultCategory }: PostFormP
     );
   }
 
-  // 로그인 필요
-  if (!isAuthenticated) {
+  // 로그인 필요 (인증 초기화 완료 후에만 체크)
+  // 수정 모드에서는 이미 게시글을 로드했으므로 인증 상태 변동에 의한 깜빡임 방지
+  // (백그라운드 API 호출 실패로 인한 일시적 인증 해제 시 UI 유지)
+  // 실제 권한 검증은 submit 시 백엔드에서 수행
+  if (!isAuthenticated && mode === 'create') {
     return (
       <div className="text-center py-12 space-y-4">
         <p className="text-lg text-foreground-muted">
@@ -255,8 +267,8 @@ export function PostForm({ mode = 'create', postId, defaultCategory }: PostFormP
     );
   }
 
-  // 이메일 인증 필요
-  if (user && !user.isVerified) {
+  // 이메일 인증 필요 (수정 모드에서는 이미 권한이 있으므로 건너뛰기)
+  if (user && !user.isVerified && mode === 'create') {
     return (
       <div className="text-center py-12 space-y-4">
         <p className="text-lg text-foreground-muted">

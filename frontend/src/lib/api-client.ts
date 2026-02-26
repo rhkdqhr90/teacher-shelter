@@ -28,6 +28,21 @@ let failedQueue: Array<{
 }> = [];
 
 /**
+ * Reset refresh fail count (로그인 성공 시 호출)
+ */
+export function resetRefreshFailCount() {
+  refreshFailCount = 0;
+}
+
+/**
+ * Extended request config with background flag
+ */
+interface ExtendedRequestConfig extends InternalAxiosRequestConfig {
+  _isBackground?: boolean;
+  _retry?: boolean;
+}
+
+/**
  * Rate limiting retry with exponential backoff
  */
 interface RetryConfig {
@@ -149,11 +164,12 @@ const createApiClient = (): AxiosInstance => {
                              originalRequest.url?.includes('/auth/register') ||
                              originalRequest.url?.includes('/auth/refresh');
 
-      // 연속 refresh 실패가 너무 많으면 강제 로그아웃
-      if (refreshFailCount >= MAX_REFRESH_FAILURES) {
-        useAuthStore.getState().clearAuth();
-        refreshFailCount = 0;
-        const apiError = new ApiError(401, '세션이 만료되었습니다. 다시 로그인해주세요.');
+      const extendedConfig = originalRequest as ExtendedRequestConfig;
+
+      // 백그라운드 요청이면 refresh 시도 없이 조용히 실패
+      // (polling 등 백그라운드 요청이 UI 깜빡임을 유발하지 않도록)
+      if (error.response?.status === 401 && extendedConfig._isBackground) {
+        const apiError = new ApiError(401, '인증 필요 (백그라운드)', error.response?.data);
         return Promise.reject(apiError);
       }
 
@@ -209,8 +225,12 @@ const createApiClient = (): AxiosInstance => {
           refreshFailCount++;
           processQueue(refreshError, null);
 
-          // Clear auth state (리다이렉트는 컴포넌트에서 처리)
-          useAuthStore.getState().clearAuth();
+          // 연속 실패 횟수가 임계값을 넘을 때만 로그아웃
+          // (일시적인 네트워크 오류나 백그라운드 요청 실패로 인한 깜빡임 방지)
+          if (refreshFailCount >= MAX_REFRESH_FAILURES) {
+            useAuthStore.getState().clearAuth();
+            refreshFailCount = 0;
+          }
 
           return Promise.reject(refreshError);
         } finally {

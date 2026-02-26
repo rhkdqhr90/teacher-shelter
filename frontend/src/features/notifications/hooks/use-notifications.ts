@@ -30,6 +30,7 @@ export function useUnreadCount() {
     queryKey: queryKeys.notifications.unreadCount(),
     queryFn: () => notificationsApi.getUnreadCount(),
     refetchInterval: isAuthenticated ? 30000 : false,
+    refetchIntervalInBackground: false,
     staleTime: CACHE_TIME.UNREAD_COUNT,
     enabled: isAuthenticated,
   });

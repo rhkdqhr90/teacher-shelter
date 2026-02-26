@@ -43,7 +43,11 @@ export const notificationsApi = {
   },
 
   async getUnreadCount(): Promise<{ count: number }> {
-    const response = await api.get<{ count: number }>('/notifications/unread-count');
+    // _isBackground: 백그라운드 polling 요청 표시
+    // 401 발생 시 refresh 시도 없이 조용히 실패 (UI 깜빡임 방지)
+    const response = await api.get<{ count: number }>('/notifications/unread-count', {
+      _isBackground: true,
+    } as Parameters<typeof api.get>[1]);
     return response.data;
   },
 

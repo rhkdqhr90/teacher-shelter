@@ -1,5 +1,5 @@
 import { api } from '@/lib/api-client';
-import type { Post, PostsResponse, CreatePostInput, PostCategory, JobSubCategory, Region, TherapyTag } from '../types';
+import type { Post, PostsResponse, CreatePostInput, UpdatePostInput, PostCategory, JobSubCategory, Region, TherapyTag } from '../types';
 
 interface GetPostsParams {
   page?: number;
@@ -63,7 +63,7 @@ export const postsApi = {
   },
 
   // 게시글 수정
-  async updatePost(id: string, data: Partial<CreatePostInput>): Promise<Post> {
+  async updatePost(id: string, data: UpdatePostInput): Promise<Post> {
     const response = await api.patch<Post>(`/posts/${id}`, data);
     return response.data;
   },

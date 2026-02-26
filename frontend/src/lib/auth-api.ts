@@ -1,4 +1,4 @@
-import { api } from './api-client';
+import { api, resetRefreshFailCount } from './api-client';
 import { useAuthStore, type AuthUser } from '@/stores/auth-store';
 
 interface LoginRequest {
@@ -84,6 +84,9 @@ export async function login(data: LoginRequest): Promise<AuthUser> {
     expertType: userResponse.data.expertType,
   };
 
+  // 로그인 성공 시 refresh 실패 카운터 리셋
+  resetRefreshFailCount();
+
   // Zustand 스토어에 저장 (메모리)
   useAuthStore.getState().setAuth(accessToken, user);
 
@@ -120,6 +123,9 @@ export async function register(data: RegisterRequest): Promise<AuthUser> {
     isExpert: userResponse.data.isExpert,
     expertType: userResponse.data.expertType,
   };
+
+  // 회원가입 성공 시 refresh 실패 카운터 리셋
+  resetRefreshFailCount();
 
   // Zustand 스토어에 저장 (메모리)
   useAuthStore.getState().setAuth(accessToken, user);
@@ -225,6 +231,9 @@ export async function handleOAuthCallback(code: string): Promise<AuthUser> {
     expertType: userResponse.data.expertType,
   };
 
+  // OAuth 로그인 성공 시 refresh 실패 카운터 리셋
+  resetRefreshFailCount();
+
   // Zustand 스토어에 저장 (메모리)
   useAuthStore.getState().setAuth(accessToken, user);
 
@@ -281,6 +290,9 @@ export async function initializeAuth(): Promise<boolean> {
       isExpert: userResponse.data.isExpert,
       expertType: userResponse.data.expertType,
     };
+
+    // 앱 초기화 refresh 성공 시 카운터 리셋
+    resetRefreshFailCount();
 
     // 한 번의 상태 업데이트로 처리
     useAuthStore.getState().setAuth(accessToken, user);

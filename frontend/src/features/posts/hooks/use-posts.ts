@@ -12,6 +12,7 @@ import {
   INFO_CATEGORIES,
   TEACHING_LIFE_CATEGORIES,
   type CreatePostInput,
+  type UpdatePostInput,
   type Post,
 } from '../types';
 
@@ -76,7 +77,7 @@ export function useUpdatePost() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<CreatePostInput> }) =>
+    mutationFn: ({ id, data }: { id: string; data: UpdatePostInput }) =>
       postsApi.updatePost(id, data),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.posts.all });
