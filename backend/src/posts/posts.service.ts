@@ -50,6 +50,7 @@ export class PostsService {
       : undefined;
 
     // attachments, deadline 분리 (Prisma create에서 별도 처리)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { attachments, deadline, ...postData } = createPostDto;
 
     // 수업자료 카테고리가 아니면 첨부파일 무시 (보안: ValidateIf 우회 방지)
@@ -270,6 +271,7 @@ export class PostsService {
       : undefined;
 
     // attachments, deadline 분리 (Prisma update에서 별도 처리)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { attachments, deadline, ...postData } = updatePostDto;
 
     // 트랜잭션으로 업데이트 (첨부파일 교체 포함)
