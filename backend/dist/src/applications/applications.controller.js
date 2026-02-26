@@ -53,6 +53,16 @@ let ApplicationsController = class ApplicationsController {
         await this.applicationsService.cancel(id, user.sub);
         return { message: '지원이 취소되었습니다.' };
     }
+    async downloadResume(id, req, res) {
+        const user = req.user;
+        const { buffer, fileName, mimeType } = await this.applicationsService.getResume(id, user.sub);
+        const encodedFileName = encodeURIComponent(fileName);
+        res.set({
+            'Content-Type': mimeType,
+            'Content-Disposition': `attachment; filename*=UTF-8''${encodedFileName}`,
+        });
+        return new common_1.StreamableFile(buffer);
+    }
 };
 exports.ApplicationsController = ApplicationsController;
 __decorate([
@@ -111,6 +121,15 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], ApplicationsController.prototype, "cancel", null);
+__decorate([
+    (0, common_1.Get)(':id/resume'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Req)()),
+    __param(2, (0, common_1.Res)({ passthrough: true })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], ApplicationsController.prototype, "downloadResume", null);
 exports.ApplicationsController = ApplicationsController = __decorate([
     (0, swagger_1.ApiTags)('Applications'),
     (0, swagger_1.ApiBearerAuth)('access-token'),

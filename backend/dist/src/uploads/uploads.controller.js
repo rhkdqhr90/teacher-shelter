@@ -51,6 +51,20 @@ let UploadsController = class UploadsController {
         const imageUrl = await this.uploadsService.saveFile(file, 'banner', user.sub);
         return { imageUrl };
     }
+    async uploadResume(req, file) {
+        if (!file) {
+            throw new common_1.BadRequestException('파일이 없습니다');
+        }
+        const user = req.user;
+        return this.uploadsService.saveResumeFile(file, user.sub);
+    }
+    async uploadMaterial(req, file) {
+        if (!file) {
+            throw new common_1.BadRequestException('파일이 없습니다');
+        }
+        const user = req.user;
+        return this.uploadsService.saveMaterialFile(file, user.sub);
+    }
 };
 exports.UploadsController = UploadsController;
 __decorate([
@@ -95,6 +109,28 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], UploadsController.prototype, "uploadBannerImage", null);
+__decorate([
+    (0, common_1.Post)('resume'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
+        limits: { fileSize: 10 * 1024 * 1024 },
+    })),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], UploadsController.prototype, "uploadResume", null);
+__decorate([
+    (0, common_1.Post)('material'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
+        limits: { fileSize: 20 * 1024 * 1024 },
+    })),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], UploadsController.prototype, "uploadMaterial", null);
 exports.UploadsController = UploadsController = __decorate([
     (0, common_1.Controller)('uploads'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),

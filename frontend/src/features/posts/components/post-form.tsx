@@ -3,11 +3,12 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PostEditor } from '@/components/editor';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Upload, FileText, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
 import { useCreatePost, useUpdatePost, usePost } from '../hooks/use-posts';
+import { useUploadMaterial } from '@/features/uploads/hooks/use-uploads';
 import {
   PostCategory,
   POST_CATEGORY_LABELS,
@@ -26,6 +27,7 @@ import {
   EMPLOYMENT_TYPE_LABELS,
   TherapyTag,
   THERAPY_TAG_LABELS,
+  AttachmentInput,
 } from '../types';
 
 // 카테고리 그룹 설정 (게시글 작성 폼용)
@@ -103,6 +105,12 @@ export function PostForm({ mode = 'create', postId, defaultCategory }: PostFormP
   // 치료/교육 분야 태그
   const [therapyTags, setTherapyTags] = useState<TherapyTag[]>([]);
 
+  // 수업자료 첨부파일
+  const [attachments, setAttachments] = useState<AttachmentInput[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const materialInputRef = useRef<HTMLInputElement>(null);
+  const uploadMaterial = useUploadMaterial();
+
   // 카테고리가 고정되어 있는지 (URL 파라미터로 전달된 경우 또는 수정 모드)
   // 수정 모드에서는 카테고리 변경 불가 (익명→일반 등 악용 방지)
   const isCategoryFixed = (mode === 'create' && !!defaultCategory) || mode === 'edit';
@@ -112,6 +120,72 @@ export function PostForm({ mode = 'create', postId, defaultCategory }: PostFormP
 
   // 구인공고 여부
   const isJobPosting = category === PostCategory.JOB_POSTING;
+
+  // 수업자료 여부
+  const isClassMaterial = category === PostCategory.CLASS_MATERIAL;
+
+  // 허용 파일 형식 (수업자료)
+  const MATERIAL_ACCEPT = '.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.hwp';
+  const MAX_ATTACHMENTS = 5;
+  const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
+
+  // 파일 업로드 핸들러
+  const handleMaterialUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const remainingSlots = MAX_ATTACHMENTS - attachments.length;
+    if (remainingSlots <= 0) {
+      setError(`첨부파일은 최대 ${MAX_ATTACHMENTS}개까지 가능합니다.`);
+      return;
+    }
+
+    const filesToUpload = Array.from(files).slice(0, remainingSlots);
+    setIsUploading(true);
+    setError(null);
+
+    try {
+      const newAttachments: AttachmentInput[] = [];
+
+      for (const file of filesToUpload) {
+        // 파일 크기 검증
+        if (file.size > MAX_FILE_SIZE) {
+          setError(`${file.name}: 파일 크기가 20MB를 초과합니다.`);
+          continue;
+        }
+
+        const result = await uploadMaterial.mutateAsync(file);
+        newAttachments.push({
+          fileUrl: result.fileUrl,
+          fileName: result.fileName,
+          fileSize: result.fileSize,
+          mimeType: result.mimeType,
+        });
+      }
+
+      setAttachments((prev) => [...prev, ...newAttachments]);
+    } catch {
+      setError('파일 업로드에 실패했습니다.');
+    } finally {
+      setIsUploading(false);
+      // input 초기화
+      if (materialInputRef.current) {
+        materialInputRef.current.value = '';
+      }
+    }
+  };
+
+  // 첨부파일 삭제 핸들러
+  const handleRemoveAttachment = (index: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // 파일 크기 포맷
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes}B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)}KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
+  };
 
   // 수정 모드일 때 기존 데이터 로드
   useEffect(() => {
@@ -142,11 +216,22 @@ export function PostForm({ mode = 'create', postId, defaultCategory }: PostFormP
       if (existingPost.detailAddress) setDetailAddress(existingPost.detailAddress);
       // 치료/교육 분야 태그
       if (existingPost.therapyTags) setTherapyTags(existingPost.therapyTags);
+      // 첨부파일 로드
+      if (existingPost.attachments && existingPost.attachments.length > 0) {
+        setAttachments(
+          existingPost.attachments.map((att) => ({
+            fileUrl: att.fileUrl,
+            fileName: att.fileName,
+            fileSize: att.fileSize,
+            mimeType: att.mimeType,
+          }))
+        );
+      }
       setIsInitialized(true);
     }
   }, [mode, existingPost, isInitialized]);
 
-  const isPending = createPost.isPending || updatePost.isPending;
+  const isPending = createPost.isPending || updatePost.isPending || isUploading;
   const isSubmitting = useRef(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -181,6 +266,7 @@ export function PostForm({ mode = 'create', postId, defaultCategory }: PostFormP
 
         // 급여 범위 유효성 검증
         if (minVal !== undefined && maxVal !== undefined && minVal > maxVal) {
+          isSubmitting.current = false;
           setError('최소 급여는 최대 급여보다 클 수 없습니다.');
           return;
         }
@@ -206,6 +292,11 @@ export function PostForm({ mode = 'create', postId, defaultCategory }: PostFormP
       if (therapyTags.length > 0) formData.therapyTags = therapyTags;
     }
 
+    // 수업자료일 경우 첨부파일 추가
+    if (category === PostCategory.CLASS_MATERIAL && attachments.length > 0) {
+      formData.attachments = attachments;
+    }
+
     try {
       if (mode === 'edit' && postId) {
         // 수정용 스키마 사용 - isAnonymous 필드가 포함되지 않음
@@ -228,6 +319,8 @@ export function PostForm({ mode = 'create', postId, defaultCategory }: PostFormP
         const newPost = await createPost.mutateAsync(result.data);
         router.push(`/posts/${newPost.id}`);
       }
+      // 성공 시에도 리셋 (페이지 이동 실패 또는 뒤로가기 대비)
+      isSubmitting.current = false;
     } catch {
       isSubmitting.current = false;
       setError(mode === 'edit' ? '게시글 수정에 실패했습니다. 다시 시도해주세요.' : '게시글 작성에 실패했습니다. 다시 시도해주세요.');
@@ -677,6 +770,86 @@ export function PostForm({ mode = 'create', postId, defaultCategory }: PostFormP
           maxLength={200}
         />
       </div>
+
+      {/* 수업자료 첨부파일 */}
+      {isClassMaterial && (
+        <div className="space-y-4 p-4 bg-muted/30 rounded-lg border border-border">
+          <div className="flex items-center justify-between">
+            <h3 className="font-medium text-sm text-foreground">
+              첨부파일{' '}
+              <span className="text-xs text-muted-foreground font-normal">
+                (PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, HWP / 최대 20MB, {MAX_ATTACHMENTS}개)
+              </span>
+            </h3>
+            <span className="text-xs text-muted-foreground">
+              {attachments.length} / {MAX_ATTACHMENTS}
+            </span>
+          </div>
+
+          {/* 업로드 버튼 */}
+          <div>
+            <input
+              ref={materialInputRef}
+              type="file"
+              accept={MATERIAL_ACCEPT}
+              multiple
+              onChange={handleMaterialUpload}
+              className="hidden"
+              id="material-upload"
+            />
+            <label
+              htmlFor="material-upload"
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium cursor-pointer transition-colors ${
+                attachments.length >= MAX_ATTACHMENTS || isUploading
+                  ? 'bg-muted text-muted-foreground cursor-not-allowed'
+                  : 'bg-primary text-primary-foreground hover:bg-primary/90'
+              }`}
+            >
+              {isUploading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  업로드 중...
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4" />
+                  파일 선택
+                </>
+              )}
+            </label>
+          </div>
+
+          {/* 첨부파일 목록 */}
+          {attachments.length > 0 && (
+            <div className="space-y-2">
+              {attachments.map((attachment, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 bg-background rounded-md border"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <FileText className="w-5 h-5 text-muted-foreground shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{attachment.fileName}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatFileSize(attachment.fileSize)}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveAttachment(index)}
+                    className="p-1 rounded-md hover:bg-muted transition-colors shrink-0"
+                    title="삭제"
+                  >
+                    <X className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Content */}
       <div>

@@ -14,6 +14,7 @@ const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
 const client_1 = require("@prisma/client");
 const sanitize_util_1 = require("../../common/utils/sanitize.util");
+const create_post_dto_1 = require("./create-post.dto");
 class UpdatePostDto {
     title;
     content;
@@ -37,6 +38,7 @@ class UpdatePostDto {
     requirements;
     detailAddress;
     therapyTags;
+    attachments;
 }
 exports.UpdatePostDto = UpdatePostDto;
 __decorate([
@@ -105,6 +107,7 @@ __decorate([
     (0, class_validator_1.MaxLength)(100),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.ValidateIf)((o) => o.category === client_1.PostCategory.JOB_POSTING),
+    (0, class_transformer_1.Transform)(sanitize_util_1.sanitizeTitle),
     __metadata("design:type", String)
 ], UpdatePostDto.prototype, "organizationName", void 0);
 __decorate([
@@ -125,6 +128,7 @@ __decorate([
     (0, class_validator_1.MaxLength)(50),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.ValidateIf)((o) => o.category === client_1.PostCategory.JOB_POSTING),
+    (0, class_transformer_1.Transform)(sanitize_util_1.sanitizeTitle),
     __metadata("design:type", String)
 ], UpdatePostDto.prototype, "contactKakao", void 0);
 __decorate([
@@ -151,6 +155,7 @@ __decorate([
     (0, class_validator_1.MaxLength)(50),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.ValidateIf)((o) => o.category === client_1.PostCategory.JOB_POSTING),
+    (0, class_transformer_1.Transform)(sanitize_util_1.sanitizeTitle),
     __metadata("design:type", String)
 ], UpdatePostDto.prototype, "workingHours", void 0);
 __decorate([
@@ -164,6 +169,7 @@ __decorate([
     (0, class_validator_1.MaxLength)(2000),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.ValidateIf)((o) => o.category === client_1.PostCategory.JOB_POSTING),
+    (0, class_transformer_1.Transform)(sanitize_util_1.sanitizeTitle),
     __metadata("design:type", String)
 ], UpdatePostDto.prototype, "benefits", void 0);
 __decorate([
@@ -171,6 +177,7 @@ __decorate([
     (0, class_validator_1.MaxLength)(2000),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.ValidateIf)((o) => o.category === client_1.PostCategory.JOB_POSTING),
+    (0, class_transformer_1.Transform)(sanitize_util_1.sanitizeTitle),
     __metadata("design:type", String)
 ], UpdatePostDto.prototype, "requirements", void 0);
 __decorate([
@@ -178,6 +185,7 @@ __decorate([
     (0, class_validator_1.MaxLength)(200),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.ValidateIf)((o) => o.category === client_1.PostCategory.JOB_POSTING),
+    (0, class_transformer_1.Transform)(sanitize_util_1.sanitizeTitle),
     __metadata("design:type", String)
 ], UpdatePostDto.prototype, "detailAddress", void 0);
 __decorate([
@@ -188,4 +196,13 @@ __decorate([
     (0, class_validator_1.ValidateIf)((o) => o.category === client_1.PostCategory.JOB_POSTING),
     __metadata("design:type", Array)
 ], UpdatePostDto.prototype, "therapyTags", void 0);
+__decorate([
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.ValidateNested)({ each: true }),
+    (0, class_transformer_1.Type)(() => create_post_dto_1.AttachmentInputDto),
+    (0, class_validator_1.ArrayMaxSize)(5, { message: '첨부파일은 최대 5개까지 가능합니다' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.ValidateIf)((o) => o.category === client_1.PostCategory.CLASS_MATERIAL),
+    __metadata("design:type", Array)
+], UpdatePostDto.prototype, "attachments", void 0);
 //# sourceMappingURL=update-post.dto.js.map

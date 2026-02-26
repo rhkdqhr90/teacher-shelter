@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { Loader2, User, Mail, Phone, ChevronDown, ChevronUp } from 'lucide-react';
+import { Loader2, User, Mail, Phone, ChevronDown, ChevronUp, FileText, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useApplicationsByPost, useUpdateApplicationStatus } from '../hooks/use-applications';
 import {
@@ -12,6 +12,7 @@ import {
   ApplicationStatus,
   type Application,
 } from '../types';
+import { applicationsApi } from '../services/applications-api';
 import { useToast } from '@/hooks/use-toast';
 import { JOB_TYPE_LABELS } from '@/features/profile/types';
 
@@ -24,6 +25,20 @@ export function ApplicantList({ postId }: ApplicantListProps) {
   const { data: applications, isLoading, error } = useApplicationsByPost(postId);
   const updateStatus = useUpdateApplicationStatus();
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+
+  const handleResumeDownload = async (app: Application) => {
+    if (!app.resumeUrl || !app.resumeFileName) return;
+
+    setDownloadingId(app.id);
+    try {
+      await applicationsApi.downloadResume(app.id, app.resumeFileName);
+    } catch {
+      toast.error('다운로드 실패', '이력서 다운로드에 실패했습니다.');
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   const handleStatusChange = async (app: Application, newStatus: ApplicationStatus) => {
     try {
@@ -181,6 +196,33 @@ export function ApplicantList({ postId }: ApplicantListProps) {
                       <p className="text-sm text-muted-foreground whitespace-pre-wrap bg-muted/30 p-3 rounded">
                         {app.coverLetter}
                       </p>
+                    </div>
+                  )}
+
+                  {/* 이력서 다운로드 */}
+                  {app.resumeUrl && app.resumeFileName && (
+                    <div>
+                      <h5 className="text-sm font-medium mb-1">첨부 이력서</h5>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleResumeDownload(app);
+                        }}
+                        disabled={downloadingId === app.id}
+                        className="gap-2"
+                      >
+                        {downloadingId === app.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <FileText className="w-4 h-4" />
+                        )}
+                        <span className="truncate max-w-[200px]">
+                          {app.resumeFileName}
+                        </span>
+                        <Download className="w-4 h-4" />
+                      </Button>
                     </div>
                   )}
 

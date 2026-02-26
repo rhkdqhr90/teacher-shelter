@@ -18,6 +18,8 @@ class CreateApplicationDto {
     coverLetter;
     contactPhone;
     contactEmail;
+    resumeUrl;
+    resumeFileName;
 }
 exports.CreateApplicationDto = CreateApplicationDto;
 __decorate([
@@ -42,4 +44,19 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateApplicationDto.prototype, "contactEmail", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.MaxLength)(500),
+    (0, class_validator_1.Matches)(/^\/uploads\/resume\/[a-zA-Z0-9_-]+\.(pdf|doc|docx)$/i, {
+        message: '유효하지 않은 이력서 파일 URL입니다',
+    }),
+    __metadata("design:type", String)
+], CreateApplicationDto.prototype, "resumeUrl", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.MaxLength)(255),
+    __metadata("design:type", String)
+], CreateApplicationDto.prototype, "resumeFileName", void 0);
 //# sourceMappingURL=create-application.dto.js.map

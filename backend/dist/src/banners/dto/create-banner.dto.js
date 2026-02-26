@@ -18,6 +18,10 @@ class CreateBannerDto {
     linkUrl;
     alt;
     type;
+    bannerText;
+    subText;
+    bgColor;
+    textColor;
     isActive;
     priority;
     startDate;
@@ -31,6 +35,7 @@ __decorate([
     __metadata("design:type", String)
 ], CreateBannerDto.prototype, "title", void 0);
 __decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MaxLength)(2000),
     (0, class_validator_1.Matches)(/^(https?:\/\/|\/)/i, {
@@ -56,6 +61,34 @@ __decorate([
     (0, class_validator_1.IsEnum)(client_1.BannerType),
     __metadata("design:type", String)
 ], CreateBannerDto.prototype, "type", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(100),
+    __metadata("design:type", String)
+], CreateBannerDto.prototype, "bannerText", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(200),
+    __metadata("design:type", String)
+], CreateBannerDto.prototype, "subText", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.Matches)(/^#[0-9A-Fa-f]{6}$/, {
+        message: 'bgColor must be a valid hex color (e.g. #3B82F6)',
+    }),
+    __metadata("design:type", String)
+], CreateBannerDto.prototype, "bgColor", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.Matches)(/^#[0-9A-Fa-f]{6}$/, {
+        message: 'textColor must be a valid hex color (e.g. #FFFFFF)',
+    }),
+    __metadata("design:type", String)
+], CreateBannerDto.prototype, "textColor", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsBoolean)(),

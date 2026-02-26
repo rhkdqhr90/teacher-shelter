@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { UploadsService } from '../uploads/uploads.service';
 import {
   CreateApplicationDto,
   UpdateApplicationStatusDto,
@@ -23,6 +24,7 @@ export class ApplicationsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notificationsService: NotificationsService,
+    private readonly uploadsService: UploadsService,
   ) {}
 
   async create(
@@ -76,6 +78,8 @@ export class ApplicationsService {
         coverLetter: dto.coverLetter,
         contactPhone: dto.contactPhone,
         contactEmail: dto.contactEmail,
+        resumeUrl: dto.resumeUrl,
+        resumeFileName: dto.resumeFileName,
       },
       include: {
         post: true,
@@ -188,6 +192,13 @@ export class ApplicationsService {
       throw new ForbiddenException('상태를 변경할 권한이 없습니다.');
     }
 
+    // CANCELLED 상태는 지원자 본인만 설정 가능 (cancel 메서드 사용)
+    if (dto.status === ApplicationStatus.CANCELLED) {
+      throw new BadRequestException(
+        '취소 상태는 지원자 본인만 변경할 수 있습니다.',
+      );
+    }
+
     const updated = await this.prisma.application.update({
       where: { id },
       data: {
@@ -261,5 +272,59 @@ export class ApplicationsService {
       },
     });
     return !!application;
+  }
+
+  /**
+   * 이력서 다운로드 (채용담당자만 가능)
+   */
+  async getResume(
+    applicationId: string,
+    userId: string,
+  ): Promise<{
+    buffer: Buffer;
+    fileName: string;
+    mimeType: string;
+  }> {
+    const application = await this.prisma.application.findUnique({
+      where: { id: applicationId },
+      include: {
+        post: true,
+      },
+    });
+
+    if (!application) {
+      throw new NotFoundException('지원 내역을 찾을 수 없습니다.');
+    }
+
+    // 채용담당자만 이력서 다운로드 가능
+    if (application.post.authorId !== userId) {
+      throw new ForbiddenException('이력서를 다운로드할 권한이 없습니다.');
+    }
+
+    if (!application.resumeUrl) {
+      throw new NotFoundException('이력서가 첨부되지 않은 지원입니다.');
+    }
+
+    const buffer = await this.uploadsService.readResumeFile(
+      application.resumeUrl,
+    );
+
+    // MIME 타입 추론
+    const ext = application.resumeUrl.split('.').pop()?.toLowerCase();
+    let mimeType = 'application/octet-stream';
+    if (ext === 'pdf') {
+      mimeType = 'application/pdf';
+    } else if (ext === 'doc') {
+      mimeType = 'application/msword';
+    } else if (ext === 'docx') {
+      mimeType =
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    }
+
+    return {
+      buffer,
+      fileName: application.resumeFileName || `resume.${ext}`,
+      mimeType,
+    };
   }
 }

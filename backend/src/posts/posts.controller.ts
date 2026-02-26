@@ -8,11 +8,13 @@ import {
   Delete,
   UseGuards,
   Req,
+  Res,
   Query,
   HttpCode,
   HttpStatus,
+  StreamableFile,
 } from '@nestjs/common';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 import { Throttle } from '@nestjs/throttler';
 import { ApiTags } from '@nestjs/swagger';
 import { PostsService } from './posts.service';
@@ -228,5 +230,29 @@ export class PostsController {
   async getLikeStatus(@Param('id') id: string, @Req() req: Request) {
     const user = req.user as JwtPayload;
     return this.postsService.getLikeStatus(id, user.sub);
+  }
+
+  // ========================================
+  // 10. 첨부파일 다운로드 (인증 필요)
+  // ========================================
+  @Get(':id/attachments/:attachmentId')
+  @UseGuards(JwtAuthGuard)
+  async downloadAttachment(
+    @Param('id') id: string,
+    @Param('attachmentId') attachmentId: string,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<StreamableFile> {
+    const { buffer, fileName, mimeType } =
+      await this.postsService.downloadAttachment(id, attachmentId);
+
+    // 파일명 인코딩 (한글 파일명 지원)
+    const encodedFileName = encodeURIComponent(fileName);
+
+    res.set({
+      'Content-Type': mimeType,
+      'Content-Disposition': `attachment; filename*=UTF-8''${encodedFileName}`,
+    });
+
+    return new StreamableFile(buffer);
   }
 }

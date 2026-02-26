@@ -1,4 +1,5 @@
-import type { Request } from 'express';
+import { StreamableFile } from '@nestjs/common';
+import type { Request, Response } from 'express';
 import { ApplicationsService } from './applications.service';
 import { CreateApplicationDto, UpdateApplicationStatusDto, ApplicationResponseDto } from './dto';
 export declare class ApplicationsController {
@@ -15,4 +16,5 @@ export declare class ApplicationsController {
     cancel(id: string, req: Request): Promise<{
         message: string;
     }>;
+    downloadResume(id: string, req: Request, res: Response): Promise<StreamableFile>;
 }

@@ -251,6 +251,9 @@ model Post {
   // 지원 관계
   applications      Application[]
 
+  // 첨부파일 (수업자료 등)
+  attachments       PostAttachment[]
+
   authorId    String?
   author      User?        @relation(fields: [authorId], references: [id], onDelete: SetNull)
 
@@ -748,4 +751,30 @@ model Announcement {
   @@index([isPinned, createdAt])
   @@index([isPublished])
   @@map("announcements")
+}
+
+// ========================================
+// 게시글 첨부파일 모델 (수업자료 등)
+// ========================================
+
+model PostAttachment {
+  id            String   @id @default(cuid())
+
+  // 게시글 연결
+  postId        String
+  post          Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  // 파일 정보
+  fileUrl       String   // 업로드된 파일 URL
+  fileName      String   // 원본 파일명
+  fileSize      Int      // 파일 크기 (bytes)
+  mimeType      String   // MIME type
+
+  // 다운로드 통계
+  downloadCount Int      @default(0)
+
+  createdAt     DateTime @default(now())
+
+  @@index([postId])
+  @@map("post_attachments")
 }

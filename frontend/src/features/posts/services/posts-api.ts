@@ -110,4 +110,22 @@ export const postsApi = {
     );
     return response.data;
   },
+
+  // 첨부파일 다운로드 (수업자료 등)
+  async downloadAttachment(postId: string, attachmentId: string, fileName: string): Promise<void> {
+    const response = await api.get(`/posts/${postId}/attachments/${attachmentId}`, {
+      responseType: 'blob',
+    });
+
+    // Blob으로 다운로드 처리
+    const blob = new Blob([response.data]);
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  },
 };

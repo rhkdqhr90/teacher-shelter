@@ -50,4 +50,9 @@ export declare class PostsService {
     getLikeStatus(postId: string, userId: string): Promise<{
         liked: boolean;
     }>;
+    downloadAttachment(postId: string, attachmentId: string): Promise<{
+        buffer: Buffer;
+        fileName: string;
+        mimeType: string;
+    }>;
 }

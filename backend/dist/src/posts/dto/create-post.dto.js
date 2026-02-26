@@ -9,9 +9,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreatePostDto = void 0;
+exports.AttachmentInputDto = exports.CreatePostDto = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
+const class_transformer_2 = require("class-transformer");
 const client_1 = require("@prisma/client");
 const sanitize_util_1 = require("../../common/utils/sanitize.util");
 class CreatePostDto {
@@ -37,20 +38,21 @@ class CreatePostDto {
     requirements;
     detailAddress;
     therapyTags;
+    attachments;
 }
 exports.CreatePostDto = CreatePostDto;
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(1),
     (0, class_validator_1.MaxLength)(200),
-    (0, class_transformer_1.Transform)(sanitize_util_1.sanitizeTitle),
+    (0, class_transformer_2.Transform)(sanitize_util_1.sanitizeTitle),
     __metadata("design:type", String)
 ], CreatePostDto.prototype, "title", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(1),
     (0, class_validator_1.MaxLength)(10000),
-    (0, class_transformer_1.Transform)(sanitize_util_1.sanitizeContent),
+    (0, class_transformer_2.Transform)(sanitize_util_1.sanitizeContent),
     __metadata("design:type", String)
 ], CreatePostDto.prototype, "content", void 0);
 __decorate([
@@ -102,7 +104,7 @@ __decorate([
     (0, class_validator_1.MaxLength)(100),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.ValidateIf)((o) => o.category === client_1.PostCategory.JOB_POSTING),
-    (0, class_transformer_1.Transform)(sanitize_util_1.sanitizeTitle),
+    (0, class_transformer_2.Transform)(sanitize_util_1.sanitizeTitle),
     __metadata("design:type", String)
 ], CreatePostDto.prototype, "organizationName", void 0);
 __decorate([
@@ -123,7 +125,7 @@ __decorate([
     (0, class_validator_1.MaxLength)(50),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.ValidateIf)((o) => o.category === client_1.PostCategory.JOB_POSTING),
-    (0, class_transformer_1.Transform)(sanitize_util_1.sanitizeTitle),
+    (0, class_transformer_2.Transform)(sanitize_util_1.sanitizeTitle),
     __metadata("design:type", String)
 ], CreatePostDto.prototype, "contactKakao", void 0);
 __decorate([
@@ -150,7 +152,7 @@ __decorate([
     (0, class_validator_1.MaxLength)(50),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.ValidateIf)((o) => o.category === client_1.PostCategory.JOB_POSTING),
-    (0, class_transformer_1.Transform)(sanitize_util_1.sanitizeTitle),
+    (0, class_transformer_2.Transform)(sanitize_util_1.sanitizeTitle),
     __metadata("design:type", String)
 ], CreatePostDto.prototype, "workingHours", void 0);
 __decorate([
@@ -164,7 +166,7 @@ __decorate([
     (0, class_validator_1.MaxLength)(2000),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.ValidateIf)((o) => o.category === client_1.PostCategory.JOB_POSTING),
-    (0, class_transformer_1.Transform)(sanitize_util_1.sanitizeTitle),
+    (0, class_transformer_2.Transform)(sanitize_util_1.sanitizeTitle),
     __metadata("design:type", String)
 ], CreatePostDto.prototype, "benefits", void 0);
 __decorate([
@@ -172,7 +174,7 @@ __decorate([
     (0, class_validator_1.MaxLength)(2000),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.ValidateIf)((o) => o.category === client_1.PostCategory.JOB_POSTING),
-    (0, class_transformer_1.Transform)(sanitize_util_1.sanitizeTitle),
+    (0, class_transformer_2.Transform)(sanitize_util_1.sanitizeTitle),
     __metadata("design:type", String)
 ], CreatePostDto.prototype, "requirements", void 0);
 __decorate([
@@ -180,7 +182,7 @@ __decorate([
     (0, class_validator_1.MaxLength)(200),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.ValidateIf)((o) => o.category === client_1.PostCategory.JOB_POSTING),
-    (0, class_transformer_1.Transform)(sanitize_util_1.sanitizeTitle),
+    (0, class_transformer_2.Transform)(sanitize_util_1.sanitizeTitle),
     __metadata("design:type", String)
 ], CreatePostDto.prototype, "detailAddress", void 0);
 __decorate([
@@ -191,4 +193,43 @@ __decorate([
     (0, class_validator_1.ValidateIf)((o) => o.category === client_1.PostCategory.JOB_POSTING),
     __metadata("design:type", Array)
 ], CreatePostDto.prototype, "therapyTags", void 0);
+__decorate([
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.ValidateNested)({ each: true }),
+    (0, class_transformer_1.Type)(() => AttachmentInputDto),
+    (0, class_validator_1.ArrayMaxSize)(5, { message: '첨부파일은 최대 5개까지 가능합니다' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.ValidateIf)((o) => o.category === client_1.PostCategory.CLASS_MATERIAL),
+    __metadata("design:type", Array)
+], CreatePostDto.prototype, "attachments", void 0);
+class AttachmentInputDto {
+    fileUrl;
+    fileName;
+    fileSize;
+    mimeType;
+}
+exports.AttachmentInputDto = AttachmentInputDto;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.Matches)(/^\/uploads\/material\/[a-zA-Z0-9_-]+\.(pdf|doc|docx|ppt|pptx|xls|xlsx|hwp)$/i, {
+        message: '유효하지 않은 파일 경로입니다',
+    }),
+    __metadata("design:type", String)
+], AttachmentInputDto.prototype, "fileUrl", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(255),
+    __metadata("design:type", String)
+], AttachmentInputDto.prototype, "fileName", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(1),
+    (0, class_validator_1.Max)(20 * 1024 * 1024),
+    __metadata("design:type", Number)
+], AttachmentInputDto.prototype, "fileSize", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.Matches)(/^(application\/(pdf|msword|vnd\.openxmlformats-officedocument\.(wordprocessingml\.document|presentationml\.presentation|spreadsheetml\.sheet)|vnd\.ms-(powerpoint|excel)|x-hwp|haansofthwp))$/, { message: '유효하지 않은 파일 형식입니다' }),
+    __metadata("design:type", String)
+], AttachmentInputDto.prototype, "mimeType", void 0);
 //# sourceMappingURL=create-post.dto.js.map

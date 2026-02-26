@@ -99,4 +99,50 @@ export class UploadsController {
     );
     return { imageUrl };
   }
+
+  /**
+   * 이력서 파일 업로드 (채용공고 지원용)
+   * 지원 형식: PDF, DOC, DOCX
+   * 최대 크기: 10MB
+   */
+  @Post('resume')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+    }),
+  )
+  async uploadResume(
+    @Req() req: Request,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new BadRequestException('파일이 없습니다');
+    }
+
+    const user = req.user as { sub: string };
+    return this.uploadsService.saveResumeFile(file, user.sub);
+  }
+
+  /**
+   * 수업자료 파일 업로드 (게시글 첨부용)
+   * 지원 형식: PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, HWP
+   * 최대 크기: 20MB
+   */
+  @Post('material')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
+    }),
+  )
+  async uploadMaterial(
+    @Req() req: Request,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new BadRequestException('파일이 없습니다');
+    }
+
+    const user = req.user as { sub: string };
+    return this.uploadsService.saveMaterialFile(file, user.sub);
+  }
 }

@@ -13,14 +13,17 @@ exports.ApplicationsService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../database/prisma.service");
 const notifications_service_1 = require("../notifications/notifications.service");
+const uploads_service_1 = require("../uploads/uploads.service");
 const dto_1 = require("./dto");
 const client_1 = require("@prisma/client");
 let ApplicationsService = class ApplicationsService {
     prisma;
     notificationsService;
-    constructor(prisma, notificationsService) {
+    uploadsService;
+    constructor(prisma, notificationsService, uploadsService) {
         this.prisma = prisma;
         this.notificationsService = notificationsService;
+        this.uploadsService = uploadsService;
     }
     async create(userId, dto) {
         const post = await this.prisma.post.findUnique({
@@ -57,6 +60,8 @@ let ApplicationsService = class ApplicationsService {
                 coverLetter: dto.coverLetter,
                 contactPhone: dto.contactPhone,
                 contactEmail: dto.contactEmail,
+                resumeUrl: dto.resumeUrl,
+                resumeFileName: dto.resumeFileName,
             },
             include: {
                 post: true,
@@ -139,6 +144,9 @@ let ApplicationsService = class ApplicationsService {
         if (application.post.authorId !== userId) {
             throw new common_1.ForbiddenException('상태를 변경할 권한이 없습니다.');
         }
+        if (dto.status === client_1.ApplicationStatus.CANCELLED) {
+            throw new common_1.BadRequestException('취소 상태는 지원자 본인만 변경할 수 있습니다.');
+        }
         const updated = await this.prisma.application.update({
             where: { id },
             data: {
@@ -199,11 +207,47 @@ let ApplicationsService = class ApplicationsService {
         });
         return !!application;
     }
+    async getResume(applicationId, userId) {
+        const application = await this.prisma.application.findUnique({
+            where: { id: applicationId },
+            include: {
+                post: true,
+            },
+        });
+        if (!application) {
+            throw new common_1.NotFoundException('지원 내역을 찾을 수 없습니다.');
+        }
+        if (application.post.authorId !== userId) {
+            throw new common_1.ForbiddenException('이력서를 다운로드할 권한이 없습니다.');
+        }
+        if (!application.resumeUrl) {
+            throw new common_1.NotFoundException('이력서가 첨부되지 않은 지원입니다.');
+        }
+        const buffer = await this.uploadsService.readResumeFile(application.resumeUrl);
+        const ext = application.resumeUrl.split('.').pop()?.toLowerCase();
+        let mimeType = 'application/octet-stream';
+        if (ext === 'pdf') {
+            mimeType = 'application/pdf';
+        }
+        else if (ext === 'doc') {
+            mimeType = 'application/msword';
+        }
+        else if (ext === 'docx') {
+            mimeType =
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        }
+        return {
+            buffer,
+            fileName: application.resumeFileName || `resume.${ext}`,
+            mimeType,
+        };
+    }
 };
 exports.ApplicationsService = ApplicationsService;
 exports.ApplicationsService = ApplicationsService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        notifications_service_1.NotificationsService])
+        notifications_service_1.NotificationsService,
+        uploads_service_1.UploadsService])
 ], ApplicationsService);
 //# sourceMappingURL=applications.service.js.map

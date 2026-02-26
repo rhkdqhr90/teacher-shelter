@@ -5,6 +5,8 @@ import {
   Region,
   SalaryType,
   EmploymentType,
+  TherapyTag,
+  PostAttachment,
 } from '@prisma/client';
 
 export class PostResponseDto {
@@ -51,11 +53,21 @@ export class PostResponseDto {
   requirements: string | null;
   detailAddress: string | null;
 
+  // 치료/교육 분야 태그
+  therapyTags: TherapyTag[];
+
+  // 첨부파일 (수업자료 등)
+  attachments: PostAttachmentDto[];
+
   createdAt: Date;
   updatedAt: Date;
 
   constructor(
-    post: Post & { author?: any; _count?: { applications?: number } },
+    post: Post & {
+      author?: any;
+      _count?: { applications?: number };
+      attachments?: PostAttachment[];
+    },
   ) {
     this.id = post.id;
     this.title = post.title;
@@ -92,6 +104,9 @@ export class PostResponseDto {
     this.requirements = post.requirements;
     this.detailAddress = post.detailAddress;
 
+    // 치료/교육 분야 태그
+    this.therapyTags = post.therapyTags || [];
+
     // 익명 게시글이면 작성자 정보 숨김
     if (post.isAnonymous || !post.author) {
       this.author = null;
@@ -105,5 +120,25 @@ export class PostResponseDto {
         isVerified: post.author.isVerified,
       };
     }
+
+    // 첨부파일
+    this.attachments = (post.attachments || []).map((att) => ({
+      id: att.id,
+      fileUrl: att.fileUrl,
+      fileName: att.fileName,
+      fileSize: att.fileSize,
+      mimeType: att.mimeType,
+      downloadCount: att.downloadCount,
+    }));
   }
+}
+
+// 첨부파일 DTO
+export interface PostAttachmentDto {
+  id: string;
+  fileUrl: string;
+  fileName: string;
+  fileSize: number;
+  mimeType: string;
+  downloadCount: number;
 }

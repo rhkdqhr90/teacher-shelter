@@ -175,6 +175,24 @@ export const THERAPY_TAG_LABELS: Record<TherapyTag, string> = {
   [TherapyTag.MUSIC]: '음악치료',
 };
 
+// 첨부파일 타입
+export interface PostAttachment {
+  id: string;
+  fileUrl: string;
+  fileName: string;
+  fileSize: number;
+  mimeType: string;
+  downloadCount: number;
+}
+
+// 첨부파일 입력 타입
+export interface AttachmentInput {
+  fileUrl: string;
+  fileName: string;
+  fileSize: number;
+  mimeType: string;
+}
+
 export interface Post {
   id: string;
   title: string;
@@ -215,11 +233,26 @@ export interface Post {
   detailAddress?: string | null;
   // 치료/교육 분야 태그
   therapyTags?: TherapyTag[];
+  // 첨부파일 (수업자료 등)
+  attachments?: PostAttachment[];
   createdAt: string;
   updatedAt: string;
 }
 
 export type PostsResponse = PaginatedResponse<Post>;
+
+// 첨부파일 입력 스키마 (백엔드 검증과 일치)
+const attachmentInputSchema = z.object({
+  fileUrl: z
+    .string()
+    .regex(
+      /^\/uploads\/material\/[a-zA-Z0-9_-]+\.(pdf|doc|docx|ppt|pptx|xls|xlsx|hwp)$/i,
+      '유효하지 않은 파일 경로입니다'
+    ),
+  fileName: z.string().max(255),
+  fileSize: z.number().min(1).max(20 * 1024 * 1024), // 20MB
+  mimeType: z.string(),
+});
 
 export const createPostSchema = z.object({
   title: z.string().min(1, '제목을 입력해주세요').max(200, '제목은 200자 이내로 입력해주세요'),
@@ -249,6 +282,8 @@ export const createPostSchema = z.object({
   detailAddress: z.string().max(200).optional(),
   // 치료/교육 분야 태그
   therapyTags: z.array(z.nativeEnum(TherapyTag)).max(8).optional(),
+  // 첨부파일 (수업자료 전용)
+  attachments: z.array(attachmentInputSchema).max(5).optional(),
 });
 
 // 수정용 스키마 - isAnonymous 제외 (백엔드 UpdatePostDto와 일치)

@@ -124,6 +124,15 @@ let PostsController = class PostsController {
         const user = req.user;
         return this.postsService.getLikeStatus(id, user.sub);
     }
+    async downloadAttachment(id, attachmentId, res) {
+        const { buffer, fileName, mimeType } = await this.postsService.downloadAttachment(id, attachmentId);
+        const encodedFileName = encodeURIComponent(fileName);
+        res.set({
+            'Content-Type': mimeType,
+            'Content-Disposition': `attachment; filename*=UTF-8''${encodedFileName}`,
+        });
+        return new common_1.StreamableFile(buffer);
+    }
 };
 exports.PostsController = PostsController;
 __decorate([
@@ -225,6 +234,16 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], PostsController.prototype, "getLikeStatus", null);
+__decorate([
+    (0, common_1.Get)(':id/attachments/:attachmentId'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('attachmentId')),
+    __param(2, (0, common_1.Res)({ passthrough: true })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, Object]),
+    __metadata("design:returntype", Promise)
+], PostsController.prototype, "downloadAttachment", null);
 exports.PostsController = PostsController = __decorate([
     (0, swagger_1.ApiTags)('Posts'),
     (0, common_1.Controller)('posts'),

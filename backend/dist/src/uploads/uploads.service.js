@@ -82,6 +82,18 @@ const OPTIMIZATION_PRESETS = {
         quality: 90,
         format: 'webp',
     },
+    resume: {
+        maxWidth: 0,
+        maxHeight: 0,
+        quality: 0,
+        format: 'jpeg',
+    },
+    material: {
+        maxWidth: 0,
+        maxHeight: 0,
+        quality: 0,
+        format: 'jpeg',
+    },
 };
 let UploadsService = class UploadsService {
     prisma;
@@ -108,6 +120,35 @@ let UploadsService = class UploadsService {
     ];
     documentExtensions = ['.pdf', '.doc', '.docx'];
     verificationMaxFileSize = 10 * 1024 * 1024;
+    resumeMaxFileSize = 10 * 1024 * 1024;
+    resumeMimeTypes = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ];
+    resumeExtensions = ['.pdf', '.doc', '.docx'];
+    materialMaxFileSize = 20 * 1024 * 1024;
+    materialMimeTypes = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.ms-powerpoint',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/x-hwp',
+        'application/haansofthwp',
+    ];
+    materialExtensions = [
+        '.pdf',
+        '.doc',
+        '.docx',
+        '.ppt',
+        '.pptx',
+        '.xls',
+        '.xlsx',
+        '.hwp',
+    ];
     imageMagicNumbers = [
         { type: 'image/jpeg', bytes: [0xff, 0xd8, 0xff] },
         {
@@ -125,6 +166,15 @@ let UploadsService = class UploadsService {
             bytes: [0x50, 0x4b, 0x03, 0x04],
         },
     ];
+    materialMagicNumbers = [
+        { type: 'application/pdf', bytes: [0x25, 0x50, 0x44, 0x46] },
+        { type: 'application/msword', bytes: [0xd0, 0xcf, 0x11, 0xe0] },
+        { type: 'application/vnd.ms-powerpoint', bytes: [0xd0, 0xcf, 0x11, 0xe0] },
+        { type: 'application/vnd.ms-excel', bytes: [0xd0, 0xcf, 0x11, 0xe0] },
+        { type: 'zip-based', bytes: [0x50, 0x4b, 0x03, 0x04] },
+        { type: 'application/x-hwp', bytes: [0xd0, 0xcf, 0x11, 0xe0] },
+        { type: 'application/haansofthwp', bytes: [0xd0, 0xcf, 0x11, 0xe0] },
+    ];
     constructor(prisma, logger) {
         this.prisma = prisma;
         this.logger = logger;
@@ -132,7 +182,14 @@ let UploadsService = class UploadsService {
         this.ensureUploadDirs();
     }
     ensureUploadDirs() {
-        const dirs = ['profile', 'post', 'verification', 'banner'];
+        const dirs = [
+            'profile',
+            'post',
+            'verification',
+            'banner',
+            'resume',
+            'material',
+        ];
         dirs.forEach((dir) => {
             const fullPath = path.join(this.uploadDir, dir);
             if (!fs.existsSync(fullPath)) {
@@ -411,6 +468,154 @@ let UploadsService = class UploadsService {
             return (0, file_encryption_util_1.decryptBuffer)(fileBuffer);
         }
         return fileBuffer;
+    }
+    validateResumeFile(file) {
+        if (!file) {
+            throw new common_1.BadRequestException('파일이 없습니다');
+        }
+        if (file.size > this.resumeMaxFileSize) {
+            throw new common_1.BadRequestException('파일 크기는 10MB를 초과할 수 없습니다');
+        }
+        const ext = path.extname(file.originalname).toLowerCase();
+        if (!this.resumeMimeTypes.includes(file.mimetype)) {
+            throw new common_1.BadRequestException('허용되지 않는 파일 형식입니다. (PDF, DOC, DOCX만 허용)');
+        }
+        if (!this.resumeExtensions.includes(ext)) {
+            throw new common_1.BadRequestException('허용되지 않는 파일 확장자입니다. (pdf, doc, docx만 허용)');
+        }
+        if (!this.validateDocumentMagicNumber(file.buffer, file.mimetype)) {
+            throw new common_1.BadRequestException('유효하지 않은 문서 파일입니다. 파일이 손상되었거나 위조되었을 수 있습니다.');
+        }
+    }
+    async saveResumeFile(file, userId) {
+        this.validateResumeFile(file);
+        if (!userId || !/^[a-zA-Z0-9_-]+$/.test(userId)) {
+            throw new common_1.BadRequestException('유효하지 않은 사용자 ID입니다');
+        }
+        const timestamp = Date.now();
+        const random = crypto.randomBytes(8).toString('hex');
+        const ext = path.extname(file.originalname).toLowerCase();
+        const filename = `${userId}_${timestamp}_${random}${ext}`;
+        const typeDir = path.resolve(this.uploadDir, 'resume');
+        const filePath = path.resolve(typeDir, filename);
+        if (!filePath.startsWith(typeDir + path.sep)) {
+            throw new common_1.BadRequestException('잘못된 파일 경로입니다');
+        }
+        await fs.promises.writeFile(filePath, file.buffer);
+        this.logger.log(`Resume file saved: ${filename} (${file.size} bytes)`, 'UploadsService');
+        return {
+            fileUrl: `/uploads/resume/${filename}`,
+            fileName: file.originalname,
+            fileSize: file.size,
+            mimeType: file.mimetype,
+        };
+    }
+    async readResumeFile(fileUrl) {
+        let filename = fileUrl.replace('/uploads/resume/', '');
+        try {
+            filename = decodeURIComponent(filename);
+        }
+        catch {
+            throw new common_1.BadRequestException('잘못된 파일 경로입니다');
+        }
+        const uploadsDir = path.resolve(this.uploadDir, 'resume');
+        const filePath = path.resolve(uploadsDir, path.basename(filename));
+        if (!filePath.startsWith(uploadsDir + path.sep)) {
+            throw new common_1.BadRequestException('잘못된 파일 경로입니다');
+        }
+        if (!fs.existsSync(filePath)) {
+            throw new common_1.BadRequestException('파일을 찾을 수 없습니다');
+        }
+        return fs.promises.readFile(filePath);
+    }
+    validateMaterialMagicNumber(buffer, mimetype) {
+        if (!buffer || buffer.length < 4) {
+            return false;
+        }
+        if (mimetype === 'application/pdf') {
+            const pdfMagic = [0x25, 0x50, 0x44, 0x46];
+            return pdfMagic.every((byte, i) => buffer[i] === byte);
+        }
+        const oleMimeTypes = [
+            'application/msword',
+            'application/vnd.ms-powerpoint',
+            'application/vnd.ms-excel',
+            'application/x-hwp',
+            'application/haansofthwp',
+        ];
+        if (oleMimeTypes.includes(mimetype)) {
+            const oleMagic = [0xd0, 0xcf, 0x11, 0xe0];
+            return oleMagic.every((byte, i) => buffer[i] === byte);
+        }
+        const zipMimeTypes = [
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ];
+        if (zipMimeTypes.includes(mimetype)) {
+            const zipMagic = [0x50, 0x4b, 0x03, 0x04];
+            return zipMagic.every((byte, i) => buffer[i] === byte);
+        }
+        return false;
+    }
+    validateMaterialFile(file) {
+        if (!file) {
+            throw new common_1.BadRequestException('파일이 없습니다');
+        }
+        if (file.size > this.materialMaxFileSize) {
+            throw new common_1.BadRequestException('파일 크기는 20MB를 초과할 수 없습니다');
+        }
+        const ext = path.extname(file.originalname).toLowerCase();
+        if (!this.materialMimeTypes.includes(file.mimetype)) {
+            throw new common_1.BadRequestException('허용되지 않는 파일 형식입니다. (PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, HWP만 허용)');
+        }
+        if (!this.materialExtensions.includes(ext)) {
+            throw new common_1.BadRequestException('허용되지 않는 파일 확장자입니다. (pdf, doc, docx, ppt, pptx, xls, xlsx, hwp만 허용)');
+        }
+        if (!this.validateMaterialMagicNumber(file.buffer, file.mimetype)) {
+            throw new common_1.BadRequestException('유효하지 않은 문서 파일입니다. 파일이 손상되었거나 위조되었을 수 있습니다.');
+        }
+    }
+    async saveMaterialFile(file, userId) {
+        this.validateMaterialFile(file);
+        if (!userId || !/^[a-zA-Z0-9_-]+$/.test(userId)) {
+            throw new common_1.BadRequestException('유효하지 않은 사용자 ID입니다');
+        }
+        const timestamp = Date.now();
+        const random = crypto.randomBytes(8).toString('hex');
+        const ext = path.extname(file.originalname).toLowerCase();
+        const filename = `${userId}_${timestamp}_${random}${ext}`;
+        const typeDir = path.resolve(this.uploadDir, 'material');
+        const filePath = path.resolve(typeDir, filename);
+        if (!filePath.startsWith(typeDir + path.sep)) {
+            throw new common_1.BadRequestException('잘못된 파일 경로입니다');
+        }
+        await fs.promises.writeFile(filePath, file.buffer);
+        this.logger.log(`Material file saved: ${filename} (${file.size} bytes)`, 'UploadsService');
+        return {
+            fileUrl: `/uploads/material/${filename}`,
+            fileName: file.originalname,
+            fileSize: file.size,
+            mimeType: file.mimetype,
+        };
+    }
+    async readMaterialFile(fileUrl) {
+        let filename = fileUrl.replace('/uploads/material/', '');
+        try {
+            filename = decodeURIComponent(filename);
+        }
+        catch {
+            throw new common_1.BadRequestException('잘못된 파일 경로입니다');
+        }
+        const uploadsDir = path.resolve(this.uploadDir, 'material');
+        const filePath = path.resolve(uploadsDir, path.basename(filename));
+        if (!filePath.startsWith(uploadsDir + path.sep)) {
+            throw new common_1.BadRequestException('잘못된 파일 경로입니다');
+        }
+        if (!fs.existsSync(filePath)) {
+            throw new common_1.BadRequestException('파일을 찾을 수 없습니다');
+        }
+        return fs.promises.readFile(filePath);
     }
 };
 exports.UploadsService = UploadsService;

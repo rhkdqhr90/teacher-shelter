@@ -7,9 +7,11 @@ import {
   Body,
   Param,
   Req,
+  Res,
   UseGuards,
+  StreamableFile,
 } from '@nestjs/common';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ApplicationsService } from './applications.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -90,5 +92,29 @@ export class ApplicationsController {
     const user = req.user as JwtPayload;
     await this.applicationsService.cancel(id, user.sub);
     return { message: '지원이 취소되었습니다.' };
+  }
+
+  /**
+   * 이력서 다운로드 (채용담당자만 가능)
+   */
+  @Get(':id/resume')
+  async downloadResume(
+    @Param('id') id: string,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<StreamableFile> {
+    const user = req.user as JwtPayload;
+    const { buffer, fileName, mimeType } =
+      await this.applicationsService.getResume(id, user.sub);
+
+    // 파일명 인코딩 (한글 파일명 지원)
+    const encodedFileName = encodeURIComponent(fileName);
+
+    res.set({
+      'Content-Type': mimeType,
+      'Content-Disposition': `attachment; filename*=UTF-8''${encodedFileName}`,
+    });
+
+    return new StreamableFile(buffer);
   }
 }

@@ -19,6 +19,9 @@ let BannersService = class BannersService {
         this.prisma = prisma;
     }
     async create(dto) {
+        if (!dto.imageUrl && !dto.bannerText) {
+            throw new common_1.BadRequestException('이미지 URL 또는 배너 텍스트 중 하나는 필수입니다.');
+        }
         return this.prisma.banner.create({
             data: {
                 title: dto.title,
@@ -26,6 +29,10 @@ let BannersService = class BannersService {
                 linkUrl: dto.linkUrl,
                 alt: dto.alt,
                 type: dto.type || client_1.BannerType.PROMO,
+                bannerText: dto.bannerText,
+                subText: dto.subText,
+                bgColor: dto.bgColor,
+                textColor: dto.textColor,
                 isActive: dto.isActive ?? true,
                 priority: dto.priority ?? 0,
                 startDate: dto.startDate ? new Date(dto.startDate) : null,
@@ -74,6 +81,10 @@ let BannersService = class BannersService {
                 ...(dto.linkUrl !== undefined && { linkUrl: dto.linkUrl }),
                 ...(dto.alt !== undefined && { alt: dto.alt }),
                 ...(dto.type !== undefined && { type: dto.type }),
+                ...(dto.bannerText !== undefined && { bannerText: dto.bannerText }),
+                ...(dto.subText !== undefined && { subText: dto.subText }),
+                ...(dto.bgColor !== undefined && { bgColor: dto.bgColor }),
+                ...(dto.textColor !== undefined && { textColor: dto.textColor }),
                 ...(dto.isActive !== undefined && { isActive: dto.isActive }),
                 ...(dto.priority !== undefined && { priority: dto.priority }),
                 ...(dto.startDate !== undefined && {

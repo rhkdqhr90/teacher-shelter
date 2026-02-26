@@ -1,6 +1,6 @@
 'use client';
 
-import { Eye, Flag, Heart, Share2, Pencil, Trash2, MoreVertical, Bookmark, MapPin, Building2, Clock, Users, Calendar, Phone, Mail, MessageCircle, Briefcase, Banknote, CheckCircle, List } from 'lucide-react';
+import { Eye, Flag, Heart, Share2, Pencil, Trash2, MoreVertical, Bookmark, MapPin, Building2, Clock, Users, Calendar, Phone, Mail, MessageCircle, Briefcase, Banknote, CheckCircle, List, FileText, Download, Loader2 } from 'lucide-react';
 import { PostDetailSkeleton } from '@/components/ui/skeleton';
 import DOMPurify from 'dompurify';
 import { Button } from '@/components/ui/button';
@@ -44,7 +44,8 @@ import { useUser, useIsAuthenticated } from '@/stores/auth-store';
 import { useAppStore } from '@/stores/app-store';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { postsApi } from '../services/posts-api';
 import { JOB_TYPE_LABELS } from '@/features/profile/types';
 import { AnswerList } from '@/features/legal-qa';
 import { ApplicationForm } from '@/features/applications';
@@ -79,6 +80,7 @@ export function PostDetail({ postId }: PostDetailProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
+  const [downloadingAttachment, setDownloadingAttachment] = useState<string | null>(null);
   const { toast } = useToast();
 
   const isTogglingRecruiting = updatePost.isPending;
@@ -169,6 +171,34 @@ export function PostDetail({ postId }: PostDetailProps) {
       return;
     }
     setShowReportModal(true);
+  };
+
+  // 첨부파일 다운로드 핸들러
+  const handleDownloadAttachment = useCallback(async (attachmentId: string, fileName: string) => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+    if (!user.isVerified) {
+      router.push('/register');
+      return;
+    }
+
+    setDownloadingAttachment(attachmentId);
+    try {
+      await postsApi.downloadAttachment(postId, attachmentId, fileName);
+    } catch {
+      toast.error('다운로드 실패', '파일을 다운로드할 수 없습니다.');
+    } finally {
+      setDownloadingAttachment(null);
+    }
+  }, [postId, user, router, toast]);
+
+  // 파일 크기 포맷
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes}B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)}KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
   };
 
   if (isLoading) {
@@ -482,6 +512,49 @@ export function PostDetail({ postId }: PostDetailProps) {
             }),
           }}
         />
+
+        {/* 첨부파일 목록 (수업자료) */}
+        {post.attachments && post.attachments.length > 0 && (
+          <div className="mt-6 p-4 bg-muted/30 rounded-lg border border-border">
+            <h3 className="flex items-center gap-2 font-medium text-sm mb-3">
+              <FileText className="w-4 h-4 text-primary" />
+              첨부파일 ({post.attachments.length}개)
+            </h3>
+            <div className="space-y-2">
+              {post.attachments.map((attachment) => (
+                <div
+                  key={attachment.id}
+                  className="flex items-center justify-between p-3 bg-background rounded-md border"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <FileText className="w-5 h-5 text-muted-foreground shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{attachment.fileName}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatFileSize(attachment.fileSize)}
+                        {attachment.downloadCount > 0 && ` · 다운로드 ${attachment.downloadCount}회`}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDownloadAttachment(attachment.id, attachment.fileName)}
+                    disabled={downloadingAttachment === attachment.id}
+                    className="shrink-0 ml-3"
+                    title={!user ? '로그인이 필요합니다' : !user.isVerified ? '이메일 인증이 필요합니다' : '다운로드'}
+                  >
+                    {downloadingAttachment === attachment.id ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Download className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Stats & Actions */}
         <div className="post-detail__actions">

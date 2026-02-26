@@ -40,16 +40,29 @@ let PostsService = class PostsService {
             createPostDto.salaryMin > createPostDto.salaryMax) {
             throw new common_1.BadRequestException('최소 급여는 최대 급여보다 클 수 없습니다');
         }
-        const deadline = createPostDto.deadline
+        const deadlineDate = createPostDto.deadline
             ? new Date(createPostDto.deadline)
             : undefined;
+        const { attachments, deadline, ...postData } = createPostDto;
+        const validAttachments = createPostDto.category === 'CLASS_MATERIAL' ? attachments : undefined;
         const post = await this.prisma.post.create({
             data: {
-                ...createPostDto,
-                deadline,
+                ...postData,
+                deadline: deadlineDate,
                 authorId: createPostDto.isAnonymous ? null : userId,
                 anonymousAuthorId: createPostDto.isAnonymous ? userId : null,
                 ipHash: createPostDto.isAnonymous ? (0, ip_util_1.hashIp)(ip) : null,
+                ...(validAttachments &&
+                    validAttachments.length > 0 && {
+                    attachments: {
+                        create: validAttachments.map((attachment) => ({
+                            fileUrl: attachment.fileUrl,
+                            fileName: attachment.fileName,
+                            fileSize: attachment.fileSize,
+                            mimeType: attachment.mimeType,
+                        })),
+                    },
+                }),
             },
             include: {
                 author: {
@@ -62,6 +75,7 @@ let PostsService = class PostsService {
                         isVerified: true,
                     },
                 },
+                attachments: true,
             },
         });
         return new post_response_dto_1.PostResponseDto(post);
@@ -150,6 +164,7 @@ let PostsService = class PostsService {
                         isVerified: true,
                     },
                 },
+                attachments: true,
             },
         });
         if (!existingPost) {
@@ -174,36 +189,56 @@ let PostsService = class PostsService {
         if (!post) {
             throw new common_1.NotFoundException('게시글을 찾을 수 없습니다');
         }
-        if (post.authorId !== userId) {
-            throw new common_1.ForbiddenException('본인이 작성한 게시글만 수정할 수 있습니다');
-        }
         if (post.isAnonymous) {
             throw new common_1.ForbiddenException('익명 게시글은 수정할 수 없습니다');
+        }
+        if (post.authorId !== userId) {
+            throw new common_1.ForbiddenException('본인이 작성한 게시글만 수정할 수 있습니다');
         }
         if (updatePostDto.category && updatePostDto.category !== post.category) {
             throw new common_1.BadRequestException('게시글의 카테고리는 변경할 수 없습니다');
         }
-        const deadline = updatePostDto.deadline
+        const deadlineDate = updatePostDto.deadline
             ? new Date(updatePostDto.deadline)
             : undefined;
-        const updatedPost = await this.prisma.post.update({
-            where: { id },
-            data: {
-                ...updatePostDto,
-                deadline,
-            },
-            include: {
-                author: {
-                    select: {
-                        id: true,
-                        nickname: true,
-                        profileImage: true,
-                        jobType: true,
-                        career: true,
-                        isVerified: true,
-                    },
+        const { attachments, deadline, ...postData } = updatePostDto;
+        const updatedPost = await this.prisma.$transaction(async (tx) => {
+            if (post.category === 'CLASS_MATERIAL' && attachments !== undefined) {
+                await tx.postAttachment.deleteMany({
+                    where: { postId: id },
+                });
+                if (attachments.length > 0) {
+                    await tx.postAttachment.createMany({
+                        data: attachments.map((att) => ({
+                            postId: id,
+                            fileUrl: att.fileUrl,
+                            fileName: att.fileName,
+                            fileSize: att.fileSize,
+                            mimeType: att.mimeType,
+                        })),
+                    });
+                }
+            }
+            return tx.post.update({
+                where: { id },
+                data: {
+                    ...postData,
+                    deadline: deadlineDate,
                 },
-            },
+                include: {
+                    author: {
+                        select: {
+                            id: true,
+                            nickname: true,
+                            profileImage: true,
+                            jobType: true,
+                            career: true,
+                            isVerified: true,
+                        },
+                    },
+                    attachments: true,
+                },
+            });
         });
         return new post_response_dto_1.PostResponseDto(updatedPost);
     }
@@ -435,6 +470,27 @@ let PostsService = class PostsService {
             },
         });
         return { liked: !!like };
+    }
+    async downloadAttachment(postId, attachmentId) {
+        const attachment = await this.prisma.postAttachment.findFirst({
+            where: {
+                id: attachmentId,
+                postId,
+            },
+        });
+        if (!attachment) {
+            throw new common_1.NotFoundException('첨부파일을 찾을 수 없습니다');
+        }
+        await this.prisma.postAttachment.update({
+            where: { id: attachmentId },
+            data: { downloadCount: { increment: 1 } },
+        });
+        const buffer = await this.uploadsService.readMaterialFile(attachment.fileUrl);
+        return {
+            buffer,
+            fileName: attachment.fileName,
+            mimeType: attachment.mimeType,
+        };
     }
 };
 exports.PostsService = PostsService;

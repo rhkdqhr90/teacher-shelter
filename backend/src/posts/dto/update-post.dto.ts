@@ -13,8 +13,9 @@ import {
   MinLength,
   MaxLength,
   ValidateIf,
+  ValidateNested,
 } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   PostCategory,
   JobSubCategory,
@@ -27,6 +28,7 @@ import {
   sanitizeTitle,
   sanitizeContent,
 } from '../../common/utils/sanitize.util';
+import { AttachmentInputDto } from './create-post.dto';
 
 export class UpdatePostDto {
   @IsString()
@@ -95,6 +97,7 @@ export class UpdatePostDto {
   @MaxLength(100)
   @IsOptional()
   @ValidateIf((o) => o.category === PostCategory.JOB_POSTING)
+  @Transform(sanitizeTitle)
   organizationName?: string;
 
   @IsString()
@@ -112,6 +115,7 @@ export class UpdatePostDto {
   @MaxLength(50)
   @IsOptional()
   @ValidateIf((o) => o.category === PostCategory.JOB_POSTING)
+  @Transform(sanitizeTitle)
   contactKakao?: string;
 
   @IsDateString()
@@ -134,6 +138,7 @@ export class UpdatePostDto {
   @MaxLength(50)
   @IsOptional()
   @ValidateIf((o) => o.category === PostCategory.JOB_POSTING)
+  @Transform(sanitizeTitle)
   workingHours?: string;
 
   // === 2순위: 상세 정보 ===
@@ -146,18 +151,21 @@ export class UpdatePostDto {
   @MaxLength(2000)
   @IsOptional()
   @ValidateIf((o) => o.category === PostCategory.JOB_POSTING)
+  @Transform(sanitizeTitle)
   benefits?: string;
 
   @IsString()
   @MaxLength(2000)
   @IsOptional()
   @ValidateIf((o) => o.category === PostCategory.JOB_POSTING)
+  @Transform(sanitizeTitle)
   requirements?: string;
 
   @IsString()
   @MaxLength(200)
   @IsOptional()
   @ValidateIf((o) => o.category === PostCategory.JOB_POSTING)
+  @Transform(sanitizeTitle)
   detailAddress?: string;
 
   // === 치료/교육 분야 태그 (다중 선택) ===
@@ -167,4 +175,13 @@ export class UpdatePostDto {
   @IsOptional()
   @ValidateIf((o) => o.category === PostCategory.JOB_POSTING)
   therapyTags?: TherapyTag[];
+
+  // === 첨부파일 (수업자료 전용) ===
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => AttachmentInputDto)
+  @ArrayMaxSize(5, { message: '첨부파일은 최대 5개까지 가능합니다' })
+  @IsOptional()
+  @ValidateIf((o) => o.category === PostCategory.CLASS_MATERIAL)
+  attachments?: AttachmentInputDto[];
 }

@@ -45,18 +45,37 @@ export class PostsService {
     }
 
     // deadline 문자열을 Date 객체로 변환 (날짜만 있으면 자정 UTC로 변환)
-    const deadline = createPostDto.deadline
+    const deadlineDate = createPostDto.deadline
       ? new Date(createPostDto.deadline)
       : undefined;
 
+    // attachments, deadline 분리 (Prisma create에서 별도 처리)
+    const { attachments, deadline, ...postData } = createPostDto;
+
+    // 수업자료 카테고리가 아니면 첨부파일 무시 (보안: ValidateIf 우회 방지)
+    const validAttachments =
+      createPostDto.category === 'CLASS_MATERIAL' ? attachments : undefined;
+
     const post = await this.prisma.post.create({
       data: {
-        ...createPostDto,
-        deadline,
+        ...postData,
+        deadline: deadlineDate,
         authorId: createPostDto.isAnonymous ? null : userId,
         // 익명 게시글: 실제 작성자 ID 저장 (삭제 권한용) + IP 해시 (보조 검증)
         anonymousAuthorId: createPostDto.isAnonymous ? userId : null,
         ipHash: createPostDto.isAnonymous ? hashIp(ip) : null,
+        // 첨부파일 연결 (수업자료 게시판만)
+        ...(validAttachments &&
+          validAttachments.length > 0 && {
+            attachments: {
+              create: validAttachments.map((attachment) => ({
+                fileUrl: attachment.fileUrl,
+                fileName: attachment.fileName,
+                fileSize: attachment.fileSize,
+                mimeType: attachment.mimeType,
+              })),
+            },
+          }),
       },
       include: {
         author: {
@@ -69,6 +88,7 @@ export class PostsService {
             isVerified: true,
           },
         },
+        attachments: true,
       },
     });
 
@@ -192,6 +212,7 @@ export class PostsService {
             isVerified: true,
           },
         },
+        attachments: true,
       },
     });
 
@@ -228,14 +249,14 @@ export class PostsService {
       throw new NotFoundException('게시글을 찾을 수 없습니다');
     }
 
-    // 권한 확인 (작성자만)
-    if (post.authorId !== userId) {
-      throw new ForbiddenException('본인이 작성한 게시글만 수정할 수 있습니다');
-    }
-
     // 익명 게시글은 수정 불가 (정책)
     if (post.isAnonymous) {
       throw new ForbiddenException('익명 게시글은 수정할 수 없습니다');
+    }
+
+    // 권한 확인 (작성자만)
+    if (post.authorId !== userId) {
+      throw new ForbiddenException('본인이 작성한 게시글만 수정할 수 있습니다');
     }
 
     // 카테고리 변경 방지 (보안: 익명→일반 게시판 이동 방지)
@@ -244,29 +265,57 @@ export class PostsService {
     }
 
     // deadline 문자열을 Date 객체로 변환
-    const deadline = updatePostDto.deadline
+    const deadlineDate = updatePostDto.deadline
       ? new Date(updatePostDto.deadline)
       : undefined;
 
-    // 업데이트
-    const updatedPost = await this.prisma.post.update({
-      where: { id },
-      data: {
-        ...updatePostDto,
-        deadline,
-      },
-      include: {
-        author: {
-          select: {
-            id: true,
-            nickname: true,
-            profileImage: true,
-            jobType: true,
-            career: true,
-            isVerified: true,
-          },
+    // attachments, deadline 분리 (Prisma update에서 별도 처리)
+    const { attachments, deadline, ...postData } = updatePostDto;
+
+    // 트랜잭션으로 업데이트 (첨부파일 교체 포함)
+    const updatedPost = await this.prisma.$transaction(async (tx) => {
+      // 수업자료 카테고리이고 첨부파일이 전달된 경우
+      if (post.category === 'CLASS_MATERIAL' && attachments !== undefined) {
+        // 기존 첨부파일 삭제
+        await tx.postAttachment.deleteMany({
+          where: { postId: id },
+        });
+
+        // 새 첨부파일 추가 (있는 경우)
+        if (attachments.length > 0) {
+          await tx.postAttachment.createMany({
+            data: attachments.map((att) => ({
+              postId: id,
+              fileUrl: att.fileUrl,
+              fileName: att.fileName,
+              fileSize: att.fileSize,
+              mimeType: att.mimeType,
+            })),
+          });
+        }
+      }
+
+      // 게시글 업데이트
+      return tx.post.update({
+        where: { id },
+        data: {
+          ...postData,
+          deadline: deadlineDate,
         },
-      },
+        include: {
+          author: {
+            select: {
+              id: true,
+              nickname: true,
+              profileImage: true,
+              jobType: true,
+              career: true,
+              isVerified: true,
+            },
+          },
+          attachments: true,
+        },
+      });
     });
 
     return new PostResponseDto(updatedPost);
@@ -601,5 +650,46 @@ export class PostsService {
     });
 
     return { liked: !!like };
+  }
+
+  // ========================================
+  // 11. 첨부파일 다운로드 (로그인 사용자만)
+  // ========================================
+  async downloadAttachment(
+    postId: string,
+    attachmentId: string,
+  ): Promise<{
+    buffer: Buffer;
+    fileName: string;
+    mimeType: string;
+  }> {
+    // 첨부파일 조회
+    const attachment = await this.prisma.postAttachment.findFirst({
+      where: {
+        id: attachmentId,
+        postId,
+      },
+    });
+
+    if (!attachment) {
+      throw new NotFoundException('첨부파일을 찾을 수 없습니다');
+    }
+
+    // 다운로드 카운트 증가
+    await this.prisma.postAttachment.update({
+      where: { id: attachmentId },
+      data: { downloadCount: { increment: 1 } },
+    });
+
+    // 파일 읽기
+    const buffer = await this.uploadsService.readMaterialFile(
+      attachment.fileUrl,
+    );
+
+    return {
+      buffer,
+      fileName: attachment.fileName,
+      mimeType: attachment.mimeType,
+    };
   }
 }

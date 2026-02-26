@@ -22,4 +22,12 @@ export declare class CreatePostDto {
     requirements?: string;
     detailAddress?: string;
     therapyTags?: TherapyTag[];
+    attachments?: AttachmentInputDto[];
 }
+export declare class AttachmentInputDto {
+    fileUrl: string;
+    fileName: string;
+    fileSize: number;
+    mimeType: string;
+}
+export type AttachmentInput = AttachmentInputDto;

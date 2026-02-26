@@ -56,6 +56,8 @@ export interface CreateApplicationInput {
   coverLetter?: string;
   contactPhone?: string;
   contactEmail?: string;
+  resumeUrl?: string;
+  resumeFileName?: string;
 }
 
 export interface UpdateApplicationStatusInput {

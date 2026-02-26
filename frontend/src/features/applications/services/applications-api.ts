@@ -46,4 +46,27 @@ export const applicationsApi = {
   cancel: async (id: string): Promise<void> => {
     await api.delete(`/applications/${id}`);
   },
+
+  // 이력서 다운로드 URL 가져오기 (채용담당자용)
+  getResumeDownloadUrl: (id: string): string => {
+    return `/applications/${id}/resume`;
+  },
+
+  // 이력서 다운로드 (채용담당자용)
+  downloadResume: async (id: string, fileName: string): Promise<void> => {
+    const response = await api.get(`/applications/${id}/resume`, {
+      responseType: 'blob',
+    });
+
+    // Blob으로 다운로드 처리
+    const blob = new Blob([response.data]);
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  },
 };

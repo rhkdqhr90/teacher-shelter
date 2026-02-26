@@ -29,6 +29,8 @@ class PostResponseDto {
     benefits;
     requirements;
     detailAddress;
+    therapyTags;
+    attachments;
     createdAt;
     updatedAt;
     constructor(post) {
@@ -60,6 +62,7 @@ class PostResponseDto {
         this.benefits = post.benefits;
         this.requirements = post.requirements;
         this.detailAddress = post.detailAddress;
+        this.therapyTags = post.therapyTags || [];
         if (post.isAnonymous || !post.author) {
             this.author = null;
         }
@@ -73,6 +76,14 @@ class PostResponseDto {
                 isVerified: post.author.isVerified,
             };
         }
+        this.attachments = (post.attachments || []).map((att) => ({
+            id: att.id,
+            fileUrl: att.fileUrl,
+            fileName: att.fileName,
+            fileSize: att.fileSize,
+            mimeType: att.mimeType,
+            downloadCount: att.downloadCount,
+        }));
     }
 }
 exports.PostResponseDto = PostResponseDto;

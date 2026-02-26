@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, Send, CheckCircle } from 'lucide-react';
+import { Loader2, Send, CheckCircle, Upload, X, FileText } from 'lucide-react';
 import { useCreateApplication, useCheckApplied } from '../hooks/use-applications';
+import { useUploadResume } from '@/features/uploads/hooks/use-uploads';
 import { useToast } from '@/hooks/use-toast';
 
 interface ApplicationFormProps {
@@ -20,6 +21,7 @@ export function ApplicationForm({
 }: ApplicationFormProps) {
   const { toast } = useToast();
   const createApplication = useCreateApplication();
+  const uploadResume = useUploadResume();
   const { data: checkData, isLoading: isChecking } = useCheckApplied(
     postId,
     isAuthenticated
@@ -29,8 +31,57 @@ export function ApplicationForm({
   const [coverLetter, setCoverLetter] = useState('');
   const [contactPhone, setContactPhone] = useState('');
   const [contactEmail, setContactEmail] = useState('');
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [uploadedResume, setUploadedResume] = useState<{
+    fileUrl: string;
+    fileName: string;
+  } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const ALLOWED_EXTENSIONS = ['.pdf', '.doc', '.docx'];
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
   const hasApplied = checkData?.applied || false;
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 확장자 검증
+    const ext = '.' + file.name.split('.').pop()?.toLowerCase();
+    if (!ALLOWED_EXTENSIONS.includes(ext)) {
+      toast.error('허용되지 않는 파일 형식', 'PDF, DOC, DOCX 파일만 업로드 가능합니다.');
+      return;
+    }
+
+    // 파일 크기 검증
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error('파일 크기 초과', '10MB 이하의 파일만 업로드 가능합니다.');
+      return;
+    }
+
+    setResumeFile(file);
+
+    try {
+      const result = await uploadResume.mutateAsync(file);
+      setUploadedResume({
+        fileUrl: result.fileUrl,
+        fileName: result.fileName,
+      });
+      toast.success('이력서가 업로드되었습니다');
+    } catch {
+      toast.error('업로드 실패', '이력서 업로드에 실패했습니다.');
+      setResumeFile(null);
+    }
+  };
+
+  const handleRemoveResume = () => {
+    setResumeFile(null);
+    setUploadedResume(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,9 +92,13 @@ export function ApplicationForm({
         coverLetter: coverLetter || undefined,
         contactPhone: contactPhone || undefined,
         contactEmail: contactEmail || undefined,
+        resumeUrl: uploadedResume?.fileUrl,
+        resumeFileName: uploadedResume?.fileName,
       });
       toast.success('지원이 완료되었습니다');
       setShowForm(false);
+      setResumeFile(null);
+      setUploadedResume(null);
     } catch (error: unknown) {
       const errorMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
       toast.error('지원 실패', errorMessage || '지원에 실패했습니다.');
@@ -140,6 +195,52 @@ export function ApplicationForm({
             placeholder="example@email.com"
           />
         </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-2">이력서 첨부 (선택)</label>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf,.doc,.docx"
+          onChange={handleFileSelect}
+          className="hidden"
+        />
+        {!resumeFile && !uploadedResume ? (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploadResume.isPending}
+            className="w-full border-dashed"
+          >
+            <Upload className="w-4 h-4 mr-2" />
+            PDF, DOC, DOCX 파일 (최대 10MB)
+          </Button>
+        ) : (
+          <div className="flex items-center gap-2 p-3 bg-muted rounded-md">
+            <FileText className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+            <span className="text-sm flex-1 truncate">
+              {uploadedResume?.fileName || resumeFile?.name}
+            </span>
+            {uploadResume.isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleRemoveResume}
+                className="h-8 w-8 p-0"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
+        )}
+        <p className="text-xs text-muted-foreground mt-1">
+          채용담당자만 이력서를 다운로드할 수 있습니다.
+        </p>
       </div>
 
       <div className="flex gap-2">

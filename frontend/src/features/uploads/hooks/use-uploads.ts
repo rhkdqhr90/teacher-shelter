@@ -30,3 +30,15 @@ export function useUploadPostImage() {
     mutationFn: (file: File) => uploadsApi.uploadPostImage(file),
   });
 }
+
+export function useUploadResume() {
+  return useMutation({
+    mutationFn: (file: File) => uploadsApi.uploadResume(file),
+  });
+}
+
+export function useUploadMaterial() {
+  return useMutation({
+    mutationFn: (file: File) => uploadsApi.uploadMaterial(file),
+  });
+}

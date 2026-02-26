@@ -1,4 +1,4 @@
-import { Post, PostCategory, JobSubCategory, Region, SalaryType, EmploymentType } from '@prisma/client';
+import { Post, PostCategory, JobSubCategory, Region, SalaryType, EmploymentType, TherapyTag, PostAttachment } from '@prisma/client';
 export declare class PostResponseDto {
     id: string;
     title: string;
@@ -34,6 +34,8 @@ export declare class PostResponseDto {
     benefits: string | null;
     requirements: string | null;
     detailAddress: string | null;
+    therapyTags: TherapyTag[];
+    attachments: PostAttachmentDto[];
     createdAt: Date;
     updatedAt: Date;
     constructor(post: Post & {
@@ -41,5 +43,14 @@ export declare class PostResponseDto {
         _count?: {
             applications?: number;
         };
+        attachments?: PostAttachment[];
     });
+}
+export interface PostAttachmentDto {
+    id: string;
+    fileUrl: string;
+    fileName: string;
+    fileSize: number;
+    mimeType: string;
+    downloadCount: number;
 }

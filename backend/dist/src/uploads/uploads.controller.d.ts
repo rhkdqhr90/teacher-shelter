@@ -15,4 +15,16 @@ export declare class UploadsController {
     uploadBannerImage(req: Request, file: Express.Multer.File): Promise<{
         imageUrl: string;
     }>;
+    uploadResume(req: Request, file: Express.Multer.File): Promise<{
+        fileUrl: string;
+        fileName: string;
+        fileSize: number;
+        mimeType: string;
+    }>;
+    uploadMaterial(req: Request, file: Express.Multer.File): Promise<{
+        fileUrl: string;
+        fileName: string;
+        fileSize: number;
+        mimeType: string;
+    }>;
 }

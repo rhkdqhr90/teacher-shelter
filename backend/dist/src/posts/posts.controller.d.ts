@@ -1,4 +1,5 @@
-import type { Request } from 'express';
+import { StreamableFile } from '@nestjs/common';
+import type { Request, Response } from 'express';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -43,4 +44,5 @@ export declare class PostsController {
     getLikeStatus(id: string, req: Request): Promise<{
         liked: boolean;
     }>;
+    downloadAttachment(id: string, attachmentId: string, res: Response): Promise<StreamableFile>;
 }

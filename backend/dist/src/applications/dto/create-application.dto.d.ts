@@ -3,4 +3,6 @@ export declare class CreateApplicationDto {
     coverLetter?: string;
     contactPhone?: string;
     contactEmail?: string;
+    resumeUrl?: string;
+    resumeFileName?: string;
 }

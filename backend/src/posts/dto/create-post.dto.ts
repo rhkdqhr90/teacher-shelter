@@ -13,7 +13,11 @@ import {
   MinLength,
   MaxLength,
   ValidateIf,
+  ValidateNested,
+  Matches,
+  IsNumber,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { Transform } from 'class-transformer';
 import {
   PostCategory,
@@ -168,4 +172,44 @@ export class CreatePostDto {
   @IsOptional()
   @ValidateIf((o) => o.category === PostCategory.JOB_POSTING)
   therapyTags?: TherapyTag[];
+
+  // === 첨부파일 (수업자료 전용) ===
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => AttachmentInputDto)
+  @ArrayMaxSize(5, { message: '첨부파일은 최대 5개까지 가능합니다' })
+  @IsOptional()
+  @ValidateIf((o) => o.category === PostCategory.CLASS_MATERIAL)
+  attachments?: AttachmentInputDto[];
 }
+
+// 첨부파일 입력 DTO (유효성 검증 포함)
+export class AttachmentInputDto {
+  @IsString()
+  @Matches(
+    /^\/uploads\/material\/[a-zA-Z0-9_-]+\.(pdf|doc|docx|ppt|pptx|xls|xlsx|hwp)$/i,
+    {
+      message: '유효하지 않은 파일 경로입니다',
+    },
+  )
+  fileUrl: string;
+
+  @IsString()
+  @MaxLength(255)
+  fileName: string;
+
+  @IsNumber()
+  @Min(1)
+  @Max(20 * 1024 * 1024) // 20MB
+  fileSize: number;
+
+  @IsString()
+  @Matches(
+    /^(application\/(pdf|msword|vnd\.openxmlformats-officedocument\.(wordprocessingml\.document|presentationml\.presentation|spreadsheetml\.sheet)|vnd\.ms-(powerpoint|excel)|x-hwp|haansofthwp))$/,
+    { message: '유효하지 않은 파일 형식입니다' },
+  )
+  mimeType: string;
+}
+
+// 하위 호환성을 위한 타입 별칭
+export type AttachmentInput = AttachmentInputDto;
