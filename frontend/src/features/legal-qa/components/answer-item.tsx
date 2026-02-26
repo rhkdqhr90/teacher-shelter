@@ -12,6 +12,7 @@ import { useUpdateAnswer, useDeleteAnswer, useSelectBestAnswer } from '../hooks/
 import type { Answer } from '../types';
 import { EXPERT_TYPE_LABELS } from '../types';
 import { cn } from '@/lib/utils';
+import { SERVER_URL } from '@/lib/constants';
 
 // DOMPurify 설정 - XSS 방지
 const SANITIZE_CONFIG = {
@@ -116,7 +117,7 @@ export function AnswerItem({ answer, postId, isPostAuthor }: AnswerItemProps) {
           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
             {answer.author.profileImage ? (
               <img
-                src={answer.author.profileImage}
+                src={`${SERVER_URL}${answer.author.profileImage}`}
                 alt={answer.author.nickname}
                 className="w-10 h-10 rounded-full object-cover"
               />

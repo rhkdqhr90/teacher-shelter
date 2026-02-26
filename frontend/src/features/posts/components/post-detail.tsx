@@ -8,6 +8,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { ReportModal } from '@/features/reports/components/report-modal';
 import { convertMarkdownImages, formatTimeAgo } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { SERVER_URL } from '@/lib/constants';
 
 // DOMPurify 설정: 안전한 속성만 허용
 if (typeof window !== 'undefined') {
@@ -257,9 +258,10 @@ export function PostDetail({ postId }: PostDetailProps) {
           <div className="border border-border rounded-xl overflow-hidden mb-6">
             {/* 헤더: 기관명 + 상태 */}
             <div className="bg-gradient-to-r from-primary/10 to-primary/5 px-5 py-4">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
+              <div className="flex flex-col gap-3">
+                {/* 상태 배지 + 기관명 */}
+                <div>
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
                     <span
                       className={`inline-flex px-2.5 py-0.5 rounded text-xs font-semibold ${
                         post.isRecruiting
@@ -288,7 +290,7 @@ export function PostDetail({ postId }: PostDetailProps) {
                 </div>
                 {/* 작성자 관리 버튼 */}
                 {isAuthor && (
-                  <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="flex items-center gap-2">
                     <Link href={`/posts/${postId}/applicants`}>
                       <Button size="sm" className="shadow-sm">
                         <Users className="w-4 h-4 mr-1.5" />
@@ -442,7 +444,15 @@ export function PostDetail({ postId }: PostDetailProps) {
         {/* Author Info */}
         <div className="post-detail__author">
           <div className="post-detail__avatar">
-            <span>{authorDisplay[0]}</span>
+            {!post.isAnonymous && post.author?.profileImage ? (
+              <img
+                src={`${SERVER_URL}${post.author.profileImage}`}
+                alt={authorDisplay}
+                className="w-full h-full object-cover rounded-full"
+              />
+            ) : (
+              <span>{authorDisplay[0]}</span>
+            )}
           </div>
           <div className="post-detail__author-info">
             <div className="post-detail__author-name">

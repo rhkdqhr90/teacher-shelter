@@ -12,6 +12,7 @@ import { ko } from 'date-fns/locale';
 import { PenSquare, MessageCircle, Heart, Bookmark, Flame, FileText, ChevronRight, User, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ProfileCompletion } from '@/features/profile/components/profile-completion';
+import { SERVER_URL } from '@/lib/constants';
 
 function StatCard({
   icon: Icon,
@@ -253,7 +254,7 @@ function DashboardContent() {
           <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
             {user?.profileImage ? (
               <img
-                src={user.profileImage}
+                src={`${SERVER_URL}${user.profileImage}`}
                 alt={user.nickname}
                 className="w-12 h-12 rounded-full object-cover"
               />
@@ -269,13 +270,13 @@ function DashboardContent() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button asChild variant="outline" size="icon" className="hidden sm:flex">
+          <Button asChild variant="outline" size="icon">
             <Link href="/profile" title="설정">
               <Settings className="h-4 w-4" />
             </Link>
           </Button>
-          <Button asChild>
-            <Link href="/posts/new" className="hidden sm:flex items-center gap-2">
+          <Button asChild className="hidden sm:flex">
+            <Link href="/posts/new" className="flex items-center gap-2">
               <PenSquare className="h-4 w-4" />
               글쓰기
             </Link>

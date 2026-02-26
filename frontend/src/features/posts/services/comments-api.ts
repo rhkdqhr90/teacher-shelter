@@ -9,6 +9,7 @@ export interface Comment {
     jobType?: string;
     career?: number;
     isVerified: boolean;
+    profileImage?: string | null;
   };
   mentionedUser?: {
     id: string;

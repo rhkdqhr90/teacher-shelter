@@ -190,6 +190,7 @@ export interface Post {
     jobType?: string;
     career?: number;
     isVerified: boolean;
+    profileImage?: string | null;
   } | null;
   // 구인공고 전용 필드 (기존)
   jobSubCategory?: JobSubCategory | null;

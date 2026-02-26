@@ -9,6 +9,7 @@ import { ReportModal } from '@/features/reports/components/report-modal';
 import { MentionTextarea, type MentionUser } from '@/features/mentions';
 import { JOB_TYPE_LABELS } from '@/features/profile/types';
 import { formatTimeAgo, cn } from '@/lib/utils';
+import { SERVER_URL } from '@/lib/constants';
 import { useClickOutside } from '@/hooks/use-click-outside';
 import { useUpdateComment, useDeleteComment } from '../hooks/use-comments';
 import { useToast } from '@/hooks/use-toast';
@@ -92,7 +93,11 @@ export function CommentItem({
   return (
     <div className={`${isReply ? 'ml-8 pl-4 border-l-2' : ''}`} id={`comment-${comment.id}`}>
       <div className="flex gap-3">
-        <Avatar name={comment.author.nickname} size="md" />
+        <Avatar
+          name={comment.author.nickname}
+          src={comment.author.profileImage ? `${SERVER_URL}${comment.author.profileImage}` : undefined}
+          size="md"
+        />
         <div className="flex-1 min-w-0">
           <CommentHeader
             author={comment.author}
