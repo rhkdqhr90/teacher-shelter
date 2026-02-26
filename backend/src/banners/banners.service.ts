@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { CreateBannerDto } from './dto/create-banner.dto';
 import { UpdateBannerDto } from './dto/update-banner.dto';
@@ -12,7 +16,9 @@ export class BannersService {
   async create(dto: CreateBannerDto) {
     // 이미지 또는 텍스트 중 하나는 필수
     if (!dto.imageUrl && !dto.bannerText) {
-      throw new BadRequestException('이미지 URL 또는 배너 텍스트 중 하나는 필수입니다.');
+      throw new BadRequestException(
+        '이미지 URL 또는 배너 텍스트 중 하나는 필수입니다.',
+      );
     }
 
     return this.prisma.banner.create({

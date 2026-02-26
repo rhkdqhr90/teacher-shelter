@@ -12,7 +12,13 @@ import {
   isEncryptionEnabled,
 } from '../common/utils/file-encryption.util';
 
-export type UploadType = 'profile' | 'post' | 'verification' | 'banner' | 'resume' | 'material';
+export type UploadType =
+  | 'profile'
+  | 'post'
+  | 'verification'
+  | 'banner'
+  | 'resume'
+  | 'material';
 
 // 이미지 최적화 설정
 interface ImageOptimizationOptions {
