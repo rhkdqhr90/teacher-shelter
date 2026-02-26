@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { CreateBannerDto } from './dto/create-banner.dto';
 import { UpdateBannerDto } from './dto/update-banner.dto';
@@ -10,6 +10,11 @@ export class BannersService {
 
   // 배너 생성 (관리자)
   async create(dto: CreateBannerDto) {
+    // 이미지 또는 텍스트 중 하나는 필수
+    if (!dto.imageUrl && !dto.bannerText) {
+      throw new BadRequestException('이미지 URL 또는 배너 텍스트 중 하나는 필수입니다.');
+    }
+
     return this.prisma.banner.create({
       data: {
         title: dto.title,
@@ -17,6 +22,11 @@ export class BannersService {
         linkUrl: dto.linkUrl,
         alt: dto.alt,
         type: dto.type || BannerType.PROMO,
+        // 텍스트 배너 필드
+        bannerText: dto.bannerText,
+        subText: dto.subText,
+        bgColor: dto.bgColor,
+        textColor: dto.textColor,
         isActive: dto.isActive ?? true,
         priority: dto.priority ?? 0,
         startDate: dto.startDate ? new Date(dto.startDate) : null,
@@ -76,6 +86,11 @@ export class BannersService {
         ...(dto.linkUrl !== undefined && { linkUrl: dto.linkUrl }),
         ...(dto.alt !== undefined && { alt: dto.alt }),
         ...(dto.type !== undefined && { type: dto.type }),
+        // 텍스트 배너 필드
+        ...(dto.bannerText !== undefined && { bannerText: dto.bannerText }),
+        ...(dto.subText !== undefined && { subText: dto.subText }),
+        ...(dto.bgColor !== undefined && { bgColor: dto.bgColor }),
+        ...(dto.textColor !== undefined && { textColor: dto.textColor }),
         ...(dto.isActive !== undefined && { isActive: dto.isActive }),
         ...(dto.priority !== undefined && { priority: dto.priority }),
         ...(dto.startDate !== undefined && {

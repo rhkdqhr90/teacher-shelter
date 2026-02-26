@@ -58,14 +58,19 @@ export type BannerType = 'PROMO' | 'SIDEBAR';
 export interface Banner {
   id: string;
   title: string;
-  imageUrl: string;
-  linkUrl?: string;
+  imageUrl?: string | null;
+  linkUrl?: string | null;
   alt: string;
   type: BannerType;
+  // 텍스트 배너 전용 필드
+  bannerText?: string | null;
+  subText?: string | null;
+  bgColor?: string | null;
+  textColor?: string | null;
   isActive: boolean;
   priority: number;
-  startDate?: string;
-  endDate?: string;
+  startDate?: string | null;
+  endDate?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -238,10 +243,15 @@ export const adminApi = {
 
   async createBanner(data: {
     title: string;
-    imageUrl: string;
+    imageUrl?: string;
     linkUrl?: string;
     alt: string;
     type?: BannerType;
+    // 텍스트 배너 전용 필드
+    bannerText?: string;
+    subText?: string;
+    bgColor?: string;
+    textColor?: string;
     isActive?: boolean;
     priority?: number;
     startDate?: string;
@@ -259,6 +269,11 @@ export const adminApi = {
       linkUrl: string;
       alt: string;
       type: BannerType;
+      // 텍스트 배너 전용 필드
+      bannerText: string;
+      subText: string;
+      bgColor: string;
+      textColor: string;
       isActive: boolean;
       priority: number;
       startDate: string;

@@ -65,15 +65,33 @@ export const PromoBanner = memo(function PromoBanner({
     return null;
   }
 
+  // 텍스트 배너인지 이미지 배너인지 확인
+  const isTextBanner = !currentBanner.imageUrl && currentBanner.bannerText;
+
   const BannerContent = (
     <div className="promo-banner__slide">
-      <Image
-        src={getImageUrl(currentBanner.imageUrl)}
-        alt={currentBanner.alt}
-        fill
-        className="object-cover"
-        priority={currentIndex === 0}
-      />
+      {isTextBanner ? (
+        <div
+          className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center"
+          style={{
+            backgroundColor: currentBanner.bgColor || '#3B82F6',
+            color: currentBanner.textColor || '#FFFFFF',
+          }}
+        >
+          <p className="text-xl sm:text-2xl md:text-3xl font-bold">{currentBanner.bannerText}</p>
+          {currentBanner.subText && (
+            <p className="text-sm sm:text-base md:text-lg mt-2 opacity-90">{currentBanner.subText}</p>
+          )}
+        </div>
+      ) : (
+        <Image
+          src={getImageUrl(currentBanner.imageUrl)}
+          alt={currentBanner.alt}
+          fill
+          className="object-cover"
+          priority={currentIndex === 0}
+        />
+      )}
     </div>
   );
 

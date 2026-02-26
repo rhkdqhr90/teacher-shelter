@@ -35,23 +35,44 @@ export const RightSidebar = memo(function RightSidebar() {
 interface BannerContentProps {
   banner: {
     id: string;
-    imageUrl: string;
+    imageUrl?: string | null;
     linkUrl?: string | null;
     alt: string;
+    bannerText?: string | null;
+    subText?: string | null;
+    bgColor?: string | null;
+    textColor?: string | null;
   };
 }
 
 function BannerContent({ banner }: BannerContentProps) {
+  const isTextBanner = !banner.imageUrl && banner.bannerText;
+
   const content = (
     <div className="right-sidebar-ad">
       <div className="right-sidebar-ad__label">AD</div>
       <div className="right-sidebar-ad__image">
-        <Image
-          src={getImageUrl(banner.imageUrl)}
-          alt={banner.alt}
-          fill
-          className="object-cover rounded-lg"
-        />
+        {isTextBanner ? (
+          <div
+            className="absolute inset-0 flex flex-col items-center justify-center p-3 text-center rounded-lg"
+            style={{
+              backgroundColor: banner.bgColor || '#3B82F6',
+              color: banner.textColor || '#FFFFFF',
+            }}
+          >
+            <p className="text-sm font-bold leading-tight">{banner.bannerText}</p>
+            {banner.subText && (
+              <p className="text-xs mt-2 opacity-90 leading-tight">{banner.subText}</p>
+            )}
+          </div>
+        ) : (
+          <Image
+            src={getImageUrl(banner.imageUrl)}
+            alt={banner.alt}
+            fill
+            className="object-cover rounded-lg"
+          />
+        )}
       </div>
     </div>
   );

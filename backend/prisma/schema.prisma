@@ -701,10 +701,16 @@ enum BannerType {
 model Banner {
   id              String      @id @default(cuid())
   title           String      // 배너 제목 (관리용)
-  imageUrl        String      // 이미지 URL
+  imageUrl        String?     // 이미지 URL (이미지 배너용, 텍스트 배너면 null)
   linkUrl         String?     // 클릭 시 이동 URL
-  alt             String      // 이미지 alt 텍스트
+  alt             String      // 이미지 alt 텍스트 또는 텍스트 배너 설명
   type            BannerType  @default(PROMO)
+
+  // 텍스트 배너 전용 필드
+  bannerText      String?     // 배너에 표시할 텍스트
+  subText         String?     // 부제목/설명 텍스트
+  bgColor         String?     // 배경색 (hex, e.g. #3B82F6)
+  textColor       String?     // 글자색 (hex, e.g. #FFFFFF)
 
   isActive        Boolean     @default(true)   // 활성화 여부
   priority        Int         @default(0)      // 정렬 순서 (높을수록 먼저)

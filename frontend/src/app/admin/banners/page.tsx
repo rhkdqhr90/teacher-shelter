@@ -17,6 +17,19 @@ const BANNER_TYPE_LABELS: Record<BannerType, string> = {
   SIDEBAR: '사이드바 광고',
 };
 
+const BANNER_SIZE_INFO: Record<BannerType, { ratio: string; recommended: string; description: string }> = {
+  PROMO: {
+    ratio: '16:5 ~ 16:3.5',
+    recommended: '1600 x 500px (또는 1600 x 360px)',
+    description: '홈 화면 상단 캐러셀. 모바일에서 16:5, 데스크탑에서 16:3.5 비율로 표시됩니다.',
+  },
+  SIDEBAR: {
+    ratio: '1:3',
+    recommended: '160 x 480px (또는 320 x 960px)',
+    description: '데스크탑 사이드바 세로 배너. 모바일에서는 표시되지 않습니다.',
+  },
+};
+
 export default function BannersAdminPage() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -36,6 +49,12 @@ export default function BannersAdminPage() {
   const [priority, setPriority] = useState(0);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  // 텍스트 배너 전용 상태
+  const [bannerMode, setBannerMode] = useState<'image' | 'text'>('image');
+  const [bannerText, setBannerText] = useState('');
+  const [subText, setSubText] = useState('');
+  const [bgColor, setBgColor] = useState('#3B82F6');
+  const [textColor, setTextColor] = useState('#FFFFFF');
 
   const { data: banners, isLoading } = useQuery({
     queryKey: ['admin', 'banners', filterType],
@@ -85,6 +104,11 @@ export default function BannersAdminPage() {
     setPriority(0);
     setStartDate('');
     setEndDate('');
+    setBannerMode('image');
+    setBannerText('');
+    setSubText('');
+    setBgColor('#3B82F6');
+    setTextColor('#FFFFFF');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -128,30 +152,45 @@ export default function BannersAdminPage() {
   const handleEdit = useCallback((banner: Banner) => {
     setEditingId(banner.id);
     setTitle(banner.title);
-    setImageUrl(banner.imageUrl);
+    setImageUrl(banner.imageUrl || '');
     setLinkUrl(banner.linkUrl || '');
     setAlt(banner.alt);
     setType(banner.type);
     setPriority(banner.priority);
     setStartDate(banner.startDate ? banner.startDate.split('T')[0] ?? '' : '');
     setEndDate(banner.endDate ? banner.endDate.split('T')[0] ?? '' : '');
+    // 텍스트 배너 필드
+    setBannerMode(banner.bannerText ? 'text' : 'image');
+    setBannerText(banner.bannerText || '');
+    setSubText(banner.subText || '');
+    setBgColor(banner.bgColor || '#3B82F6');
+    setTextColor(banner.textColor || '#FFFFFF');
     setIsCreating(false);
   }, []);
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-      if (!title.trim() || !imageUrl.trim() || !alt.trim()) return;
+      if (!title.trim() || !alt.trim()) return;
+
+      // 모드에 따라 필수 값 검증
+      if (bannerMode === 'image' && !imageUrl.trim()) return;
+      if (bannerMode === 'text' && !bannerText.trim()) return;
 
       const data = {
         title,
-        imageUrl,
+        imageUrl: bannerMode === 'image' ? imageUrl : undefined,
         linkUrl: linkUrl || undefined,
         alt,
         type,
         priority,
         startDate: startDate || undefined,
         endDate: endDate || undefined,
+        // 텍스트 배너 필드
+        bannerText: bannerMode === 'text' ? bannerText : undefined,
+        subText: bannerMode === 'text' ? subText || undefined : undefined,
+        bgColor: bannerMode === 'text' ? bgColor : undefined,
+        textColor: bannerMode === 'text' ? textColor : undefined,
       };
 
       if (editingId) {
@@ -160,7 +199,7 @@ export default function BannersAdminPage() {
         createMutation.mutate(data);
       }
     },
-    [title, imageUrl, linkUrl, alt, type, priority, startDate, endDate, editingId, createMutation, updateMutation]
+    [title, imageUrl, linkUrl, alt, type, priority, startDate, endDate, editingId, bannerMode, bannerText, subText, bgColor, textColor, createMutation, updateMutation]
   );
 
   const handlePriorityChange = useCallback(
@@ -232,41 +271,153 @@ export default function BannersAdminPage() {
               ))}
             </select>
           </div>
-          {/* 이미지 업로드 */}
-          <div className="space-y-2">
-            <div className="flex gap-2">
-              <Input
-                placeholder="이미지 URL (직접 입력 또는 업로드)"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                required
-                className="flex-1"
-              />
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileUpload}
-                className="hidden"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isUploading}
-              >
-                {isUploading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Upload className="w-4 h-4" />
-                )}
-                <span className="ml-2 hidden sm:inline">업로드</span>
-              </Button>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              직접 URL을 입력하거나 이미지를 업로드하세요 (최대 10MB)
-            </p>
+          {/* 배너 모드 선택 */}
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant={bannerMode === 'image' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setBannerMode('image')}
+            >
+              🖼️ 이미지 배너
+            </Button>
+            <Button
+              type="button"
+              variant={bannerMode === 'text' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setBannerMode('text')}
+            >
+              📝 텍스트 배너
+            </Button>
           </div>
+
+          {/* 권장 사이즈 안내 (이미지 모드일 때만) */}
+          {bannerMode === 'image' && (
+            <div className="bg-muted/50 border border-border rounded-lg p-3">
+              <p className="text-sm font-medium mb-1">
+                📐 {BANNER_TYPE_LABELS[type]} 권장 사이즈
+              </p>
+              <p className="text-sm text-muted-foreground">
+                <span className="font-medium">비율:</span> {BANNER_SIZE_INFO[type].ratio} |
+                <span className="font-medium ml-2">권장:</span> {BANNER_SIZE_INFO[type].recommended}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {BANNER_SIZE_INFO[type].description}
+              </p>
+            </div>
+          )}
+
+          {/* 이미지 업로드 (이미지 모드) */}
+          {bannerMode === 'image' && (
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="이미지 URL (직접 입력 또는 업로드)"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  required
+                  className="flex-1"
+                />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                >
+                  {isUploading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Upload className="w-4 h-4" />
+                  )}
+                  <span className="ml-2 hidden sm:inline">업로드</span>
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                직접 URL을 입력하거나 이미지를 업로드하세요 (최대 10MB)
+              </p>
+            </div>
+          )}
+
+          {/* 텍스트 배너 설정 (텍스트 모드) */}
+          {bannerMode === 'text' && (
+            <div className="space-y-4 bg-muted/30 border border-border rounded-lg p-4">
+              <div>
+                <label className="text-sm font-medium">메인 텍스트 *</label>
+                <Input
+                  placeholder="배너에 표시할 메인 텍스트"
+                  value={bannerText}
+                  onChange={(e) => setBannerText(e.target.value)}
+                  maxLength={100}
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">부제목 (선택)</label>
+                <Input
+                  placeholder="추가 설명 텍스트"
+                  value={subText}
+                  onChange={(e) => setSubText(e.target.value)}
+                  maxLength={200}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">배경색</label>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="color"
+                      value={bgColor}
+                      onChange={(e) => setBgColor(e.target.value)}
+                      className="w-10 h-10 rounded cursor-pointer border"
+                    />
+                    <Input
+                      value={bgColor}
+                      onChange={(e) => setBgColor(e.target.value)}
+                      pattern="^#[0-9A-Fa-f]{6}$"
+                      placeholder="#3B82F6"
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">글자색</label>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="color"
+                      value={textColor}
+                      onChange={(e) => setTextColor(e.target.value)}
+                      className="w-10 h-10 rounded cursor-pointer border"
+                    />
+                    <Input
+                      value={textColor}
+                      onChange={(e) => setTextColor(e.target.value)}
+                      pattern="^#[0-9A-Fa-f]{6}$"
+                      placeholder="#FFFFFF"
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+              </div>
+              {/* 텍스트 배너 미리보기 */}
+              <div>
+                <label className="text-sm font-medium">미리보기</label>
+                <div
+                  className="mt-2 rounded-lg p-6 text-center"
+                  style={{ backgroundColor: bgColor, color: textColor }}
+                >
+                  <p className="text-lg font-bold">{bannerText || '메인 텍스트'}</p>
+                  {subText && <p className="text-sm mt-1 opacity-90">{subText}</p>}
+                </div>
+              </div>
+            </div>
+          )}
           <Input
             placeholder="Alt 텍스트 (접근성)"
             value={alt}
@@ -305,7 +456,7 @@ export default function BannersAdminPage() {
               />
             </div>
           </div>
-          {imageUrl && (
+          {bannerMode === 'image' && imageUrl && (
             <div className="relative w-full h-32 bg-muted rounded-lg overflow-hidden">
               <Image
                 src={getImageUrl(imageUrl)}
@@ -343,18 +494,29 @@ export default function BannersAdminPage() {
               className={`bg-card border rounded-lg p-4 ${!banner.isActive ? 'opacity-60' : ''}`}
             >
               <div className="flex items-start gap-4">
-                {/* 이미지 썸네일 */}
+                {/* 썸네일 (이미지 또는 텍스트 미리보기) */}
                 <div className="relative w-24 h-16 bg-muted rounded overflow-hidden shrink-0">
-                  <Image
-                    src={getImageUrl(banner.imageUrl)}
-                    alt={banner.alt}
-                    fill
-                    className="object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
-                  />
-                  {!banner.imageUrl && (
+                  {banner.imageUrl ? (
+                    <Image
+                      src={getImageUrl(banner.imageUrl)}
+                      alt={banner.alt}
+                      fill
+                      className="object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                  ) : banner.bannerText ? (
+                    <div
+                      className="absolute inset-0 flex flex-col items-center justify-center p-1 text-center"
+                      style={{ backgroundColor: banner.bgColor || '#3B82F6', color: banner.textColor || '#FFFFFF' }}
+                    >
+                      <span className="text-[10px] font-bold truncate w-full">{banner.bannerText}</span>
+                      {banner.subText && (
+                        <span className="text-[8px] opacity-80 truncate w-full">{banner.subText}</span>
+                      )}
+                    </div>
+                  ) : (
                     <div className="absolute inset-0 flex items-center justify-center">
                       <ImageIcon className="w-6 h-6 text-muted-foreground" />
                     </div>
@@ -363,10 +525,13 @@ export default function BannersAdminPage() {
 
                 {/* 배너 정보 */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-medium truncate">{banner.title}</h3>
                     <span className="text-xs bg-muted px-2 py-0.5 rounded">
                       {BANNER_TYPE_LABELS[banner.type]}
+                    </span>
+                    <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
+                      {banner.bannerText ? '텍스트' : '이미지'}
                     </span>
                     {!banner.isActive && (
                       <span className="text-xs bg-destructive/10 text-destructive px-2 py-0.5 rounded">
