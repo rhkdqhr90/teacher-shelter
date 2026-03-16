@@ -25,6 +25,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { UpdateReportDto } from '../reports/dto/update-report.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { BulkDeletePostsDto } from './dto/bulk-delete-posts.dto';
+import { CreateAutoContentDto } from './dto/create-auto-content.dto';
 import { ProcessVerificationDto } from '../verifications/dto/process-verification.dto';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 import {
@@ -172,6 +173,15 @@ export class AdminController {
   // ========================================
   // 자동생성 콘텐츠 관리
   // ========================================
+
+  @Post('auto-content')
+  async createAutoContent(
+    @Req() req: Request,
+    @Body() dto: CreateAutoContentDto,
+  ) {
+    const user = req.user as JwtPayload;
+    return this.adminService.createAutoContent(user.sub, dto);
+  }
 
   @Get('auto-content')
   async getAutoContent(

@@ -25,6 +25,7 @@ const roles_decorator_1 = require("../auth/decorators/roles.decorator");
 const update_report_dto_1 = require("../reports/dto/update-report.dto");
 const update_user_role_dto_1 = require("./dto/update-user-role.dto");
 const bulk_delete_posts_dto_1 = require("./dto/bulk-delete-posts.dto");
+const create_auto_content_dto_1 = require("./dto/create-auto-content.dto");
 const process_verification_dto_1 = require("../verifications/dto/process-verification.dto");
 const client_1 = require("@prisma/client");
 const MAX_LIMIT = 100;
@@ -76,6 +77,10 @@ let AdminController = class AdminController {
     }
     async bulkDeletePosts(dto) {
         return this.adminService.bulkDeletePosts(dto.ids);
+    }
+    async createAutoContent(req, dto) {
+        const user = req.user;
+        return this.adminService.createAutoContent(user.sub, dto);
     }
     async getAutoContent(page, limit, status) {
         return this.adminService.getAutoContent(parsePage(page), parseLimit(limit), status);
@@ -207,6 +212,14 @@ __decorate([
     __metadata("design:paramtypes", [bulk_delete_posts_dto_1.BulkDeletePostsDto]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "bulkDeletePosts", null);
+__decorate([
+    (0, common_1.Post)('auto-content'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, create_auto_content_dto_1.CreateAutoContentDto]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "createAutoContent", null);
 __decorate([
     (0, common_1.Get)('auto-content'),
     __param(0, (0, common_1.Query)('page')),
