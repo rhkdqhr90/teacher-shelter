@@ -51,9 +51,9 @@ export declare class AdminService {
             id: string;
             createdAt: Date;
             updatedAt: Date;
+            status: import("@prisma/client").$Enums.ReportStatus;
             type: import("@prisma/client").$Enums.ReportType;
             reason: string;
-            status: import("@prisma/client").$Enums.ReportStatus;
             processedAt: Date | null;
             processingNote: string | null;
             action: import("@prisma/client").$Enums.ReportAction;
@@ -108,9 +108,9 @@ export declare class AdminService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import("@prisma/client").$Enums.ReportStatus;
         type: import("@prisma/client").$Enums.ReportType;
         reason: string;
-        status: import("@prisma/client").$Enums.ReportStatus;
         processedAt: Date | null;
         processingNote: string | null;
         action: import("@prisma/client").$Enums.ReportAction;
@@ -133,9 +133,9 @@ export declare class AdminService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import("@prisma/client").$Enums.ReportStatus;
         type: import("@prisma/client").$Enums.ReportType;
         reason: string;
-        status: import("@prisma/client").$Enums.ReportStatus;
         processedAt: Date | null;
         processingNote: string | null;
         action: import("@prisma/client").$Enums.ReportAction;
@@ -216,6 +216,40 @@ export declare class AdminService {
         deletedCount: number;
     }>;
     private deletePostImages;
+    getAutoContent(page?: number, limit?: number, status?: string): Promise<{
+        data: {
+            id: string;
+            createdAt: Date;
+            title: string;
+            category: import("@prisma/client").$Enums.PostCategory;
+            viewCount: number;
+            likeCount: number;
+            commentCount: number;
+            status: string;
+            sourceUrl: string | null;
+            sourceName: string | null;
+            confidence: string | null;
+            author: {
+                id: string;
+                email: string;
+                nickname: string;
+            } | null;
+        }[];
+        meta: {
+            page: number;
+            limit: number;
+            total: number;
+            totalPages: number;
+        };
+    }>;
+    approveAutoContent(id: string): Promise<{
+        id: string;
+        title: string;
+        status: string;
+    }>;
+    rejectAutoContent(id: string): Promise<{
+        message: string;
+    }>;
     getVerifications(page?: number, limit?: number, status?: VerificationStatus): Promise<{
         data: ({
             user: {
@@ -232,8 +266,8 @@ export declare class AdminService {
             id: string;
             createdAt: Date;
             updatedAt: Date;
-            userId: string;
             status: import("@prisma/client").$Enums.VerificationStatus;
+            userId: string;
             processedAt: Date | null;
             processedById: string | null;
             fileUrl: string;
@@ -271,8 +305,8 @@ export declare class AdminService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        userId: string;
         status: import("@prisma/client").$Enums.VerificationStatus;
+        userId: string;
         processedAt: Date | null;
         processedById: string | null;
         fileUrl: string;
@@ -299,8 +333,8 @@ export declare class AdminService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        userId: string;
         status: import("@prisma/client").$Enums.VerificationStatus;
+        userId: string;
         processedAt: Date | null;
         processedById: string | null;
         fileUrl: string;

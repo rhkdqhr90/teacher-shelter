@@ -13,8 +13,8 @@ export declare class VerificationsService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        userId: string;
         status: import("@prisma/client").$Enums.VerificationStatus;
+        userId: string;
         processedAt: Date | null;
         processedById: string | null;
         fileUrl: string;
@@ -30,8 +30,8 @@ export declare class VerificationsService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        userId: string;
         status: import("@prisma/client").$Enums.VerificationStatus;
+        userId: string;
         processedAt: Date | null;
         processedById: string | null;
         fileUrl: string;
@@ -50,8 +50,8 @@ export declare class VerificationsService {
             id: string;
             createdAt: Date;
             updatedAt: Date;
-            userId: string;
             status: import("@prisma/client").$Enums.VerificationStatus;
+            userId: string;
             processedAt: Date | null;
             processedById: string | null;
             fileUrl: string;
@@ -82,8 +82,8 @@ export declare class VerificationsService {
             id: string;
             createdAt: Date;
             updatedAt: Date;
-            userId: string;
             status: import("@prisma/client").$Enums.VerificationStatus;
+            userId: string;
             processedAt: Date | null;
             processedById: string | null;
             fileUrl: string;
@@ -119,8 +119,8 @@ export declare class VerificationsService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        userId: string;
         status: import("@prisma/client").$Enums.VerificationStatus;
+        userId: string;
         processedAt: Date | null;
         processedById: string | null;
         fileUrl: string;
@@ -149,8 +149,8 @@ export declare class VerificationsService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        userId: string;
         status: import("@prisma/client").$Enums.VerificationStatus;
+        userId: string;
         processedAt: Date | null;
         processedById: string | null;
         fileUrl: string;

@@ -14,9 +14,9 @@ export declare class ReportsService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import("@prisma/client").$Enums.ReportStatus;
         type: import("@prisma/client").$Enums.ReportType;
         reason: string;
-        status: import("@prisma/client").$Enums.ReportStatus;
         processedAt: Date | null;
         processingNote: string | null;
         action: import("@prisma/client").$Enums.ReportAction;
@@ -45,9 +45,9 @@ export declare class ReportsService {
             id: string;
             createdAt: Date;
             updatedAt: Date;
+            status: import("@prisma/client").$Enums.ReportStatus;
             type: import("@prisma/client").$Enums.ReportType;
             reason: string;
-            status: import("@prisma/client").$Enums.ReportStatus;
             processedAt: Date | null;
             processingNote: string | null;
             action: import("@prisma/client").$Enums.ReportAction;
@@ -95,9 +95,9 @@ export declare class ReportsService {
             id: string;
             createdAt: Date;
             updatedAt: Date;
+            status: import("@prisma/client").$Enums.ReportStatus;
             type: import("@prisma/client").$Enums.ReportType;
             reason: string;
-            status: import("@prisma/client").$Enums.ReportStatus;
             processedAt: Date | null;
             processingNote: string | null;
             action: import("@prisma/client").$Enums.ReportAction;
@@ -152,9 +152,9 @@ export declare class ReportsService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import("@prisma/client").$Enums.ReportStatus;
         type: import("@prisma/client").$Enums.ReportType;
         reason: string;
-        status: import("@prisma/client").$Enums.ReportStatus;
         processedAt: Date | null;
         processingNote: string | null;
         action: import("@prisma/client").$Enums.ReportAction;
@@ -177,9 +177,9 @@ export declare class ReportsService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import("@prisma/client").$Enums.ReportStatus;
         type: import("@prisma/client").$Enums.ReportType;
         reason: string;
-        status: import("@prisma/client").$Enums.ReportStatus;
         processedAt: Date | null;
         processingNote: string | null;
         action: import("@prisma/client").$Enums.ReportAction;

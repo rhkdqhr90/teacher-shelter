@@ -8,8 +8,8 @@ export declare class VerificationsController {
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        userId: string;
         status: import("@prisma/client").$Enums.VerificationStatus;
+        userId: string;
         processedAt: Date | null;
         processedById: string | null;
         fileUrl: string;
@@ -25,8 +25,8 @@ export declare class VerificationsController {
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        userId: string;
         status: import("@prisma/client").$Enums.VerificationStatus;
+        userId: string;
         processedAt: Date | null;
         processedById: string | null;
         fileUrl: string;
@@ -45,8 +45,8 @@ export declare class VerificationsController {
             id: string;
             createdAt: Date;
             updatedAt: Date;
-            userId: string;
             status: import("@prisma/client").$Enums.VerificationStatus;
+            userId: string;
             processedAt: Date | null;
             processedById: string | null;
             fileUrl: string;

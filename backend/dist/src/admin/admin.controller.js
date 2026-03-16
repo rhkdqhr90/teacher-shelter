@@ -77,6 +77,15 @@ let AdminController = class AdminController {
     async bulkDeletePosts(dto) {
         return this.adminService.bulkDeletePosts(dto.ids);
     }
+    async getAutoContent(page, limit, status) {
+        return this.adminService.getAutoContent(parsePage(page), parseLimit(limit), status);
+    }
+    async approveAutoContent(id) {
+        return this.adminService.approveAutoContent(id);
+    }
+    async rejectAutoContent(id) {
+        return this.adminService.rejectAutoContent(id);
+    }
     async deleteComment(id) {
         return this.adminService.deleteComment(id);
     }
@@ -198,6 +207,30 @@ __decorate([
     __metadata("design:paramtypes", [bulk_delete_posts_dto_1.BulkDeletePostsDto]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "bulkDeletePosts", null);
+__decorate([
+    (0, common_1.Get)('auto-content'),
+    __param(0, (0, common_1.Query)('page')),
+    __param(1, (0, common_1.Query)('limit')),
+    __param(2, (0, common_1.Query)('status')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "getAutoContent", null);
+__decorate([
+    (0, common_1.Patch)('auto-content/:id/approve'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "approveAutoContent", null);
+__decorate([
+    (0, common_1.Delete)('auto-content/:id'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "rejectAutoContent", null);
 __decorate([
     (0, common_1.Delete)('comments/:id'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),

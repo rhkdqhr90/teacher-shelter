@@ -19,9 +19,9 @@ export declare class InquiriesService {
             createdAt: Date;
             updatedAt: Date;
             content: string;
+            status: import("@prisma/client").$Enums.InquiryStatus;
             userId: string | null;
             type: import("@prisma/client").$Enums.InquiryType;
-            status: import("@prisma/client").$Enums.InquiryStatus;
             subject: string;
             response: string | null;
             respondedAt: Date | null;
@@ -40,9 +40,9 @@ export declare class InquiriesService {
         createdAt: Date;
         updatedAt: Date;
         content: string;
+        status: import("@prisma/client").$Enums.InquiryStatus;
         userId: string | null;
         type: import("@prisma/client").$Enums.InquiryType;
-        status: import("@prisma/client").$Enums.InquiryStatus;
         subject: string;
         response: string | null;
         respondedAt: Date | null;
@@ -54,9 +54,9 @@ export declare class InquiriesService {
         createdAt: Date;
         updatedAt: Date;
         content: string;
+        status: import("@prisma/client").$Enums.InquiryStatus;
         userId: string | null;
         type: import("@prisma/client").$Enums.InquiryType;
-        status: import("@prisma/client").$Enums.InquiryStatus;
         subject: string;
         response: string | null;
         respondedAt: Date | null;
@@ -68,9 +68,9 @@ export declare class InquiriesService {
         createdAt: Date;
         updatedAt: Date;
         content: string;
+        status: import("@prisma/client").$Enums.InquiryStatus;
         userId: string | null;
         type: import("@prisma/client").$Enums.InquiryType;
-        status: import("@prisma/client").$Enums.InquiryStatus;
         subject: string;
         response: string | null;
         respondedAt: Date | null;
