@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { BarChart3, Flag, Users, FileText, ChevronLeft, ShieldCheck, Bell, Image, Shield, MessageSquare } from 'lucide-react';
+import { BarChart3, Flag, Users, FileText, ChevronLeft, ShieldCheck, Bell, Image, Shield, MessageSquare, Sparkles } from 'lucide-react';
 import { useUser, useIsAdmin } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
 import { AdminMobileNav } from '@/features/admin/components/admin-mobile-nav';
@@ -15,6 +15,7 @@ const adminNavItems = [
   { href: '/admin/inquiries', label: '문의 관리', icon: MessageSquare },
   { href: '/admin/users', label: '사용자 관리', icon: Users },
   { href: '/admin/posts', label: '게시글 관리', icon: FileText },
+  { href: '/admin/auto-content', label: '자동 콘텐츠', icon: Sparkles },
   { href: '/admin/announcements', label: '공지사항 관리', icon: Bell },
   { href: '/admin/banners', label: '배너 관리', icon: Image },
   { href: '/admin/privacy', label: '개인정보 관리', icon: Shield },

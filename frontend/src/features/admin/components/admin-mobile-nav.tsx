@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, BarChart3, Flag, Users, FileText, ShieldCheck, Bell, Image, Shield, MessageSquare } from 'lucide-react';
+import { Menu, X, BarChart3, Flag, Users, FileText, ShieldCheck, Bell, Image, Shield, MessageSquare, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const adminNavItems = [
@@ -13,6 +13,7 @@ const adminNavItems = [
   { href: '/admin/inquiries', label: '문의 관리', icon: MessageSquare },
   { href: '/admin/users', label: '사용자 관리', icon: Users },
   { href: '/admin/posts', label: '게시글 관리', icon: FileText },
+  { href: '/admin/auto-content', label: '자동 콘텐츠', icon: Sparkles },
   { href: '/admin/announcements', label: '공지사항 관리', icon: Bell },
   { href: '/admin/banners', label: '배너 관리', icon: Image },
   { href: '/admin/privacy', label: '개인정보 관리', icon: Shield },

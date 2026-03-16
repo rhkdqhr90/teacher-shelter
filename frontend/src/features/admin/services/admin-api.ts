@@ -123,6 +123,21 @@ export interface Report {
   processingNote?: string;
 }
 
+export interface AutoContent {
+  id: string;
+  title: string;
+  category: string;
+  status: string;
+  sourceUrl?: string | null;
+  sourceName?: string | null;
+  confidence?: string | null;
+  viewCount: number;
+  likeCount: number;
+  commentCount: number;
+  createdAt: string;
+  author?: { id: string; nickname: string; email: string };
+}
+
 // API functions
 export const adminApi = {
   // 대시보드 통계
@@ -190,6 +205,25 @@ export const adminApi = {
   async bulkDeletePosts(ids: string[]): Promise<{ deletedCount: number }> {
     const response = await api.post<{ deletedCount: number }>('/admin/posts/bulk-delete', { ids });
     return response.data;
+  },
+
+  // 자동생성 콘텐츠 관리
+  async getAutoContent(params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+  }): Promise<PaginatedResponse<AutoContent>> {
+    const response = await api.get<PaginatedResponse<AutoContent>>('/admin/auto-content', { params });
+    return response.data;
+  },
+
+  async approveAutoContent(id: string): Promise<{ id: string; title: string; status: string }> {
+    const response = await api.patch<{ id: string; title: string; status: string }>(`/admin/auto-content/${id}/approve`);
+    return response.data;
+  },
+
+  async deleteAutoContent(id: string): Promise<void> {
+    await api.delete(`/admin/auto-content/${id}`);
   },
 
   // 댓글 관리
