@@ -170,6 +170,34 @@ export class AdminController {
   }
 
   // ========================================
+  // 자동생성 콘텐츠 관리
+  // ========================================
+
+  @Get('auto-content')
+  async getAutoContent(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('status') status?: string,
+  ) {
+    return this.adminService.getAutoContent(
+      parsePage(page),
+      parseLimit(limit),
+      status,
+    );
+  }
+
+  @Patch('auto-content/:id/approve')
+  async approveAutoContent(@Param('id') id: string) {
+    return this.adminService.approveAutoContent(id);
+  }
+
+  @Delete('auto-content/:id')
+  @HttpCode(HttpStatus.OK)
+  async rejectAutoContent(@Param('id') id: string) {
+    return this.adminService.rejectAutoContent(id);
+  }
+
+  // ========================================
   // 댓글 관리
   // ========================================
 

@@ -1,4 +1,4 @@
-import { AppService } from './app.service.js';
+import { AppService } from './app.service';
 import { PrismaService } from './database/prisma.service';
 export declare class AppController {
     private readonly appService;

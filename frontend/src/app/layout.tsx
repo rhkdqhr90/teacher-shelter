@@ -8,7 +8,14 @@ import '@/styles/globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
+// metadataBase: OG 이미지·canonical 등 상대경로를 절대 URL로 변환하는 기준점
+// 없으면 카카오/네이버 공유 미리보기 이미지가 깨짐
+// NEXT_PUBLIC_SITE_URL이 빈 문자열("")로 설정된 경우 new URL("")이 throw하므로
+// || 연산자로 빈 문자열도 fallback 처리 (빈 문자열은 falsy)
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://teacherlounge.co.kr';
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: '교사쉼터',
     template: '%s | 교사쉼터',
@@ -17,10 +24,11 @@ export const metadata: Metadata = {
   keywords: ['교사', '특수교사', '보육교사', '교사 커뮤니티', '교육', '교사쉼터'],
   authors: [{ name: '교사쉼터' }],
   creator: '교사쉼터',
+  verification: { other: { 'naver-site-verification': ['a4be6b7d0289d9058229b6367486ca8a6873dcbf'] } },
   openGraph: {
     type: 'website',
     locale: 'ko_KR',
-    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://teacherlounge.co.kr',
+    url: '/', // metadataBase 기준 상대경로
     title: '교사쉼터',
     description: '특수교사, 보육교사를 위한 커뮤니티. 고민을 나누고 정보를 공유하세요.',
     siteName: '교사쉼터',
@@ -33,6 +41,12 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 

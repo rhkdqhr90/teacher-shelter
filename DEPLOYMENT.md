@@ -139,7 +139,8 @@ docker compose up -d --force-recreate backend
 | 변수명 | 값 | 설명 |
 |--------|-----|------|
 | `NEXT_PUBLIC_API_URL` | `https://api.teacherlounge.co.kr/api` | 백엔드 API URL |
-| `NEXT_PUBLIC_APP_URL` | `https://teacherlounge.co.kr` | 프론트엔드 URL |
+| `NEXT_PUBLIC_APP_URL` | `https://teacherlounge.co.kr` | 프론트엔드 URL (robots.ts, sitemap.ts) |
+| `NEXT_PUBLIC_SITE_URL` | `https://teacherlounge.co.kr` | metadataBase, canonical, JSON-LD, RSS 피드 기준 URL |
 | `AUTH_SECRET` | `<openssl rand -base64 32>` | Auth.js 시크릿 |
 
 ### 백엔드 (docker-compose.yml)

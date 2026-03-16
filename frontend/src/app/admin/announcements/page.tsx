@@ -37,7 +37,7 @@ export default function AnnouncementsAdminPage() {
       resetForm();
     },
     onError: (error) => {
-      toast.error('공지사항 작성 실패', getErrorMessage(error));
+      toast.error('공지사항 작성 실패', getErrorMessage(error, '오류가 발생했습니다'));
     },
   });
 
@@ -50,7 +50,7 @@ export default function AnnouncementsAdminPage() {
       resetForm();
     },
     onError: (error) => {
-      toast.error('공지사항 수정 실패', getErrorMessage(error));
+      toast.error('공지사항 수정 실패', getErrorMessage(error, '오류가 발생했습니다'));
     },
   });
 
@@ -62,7 +62,7 @@ export default function AnnouncementsAdminPage() {
       setDeleteTarget(null);
     },
     onError: (error) => {
-      toast.error('공지사항 삭제 실패', getErrorMessage(error));
+      toast.error('공지사항 삭제 실패', getErrorMessage(error, '오류가 발생했습니다'));
     },
   });
 
@@ -72,7 +72,7 @@ export default function AnnouncementsAdminPage() {
       queryClient.invalidateQueries({ queryKey: ['admin', 'announcements'] });
     },
     onError: (error) => {
-      toast.error('상태 변경 실패', getErrorMessage(error));
+      toast.error('상태 변경 실패', getErrorMessage(error, '오류가 발생했습니다'));
     },
   });
 
@@ -82,7 +82,7 @@ export default function AnnouncementsAdminPage() {
       queryClient.invalidateQueries({ queryKey: ['admin', 'announcements'] });
     },
     onError: (error) => {
-      toast.error('상태 변경 실패', getErrorMessage(error));
+      toast.error('상태 변경 실패', getErrorMessage(error, '오류가 발생했습니다'));
     },
   });
 
