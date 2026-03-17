@@ -299,6 +299,14 @@ export async function initializeAuth(): Promise<boolean> {
 
     return true;
   } catch (error) {
+    // Race condition 보호: refresh 실패했지만 다른 경로(login 등)에서
+    // 이미 인증이 완료된 경우 clearAuth하지 않음
+    const currentToken = useAuthStore.getState().accessToken;
+    if (currentToken) {
+      useAuthStore.getState().setInitialized(true);
+      return true;
+    }
+
     // 429 (rate limit) 등 일시적 에러는 로그아웃하지 않고 초기화만 완료
     // (새로고침하면 다시 시도할 수 있도록)
     const isTemporaryError =

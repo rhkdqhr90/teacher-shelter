@@ -36,9 +36,12 @@ interface NotificationsResponse extends Omit<PaginatedResponse<Notification>, 'm
 
 export const notificationsApi = {
   async getNotifications(page = 1, limit = 20): Promise<NotificationsResponse> {
+    // _isBackground: 401 발생 시 refresh 시도 없이 조용히 실패
+    // (폴링/리페치로 인한 연쇄 refresh → clearAuth 강제 로그아웃 방지)
     const response = await api.get<NotificationsResponse>('/notifications', {
       params: { page, limit },
-    });
+      _isBackground: true,
+    } as Parameters<typeof api.get>[1]);
     return response.data;
   },
 
