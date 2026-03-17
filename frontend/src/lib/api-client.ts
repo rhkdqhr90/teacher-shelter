@@ -116,7 +116,14 @@ const createApiClient = (): AxiosInstance => {
       const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
       // Handle 429 Too Many Requests - exponential backoff로 재시도
+      // 단, 백그라운드 요청(폴링 등)은 재시도 없이 즉시 실패 (다음 폴링 주기에 자연 재시도)
       if (error.response?.status === 429) {
+        const extConfig = originalRequest as ExtendedRequestConfig;
+        if (extConfig._isBackground) {
+          const message = (error.response?.data as { message?: string })?.message || '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.';
+          return Promise.reject(new ApiError(429, message, error.response?.data));
+        }
+
         const config = originalRequest as InternalAxiosRequestConfig & RetryConfig;
         const retryCount = config._retryCount || 0;
 

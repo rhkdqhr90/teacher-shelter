@@ -33,6 +33,7 @@ export function useUnreadCount() {
     refetchIntervalInBackground: false,
     staleTime: CACHE_TIME.UNREAD_COUNT,
     enabled: isAuthenticated,
+    retry: false, // 폴링이 30초마다 재시도하므로 실패 시 즉시 재시도 불필요
   });
 }
 
