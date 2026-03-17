@@ -826,6 +826,12 @@ body {
   color: hsl(var(--foreground));
 }
 
+/* Tiptap 에디터의 빈 줄(<p></p>, <p><br></p>) 높이 보장 */
+.post-detail__content p:empty,
+.post-detail__content p:has(> br:only-child) {
+  min-height: 1.75em; /* line-height와 동일 */
+}
+
 .post-detail__actions {
   display: flex;
   align-items: center;
