@@ -1,4 +1,4 @@
-import { api, resetRefreshFailCount } from './api-client';
+import { api, ApiError, resetRefreshFailCount } from './api-client';
 import { useAuthStore, type AuthUser } from '@/stores/auth-store';
 
 interface LoginRequest {
@@ -298,9 +298,19 @@ export async function initializeAuth(): Promise<boolean> {
     useAuthStore.getState().setAuth(accessToken, user);
 
     return true;
-  } catch {
-    // refreshToken이 없거나 만료된 경우 - clearAuth가 isInitialized도 설정
-    useAuthStore.getState().clearAuth();
+  } catch (error) {
+    // 429 (rate limit) 등 일시적 에러는 로그아웃하지 않고 초기화만 완료
+    // (새로고침하면 다시 시도할 수 있도록)
+    const isTemporaryError =
+      error instanceof ApiError && (error.statusCode === 429 || error.statusCode >= 500);
+
+    if (isTemporaryError) {
+      // 일시적 에러: 로그아웃하지 않고 미인증 상태로 초기화만 완료
+      useAuthStore.getState().setInitialized(true);
+    } else {
+      // 401/403 등 인증 관련 에러: refreshToken 만료 또는 무효 → 로그아웃
+      useAuthStore.getState().clearAuth();
+    }
     return false;
   } finally {
     isInitializing = false;

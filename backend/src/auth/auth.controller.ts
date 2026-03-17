@@ -53,7 +53,7 @@ export class AuthController {
   @ApiResponse({ status: 400, description: '유효하지 않은 입력' })
   @ApiResponse({ status: 409, description: '이미 존재하는 이메일' })
   @HttpCode(HttpStatus.CREATED)
-  @Throttle({ strict: { ttl: 900000, limit: 3 } }) // 15분에 3번 (스팸 방지)
+  @Throttle({ strict: { ttl: 900000, limit: 5 } }) // 15분에 5번 (스팸 방지)
   async register(
     @Body() registerDto: RegisterDto,
     @Res({ passthrough: true }) res: Response,
@@ -75,7 +75,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: '로그인 성공, accessToken 반환' })
   @ApiResponse({ status: 401, description: '잘못된 이메일 또는 비밀번호' })
   @HttpCode(HttpStatus.OK)
-  @Throttle({ strict: { ttl: 900000, limit: 5 } }) // 15분에 5번 (브루트포스 방지)
+  @Throttle({ strict: { ttl: 900000, limit: 10 } }) // 15분에 10번 (브루트포스 방지)
   async login(
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) res: Response,

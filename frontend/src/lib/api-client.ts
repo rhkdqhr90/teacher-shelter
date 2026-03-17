@@ -21,7 +21,7 @@ export class ApiError extends Error {
  */
 let isRefreshing = false;
 let refreshFailCount = 0;
-const MAX_REFRESH_FAILURES = 3;
+const MAX_REFRESH_FAILURES = 5;
 let failedQueue: Array<{
   resolve: (value: string) => void;
   reject: (error: unknown) => void;
@@ -116,10 +116,11 @@ const createApiClient = (): AxiosInstance => {
       const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
       // Handle 429 Too Many Requests - exponential backoff로 재시도
-      // 단, 백그라운드 요청(폴링 등)은 재시도 없이 즉시 실패 (다음 폴링 주기에 자연 재시도)
+      // 단, 백그라운드 요청 및 auth 요청은 재시도 없이 즉시 실패
       if (error.response?.status === 429) {
         const extConfig = originalRequest as ExtendedRequestConfig;
-        if (extConfig._isBackground) {
+        const isAuthRequest = originalRequest.url?.includes('/auth/');
+        if (extConfig._isBackground || isAuthRequest) {
           const message = (error.response?.data as { message?: string })?.message || '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.';
           return Promise.reject(new ApiError(429, message, error.response?.data));
         }
@@ -228,37 +229,6 @@ const createApiClient = (): AxiosInstance => {
 
           return instance(originalRequest);
         } catch (refreshError) {
-          const refreshAxiosError = refreshError as AxiosError;
-          const refreshStatus = refreshAxiosError?.response?.status;
-
-          // 409 Conflict = 다른 탭/요청이 이미 refresh 완료 (race condition)
-          // 쿠키에 새 토큰이 있을 수 있으므로 한 번 더 시도
-          if (refreshStatus === 409 && !originalRequest._retry) {
-            originalRequest._retry = true;
-            processQueue(null);
-            try {
-              const retryResponse = await axios.post<{ accessToken: string }>(
-                `${API_URL}/auth/refresh`,
-                {},
-                { withCredentials: true }
-              );
-              const { accessToken: retryToken } = retryResponse.data;
-              refreshFailCount = 0;
-              const currentUser = useAuthStore.getState().user;
-              if (currentUser) {
-                useAuthStore.getState().setAuth(retryToken, currentUser);
-              }
-              if (originalRequest.headers) {
-                originalRequest.headers.Authorization = `Bearer ${retryToken}`;
-              }
-              return instance(originalRequest);
-            } catch {
-              // 재시도도 실패하면 로그아웃
-              useAuthStore.getState().clearAuth();
-              return Promise.reject(refreshError);
-            }
-          }
-
           // Refresh 실패 카운터 증가
           refreshFailCount++;
           processQueue(refreshError, null);
