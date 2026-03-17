@@ -78,13 +78,15 @@ export function formatTimeAgo(date: Date | string): string {
  * 마크다운 이미지 문법을 안전한 HTML img 태그로 변환
  * XSS 방지: http/https URL만 허용
  */
-export function convertMarkdownImages(content: string): string {
-  // HTML 블록 태그가 없으면 plain text로 간주하고 줄바꿈을 <br>로 변환
-  const hasBlockTags = /<(p|div|br|h[1-6]|ul|ol|li|blockquote|pre|table)\b/i.test(content);
-  if (!hasBlockTags) {
-    content = content.replace(/\n/g, '<br>\n');
-  }
+/**
+ * HTML 블록 태그가 포함된 콘텐츠인지 확인
+ * (Tiptap 에디터 콘텐츠 vs plain text 구분용)
+ */
+export function isHtmlContent(content: string): boolean {
+  return /<(p|div|h[1-6]|ul|ol|li|blockquote|pre|table)\b/i.test(content);
+}
 
+export function convertMarkdownImages(content: string): string {
   // 마크다운 이미지 문법: ![alt](url)
   const imageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
 

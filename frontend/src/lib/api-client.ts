@@ -228,6 +228,37 @@ const createApiClient = (): AxiosInstance => {
 
           return instance(originalRequest);
         } catch (refreshError) {
+          const refreshAxiosError = refreshError as AxiosError;
+          const refreshStatus = refreshAxiosError?.response?.status;
+
+          // 409 Conflict = 다른 탭/요청이 이미 refresh 완료 (race condition)
+          // 쿠키에 새 토큰이 있을 수 있으므로 한 번 더 시도
+          if (refreshStatus === 409 && !originalRequest._retry) {
+            originalRequest._retry = true;
+            processQueue(null);
+            try {
+              const retryResponse = await axios.post<{ accessToken: string }>(
+                `${API_URL}/auth/refresh`,
+                {},
+                { withCredentials: true }
+              );
+              const { accessToken: retryToken } = retryResponse.data;
+              refreshFailCount = 0;
+              const currentUser = useAuthStore.getState().user;
+              if (currentUser) {
+                useAuthStore.getState().setAuth(retryToken, currentUser);
+              }
+              if (originalRequest.headers) {
+                originalRequest.headers.Authorization = `Bearer ${retryToken}`;
+              }
+              return instance(originalRequest);
+            } catch {
+              // 재시도도 실패하면 로그아웃
+              useAuthStore.getState().clearAuth();
+              return Promise.reject(refreshError);
+            }
+          }
+
           // Refresh 실패 카운터 증가
           refreshFailCount++;
           processQueue(refreshError, null);

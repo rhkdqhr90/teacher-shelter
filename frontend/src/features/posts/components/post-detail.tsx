@@ -6,7 +6,7 @@ import DOMPurify from 'dompurify';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { ReportModal } from '@/features/reports/components/report-modal';
-import { convertMarkdownImages, formatTimeAgo } from '@/lib/utils';
+import { convertMarkdownImages, isHtmlContent, formatTimeAgo } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { SERVER_URL } from '@/lib/constants';
 
@@ -506,7 +506,7 @@ export function PostDetail({ postId }: PostDetailProps) {
 
         {/* Content */}
         <div
-          className="post-detail__content prose prose-sm max-w-none prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0"
+          className={`post-detail__content prose prose-sm max-w-none prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0 ${!isHtmlContent(post.content) ? 'whitespace-pre-line' : ''}`}
           dangerouslySetInnerHTML={{
             __html: DOMPurify.sanitize(convertMarkdownImages(post.content), {
               ADD_TAGS: ['img'],
