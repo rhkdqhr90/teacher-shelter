@@ -79,6 +79,12 @@ export function formatTimeAgo(date: Date | string): string {
  * XSS 방지: http/https URL만 허용
  */
 export function convertMarkdownImages(content: string): string {
+  // HTML 블록 태그가 없으면 plain text로 간주하고 줄바꿈을 <br>로 변환
+  const hasBlockTags = /<(p|div|br|h[1-6]|ul|ol|li|blockquote|pre|table)\b/i.test(content);
+  if (!hasBlockTags) {
+    content = content.replace(/\n/g, '<br>\n');
+  }
+
   // 마크다운 이미지 문법: ![alt](url)
   const imageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
 
