@@ -51,6 +51,7 @@ const nest_winston_1 = require("nest-winston");
 const jwt_1 = require("@nestjs/jwt");
 const config_1 = require("@nestjs/config");
 const prisma_service_1 = require("../database/prisma.service");
+const client_1 = require("@prisma/client");
 const redis_service_1 = require("../redis/redis.service");
 const mail_service_1 = require("../mail/mail.service");
 const bcrypt = __importStar(require("bcrypt"));
@@ -203,19 +204,28 @@ let AuthService = class AuthService {
         ]);
         const newExpiresAt = new Date();
         newExpiresAt.setDate(newExpiresAt.getDate() + this.REFRESH_TOKEN_EXPIRY_DAYS);
-        await this.prisma.$transaction([
-            this.prisma.refreshToken.update({
-                where: { tokenHash },
-                data: { revokedAt: new Date() },
-            }),
-            this.prisma.refreshToken.create({
-                data: {
-                    tokenHash: this.hashToken(refreshToken),
-                    userId: user.id,
-                    expiresAt: newExpiresAt,
-                },
-            }),
-        ]);
+        try {
+            await this.prisma.$transaction([
+                this.prisma.refreshToken.update({
+                    where: { tokenHash },
+                    data: { revokedAt: new Date() },
+                }),
+                this.prisma.refreshToken.create({
+                    data: {
+                        tokenHash: this.hashToken(refreshToken),
+                        userId: user.id,
+                        expiresAt: newExpiresAt,
+                    },
+                }),
+            ]);
+        }
+        catch (error) {
+            if (error instanceof client_1.Prisma.PrismaClientKnownRequestError &&
+                error.code === 'P2002') {
+                throw new common_1.UnauthorizedException('토큰이 이미 갱신되었습니다. 다시 로그인해주세요.');
+            }
+            throw error;
+        }
         return { accessToken, refreshToken };
     }
     async logout(refreshToken) {

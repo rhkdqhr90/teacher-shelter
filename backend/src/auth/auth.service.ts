@@ -10,6 +10,7 @@ import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../database/prisma.service';
+import { Prisma } from '@prisma/client';
 import { RedisService } from '../redis/redis.service';
 import { MailService } from '../mail/mail.service';
 import { LoginDto } from './dto/login.dto';
@@ -256,21 +257,34 @@ export class AuthService {
       newExpiresAt.getDate() + this.REFRESH_TOKEN_EXPIRY_DAYS,
     );
 
-    await this.prisma.$transaction([
-      // 기존 토큰 revoke
-      this.prisma.refreshToken.update({
-        where: { tokenHash },
-        data: { revokedAt: new Date() },
-      }),
-      // 새 토큰 저장
-      this.prisma.refreshToken.create({
-        data: {
-          tokenHash: this.hashToken(refreshToken),
-          userId: user.id,
-          expiresAt: newExpiresAt,
-        },
-      }),
-    ]);
+    try {
+      await this.prisma.$transaction([
+        // 기존 토큰 revoke
+        this.prisma.refreshToken.update({
+          where: { tokenHash },
+          data: { revokedAt: new Date() },
+        }),
+        // 새 토큰 저장
+        this.prisma.refreshToken.create({
+          data: {
+            tokenHash: this.hashToken(refreshToken),
+            userId: user.id,
+            expiresAt: newExpiresAt,
+          },
+        }),
+      ]);
+    } catch (error) {
+      // Race condition: 동시 refresh 요청으로 토큰이 이미 갱신됨
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        throw new UnauthorizedException(
+          '토큰이 이미 갱신되었습니다. 다시 로그인해주세요.',
+        );
+      }
+      throw error;
+    }
 
     return { accessToken, refreshToken };
   }
