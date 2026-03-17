@@ -24,7 +24,15 @@ export const metadata: Metadata = {
   keywords: ['교사', '특수교사', '보육교사', '교사 커뮤니티', '교육', '교사쉼터'],
   authors: [{ name: '교사쉼터' }],
   creator: '교사쉼터',
-  verification: { other: { 'naver-site-verification': ['a4be6b7d0289d9058229b6367486ca8a6873dcbf'] } },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || '',
+    other: { 'naver-site-verification': ['a4be6b7d0289d9058229b6367486ca8a6873dcbf'] },
+  },
+  alternates: {
+    types: {
+      'application/rss+xml': '/feed.xml',
+    },
+  },
   openGraph: {
     type: 'website',
     locale: 'ko_KR',
@@ -32,11 +40,13 @@ export const metadata: Metadata = {
     title: '교사쉼터',
     description: '특수교사, 보육교사를 위한 커뮤니티. 고민을 나누고 정보를 공유하세요.',
     siteName: '교사쉼터',
+    images: [{ url: '/og-default.png', width: 1200, height: 630, alt: '교사쉼터' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: '교사쉼터',
     description: '특수교사, 보육교사를 위한 커뮤니티. 고민을 나누고 정보를 공유하세요.',
+    images: ['/og-default.png'],
   },
   robots: {
     index: true,

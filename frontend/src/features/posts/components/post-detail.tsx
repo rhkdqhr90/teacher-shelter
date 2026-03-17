@@ -11,12 +11,18 @@ import { useToast } from '@/hooks/use-toast';
 import { SERVER_URL } from '@/lib/constants';
 
 // DOMPurify 설정: 안전한 속성만 허용
+// text-align만 허용하는 안전한 style 값 목록
+const ALLOWED_STYLE_VALUES = /^text-align:\s*(left|center|right|justify);?$/;
+
 if (typeof window !== 'undefined') {
-  // style 속성 완전히 제거 (CSS 인젝션 방지)
-  DOMPurify.addHook('uponSanitizeAttribute', (node, data) => {
+  // style 속성: text-align만 허용, 나머지는 제거 (CSS 인젝션 방지)
+  DOMPurify.addHook('uponSanitizeAttribute', (_node, data) => {
     if (data.attrName === 'style') {
-      data.attrValue = '';
-      data.keepAttr = false;
+      const value = data.attrValue.trim();
+      if (!ALLOWED_STYLE_VALUES.test(value)) {
+        data.attrValue = '';
+        data.keepAttr = false;
+      }
     }
   });
 
@@ -500,12 +506,12 @@ export function PostDetail({ postId }: PostDetailProps) {
 
         {/* Content */}
         <div
-          className="post-detail__content prose prose-sm max-w-none prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg"
+          className="post-detail__content prose prose-sm max-w-none prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0"
           dangerouslySetInnerHTML={{
             __html: DOMPurify.sanitize(convertMarkdownImages(post.content), {
               ADD_TAGS: ['img'],
               ADD_ATTR: ['loading', 'class', 'target', 'rel'],
-              ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'loading', 'class', 'target', 'rel'],
+              ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'loading', 'class', 'target', 'rel', 'style'],
               ALLOW_DATA_ATTR: false,
               FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form'],
               FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover'],
