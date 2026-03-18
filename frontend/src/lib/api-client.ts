@@ -85,10 +85,13 @@ const createApiClient = (): AxiosInstance => {
    */
   instance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-      // Zustand 스토어에서 accessToken 가져오기 (메모리 저장)
-      const accessToken = useAuthStore.getState().accessToken;
-      if (accessToken && config.headers) {
-        config.headers.Authorization = `Bearer ${accessToken}`;
+      // 명시적으로 설정된 Authorization 헤더가 없을 때만 Zustand 토큰 사용
+      // (login/register에서 새 토큰으로 /users/me 호출 시 덮어쓰기 방지)
+      if (!config.headers?.Authorization) {
+        const accessToken = useAuthStore.getState().accessToken;
+        if (accessToken && config.headers) {
+          config.headers.Authorization = `Bearer ${accessToken}`;
+        }
       }
 
       return config;

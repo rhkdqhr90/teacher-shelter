@@ -57,80 +57,93 @@ function decodeToken(token: string): { sub: string; email: string; role: string 
  * 로그인
  */
 export async function login(data: LoginRequest): Promise<AuthUser> {
-  const response = await api.post<AuthResponse>('/auth/login', data);
-  const { accessToken } = response.data;
+  // initializeAuth의 refresh가 상태를 덮어쓰지 않도록 플래그 설정
+  isAuthenticating = true;
 
-  // 토큰에서 기본 정보 추출
-  const payload = decodeToken(accessToken);
-  if (!payload) {
-    throw new Error('유효하지 않은 토큰입니다.');
+  try {
+    const response = await api.post<AuthResponse>('/auth/login', data);
+    const { accessToken } = response.data;
+
+    // 토큰에서 기본 정보 추출
+    const payload = decodeToken(accessToken);
+    if (!payload) {
+      throw new Error('유효하지 않은 토큰입니다.');
+    }
+
+    // 사용자 정보 조회
+    const userResponse = await api.get<UserResponse>('/users/me', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    const user: AuthUser = {
+      id: userResponse.data.id,
+      email: userResponse.data.email,
+      nickname: userResponse.data.nickname,
+      role: userResponse.data.role,
+      jobType: userResponse.data.jobType,
+      career: userResponse.data.career,
+      isVerified: userResponse.data.isVerified,
+      profileImage: userResponse.data.profileImage,
+      isExpert: userResponse.data.isExpert,
+      expertType: userResponse.data.expertType,
+    };
+
+    // 로그인 성공 시 refresh 실패 카운터 리셋
+    resetRefreshFailCount();
+
+    // Zustand 스토어에 저장 (메모리)
+    useAuthStore.getState().setAuth(accessToken, user);
+
+    return user;
+  } finally {
+    isAuthenticating = false;
   }
-
-  // 사용자 정보 조회
-  const userResponse = await api.get<UserResponse>('/users/me', {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
-
-  const user: AuthUser = {
-    id: userResponse.data.id,
-    email: userResponse.data.email,
-    nickname: userResponse.data.nickname,
-    role: userResponse.data.role,
-    jobType: userResponse.data.jobType,
-    career: userResponse.data.career,
-    isVerified: userResponse.data.isVerified,
-    profileImage: userResponse.data.profileImage,
-    isExpert: userResponse.data.isExpert,
-    expertType: userResponse.data.expertType,
-  };
-
-  // 로그인 성공 시 refresh 실패 카운터 리셋
-  resetRefreshFailCount();
-
-  // Zustand 스토어에 저장 (메모리)
-  useAuthStore.getState().setAuth(accessToken, user);
-
-  return user;
 }
 
 /**
  * 회원가입
  */
 export async function register(data: RegisterRequest): Promise<AuthUser> {
-  const response = await api.post<AuthResponse>('/auth/register', data);
-  const { accessToken } = response.data;
+  isAuthenticating = true;
 
-  // 토큰에서 기본 정보 추출
-  const payload = decodeToken(accessToken);
-  if (!payload) {
-    throw new Error('유효하지 않은 토큰입니다.');
+  try {
+    const response = await api.post<AuthResponse>('/auth/register', data);
+    const { accessToken } = response.data;
+
+    // 토큰에서 기본 정보 추출
+    const payload = decodeToken(accessToken);
+    if (!payload) {
+      throw new Error('유효하지 않은 토큰입니다.');
+    }
+
+    // 사용자 정보 조회
+    const userResponse = await api.get<UserResponse>('/users/me', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    const user: AuthUser = {
+      id: userResponse.data.id,
+      email: userResponse.data.email,
+      nickname: userResponse.data.nickname,
+      role: userResponse.data.role,
+      jobType: userResponse.data.jobType,
+      career: userResponse.data.career,
+      isVerified: userResponse.data.isVerified,
+      profileImage: userResponse.data.profileImage,
+      isExpert: userResponse.data.isExpert,
+      expertType: userResponse.data.expertType,
+    };
+
+    // 회원가입 성공 시 refresh 실패 카운터 리셋
+    resetRefreshFailCount();
+
+    // Zustand 스토어에 저장 (메모리)
+    useAuthStore.getState().setAuth(accessToken, user);
+
+    return user;
+  } finally {
+    isAuthenticating = false;
   }
-
-  // 사용자 정보 조회
-  const userResponse = await api.get<UserResponse>('/users/me', {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
-
-  const user: AuthUser = {
-    id: userResponse.data.id,
-    email: userResponse.data.email,
-    nickname: userResponse.data.nickname,
-    role: userResponse.data.role,
-    jobType: userResponse.data.jobType,
-    career: userResponse.data.career,
-    isVerified: userResponse.data.isVerified,
-    profileImage: userResponse.data.profileImage,
-    isExpert: userResponse.data.isExpert,
-    expertType: userResponse.data.expertType,
-  };
-
-  // 회원가입 성공 시 refresh 실패 카운터 리셋
-  resetRefreshFailCount();
-
-  // Zustand 스토어에 저장 (메모리)
-  useAuthStore.getState().setAuth(accessToken, user);
-
-  return user;
 }
 
 /**
@@ -204,44 +217,52 @@ export async function exchangeOAuthCode(code: string): Promise<string> {
  * OAuth 콜백 처리 - 임시 코드로 토큰 교환 후 사용자 정보 조회 및 저장
  */
 export async function handleOAuthCallback(code: string): Promise<AuthUser> {
-  // 임시 코드를 accessToken으로 교환 (보안: URL에 토큰 노출 방지)
-  const accessToken = await exchangeOAuthCode(code);
+  isAuthenticating = true;
 
-  // 토큰에서 기본 정보 추출
-  const payload = decodeToken(accessToken);
-  if (!payload) {
-    throw new Error('유효하지 않은 토큰입니다.');
+  try {
+    // 임시 코드를 accessToken으로 교환 (보안: URL에 토큰 노출 방지)
+    const accessToken = await exchangeOAuthCode(code);
+
+    // 토큰에서 기본 정보 추출
+    const payload = decodeToken(accessToken);
+    if (!payload) {
+      throw new Error('유효하지 않은 토큰입니다.');
+    }
+
+    // 사용자 정보 조회
+    const userResponse = await api.get<UserResponse>('/users/me', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    const user: AuthUser = {
+      id: userResponse.data.id,
+      email: userResponse.data.email,
+      nickname: userResponse.data.nickname,
+      role: userResponse.data.role,
+      jobType: userResponse.data.jobType,
+      career: userResponse.data.career,
+      isVerified: userResponse.data.isVerified,
+      profileImage: userResponse.data.profileImage,
+      isExpert: userResponse.data.isExpert,
+      expertType: userResponse.data.expertType,
+    };
+
+    // OAuth 로그인 성공 시 refresh 실패 카운터 리셋
+    resetRefreshFailCount();
+
+    // Zustand 스토어에 저장 (메모리)
+    useAuthStore.getState().setAuth(accessToken, user);
+
+    return user;
+  } finally {
+    isAuthenticating = false;
   }
-
-  // 사용자 정보 조회
-  const userResponse = await api.get<UserResponse>('/users/me', {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
-
-  const user: AuthUser = {
-    id: userResponse.data.id,
-    email: userResponse.data.email,
-    nickname: userResponse.data.nickname,
-    role: userResponse.data.role,
-    jobType: userResponse.data.jobType,
-    career: userResponse.data.career,
-    isVerified: userResponse.data.isVerified,
-    profileImage: userResponse.data.profileImage,
-    isExpert: userResponse.data.isExpert,
-    expertType: userResponse.data.expertType,
-  };
-
-  // OAuth 로그인 성공 시 refresh 실패 카운터 리셋
-  resetRefreshFailCount();
-
-  // Zustand 스토어에 저장 (메모리)
-  useAuthStore.getState().setAuth(accessToken, user);
-
-  return user;
 }
 
 // 중복 호출 방지 플래그
 let isInitializing = false;
+// login/register 진행 중 플래그: initializeAuth가 상태를 덮어쓰지 않도록 방지
+let isAuthenticating = false;
 
 /**
  * 앱 초기화 시 토큰 갱신 시도
@@ -273,10 +294,23 @@ export async function initializeAuth(): Promise<boolean> {
     const response = await api.post<AuthResponse>('/auth/refresh');
     const { accessToken } = response.data;
 
+    // login/register가 진행 중이면 refresh 결과를 무시
+    // (login이 setAuth를 호출한 후 initializeAuth가 덮어쓰는 것을 방지)
+    if (isAuthenticating) {
+      useAuthStore.getState().setInitialized(true);
+      return true;
+    }
+
     // 사용자 정보 조회
     const userResponse = await api.get<UserResponse>('/users/me', {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
+
+    // login/register가 그 사이에 시작되었을 수 있으므 재확인
+    if (isAuthenticating || useAuthStore.getState().accessToken) {
+      useAuthStore.getState().setInitialized(true);
+      return true;
+    }
 
     const user: AuthUser = {
       id: userResponse.data.id,
@@ -299,6 +333,12 @@ export async function initializeAuth(): Promise<boolean> {
 
     return true;
   } catch (error) {
+    // login/register 진행 중이면 clearAuth 절대 호출하지 않음
+    if (isAuthenticating) {
+      useAuthStore.getState().setInitialized(true);
+      return true;
+    }
+
     // Race condition 보호: refresh 실패했지만 다른 경로(login 등)에서
     // 이미 인증이 완료된 경우 clearAuth하지 않음
     const currentToken = useAuthStore.getState().accessToken;
