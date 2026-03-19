@@ -1,9 +1,9 @@
 // RSS 2.0 피드 - 네이버 서치어드바이저 콘텐츠 수집용
 // 네이버는 sitemap.xml보다 RSS를 통한 콘텐츠 인덱싱을 선호
-// 등록 경로: 네이버 서치어드바이저 > 요청 > RSS 제출 > https://teacherlounge.co.kr/feed.xml
+// 등록 경로: 네이버 서치어드바이저 > 요청 > RSS 제출 > https://www.teacherlounge.co.kr/feed.xml
 import { NextResponse } from 'next/server';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://teacherlounge.co.kr';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teacherlounge.co.kr';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
 // XML 특수문자 이스케이프 (일반 텍스트 노드용)

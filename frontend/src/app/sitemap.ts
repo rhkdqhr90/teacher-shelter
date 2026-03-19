@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://teacherlounge.co.kr';
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.teacherlounge.co.kr';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
 // PostCategory enum 중 sitemap에 포함할 카테고리 (ANONYMOUS 제외)
