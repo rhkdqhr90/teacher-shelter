@@ -26,7 +26,12 @@ export const metadata: Metadata = {
   creator: '교사쉼터',
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || '',
-    other: { 'naver-site-verification': ['a4be6b7d0289d9058229b6367486ca8a6873dcbf'] },
+    other: {
+      'naver-site-verification': [
+        'a4be6b7d0289d9058229b6367486ca8a6873dcbf',
+        'ce3cba45e6550fd5c1fc27a4e8e52bf497665643',
+      ],
+    },
   },
   alternates: {
     types: {
