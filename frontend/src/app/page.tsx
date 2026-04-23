@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { HomeContent } from './home-content';
 import { API_URL } from '@/lib/constants';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teacherlounge.co.kr';
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teacherlounge.co.kr').trim();
 
 export const metadata: Metadata = {
   title: { absolute: '교사쉼터 - 특수교사·보육교사 커뮤니티' },

@@ -40,10 +40,10 @@ export function middleware(request: NextRequest) {
   // 2. 보안 헤더 (환경별 CSP)
   // ========================================
   const isDev = process.env.NODE_ENV === 'development';
-  const apiUrlFull = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+  const apiUrlFull = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api').trim();
   // CSP connect-src는 origin 기반 매칭이므로 /api 경로 제거
   const apiOrigin = apiUrlFull.replace(/\/api\/?$/, '');
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001').trim();
 
   // CSP 설정: 개발 vs 프로덕션 분리
   // - 개발: 디버깅 편의를 위해 'unsafe-eval' 허용 (Next.js Fast Refresh, React DevTools 등)

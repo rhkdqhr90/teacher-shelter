@@ -11,7 +11,7 @@ interface PostPageProps {
   }>;
 }
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teacherlounge.co.kr';
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teacherlounge.co.kr').trim();
 
 // JSON-LD dangerouslySetInnerHTML XSS 방어:
 // JSON.stringify는 </script>를 이스케이프하지 않아

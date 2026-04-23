@@ -12,7 +12,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 // 없으면 카카오/네이버 공유 미리보기 이미지가 깨짐
 // NEXT_PUBLIC_SITE_URL이 빈 문자열("")로 설정된 경우 new URL("")이 throw하므로
 // || 연산자로 빈 문자열도 fallback 처리 (빈 문자열은 falsy)
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teacherlounge.co.kr';
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teacherlounge.co.kr').trim();
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
