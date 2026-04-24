@@ -3,23 +3,10 @@ import { MetadataRoute } from 'next';
 const BASE_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://www.teacherlounge.co.kr').trim();
 const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api').trim();
 
-// PostCategory enum 중 sitemap에 포함할 카테고리 (ANONYMOUS 제외)
-// 실제 enum 값은 대문자 (FREE, HUMOR, ...) 사용
-const INDEXABLE_CATEGORIES = [
-  'FREE',
-  'HUMOR',
-  'INFO',
-  'KNOWHOW',
-  'CLASS_MATERIAL',
-  'CERTIFICATION',
-  'SCHOOL_EVENT',
-  'PARENT_COUNSEL',
-  'TEACHER_DAYCARE',
-  'TEACHER_SPECIAL',
-  'TEACHER_KINDERGARTEN',
-  'LEGAL_QNA',
-  'JOB_POSTING',
-] as const;
+// 참고: 과거엔 INDEXABLE_CATEGORIES 별로 /posts?category=XXX URL을 sitemap에 넣었으나,
+// 네이버는 sitemap 내 쿼리스트링 URL을 "올바른 형식 아님"으로 거부함.
+// → /posts 대표 URL만 남기고 개별 게시글 URL로 인덱싱 유도.
+// 향후 path 기반 라우팅(/posts/category/[name]) 도입 시 sitemap에 다시 추가 가능.
 
 interface SitemapPost {
   id: string;
@@ -51,6 +38,7 @@ async function getPostsForSitemap(): Promise<SitemapPost[]> {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // ── 정적 페이지 ─────────────────────────────────────────────
+  // 홈 URL은 trailing slash 없이 (canonical 기준)
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: BASE_URL,
@@ -76,15 +64,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.7,
     },
+    {
+      url: `${BASE_URL}/posts`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
   ];
-
-  // ── 카테고리 페이지 (대문자 enum 값, ANONYMOUS 제외) ────────
-  const categoryPages: MetadataRoute.Sitemap = INDEXABLE_CATEGORIES.map((category) => ({
-    url: `${BASE_URL}/posts?category=${category}`,
-    lastModified: new Date(),
-    changeFrequency: 'daily' as const,
-    priority: 0.8,
-  }));
 
   // ── 동적 게시글 페이지 ────────────────────────────────────
   const posts = await getPostsForSitemap();
@@ -105,5 +91,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     }));
 
-  return [...staticPages, ...categoryPages, ...postPages];
+  return [...staticPages, ...postPages];
 }
