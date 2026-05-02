@@ -44,7 +44,11 @@ export class RedisOAuthStateStore {
    *   - store(req, callback)
    *   - store(req, meta, callback)  // 신버전
    */
-  store(req: Request, metaOrCallback: unknown, maybeCallback?: StoreCallback): void {
+  store(
+    req: Request,
+    metaOrCallback: unknown,
+    maybeCallback?: StoreCallback,
+  ): void {
     const callback: StoreCallback =
       typeof metaOrCallback === 'function'
         ? (metaOrCallback as StoreCallback)
@@ -54,23 +58,26 @@ export class RedisOAuthStateStore {
     const state = crypto.randomBytes(32).toString('base64url');
     const key = `${KEY_PREFIX}${this.providerKey}:${state}`;
 
-    this.redisService
-      .set(key, '1', STATE_TTL_SECONDS)
-      .then(() => callback(null, state))
-      .catch((err: unknown) =>
+    // .then(onFulfilled, onRejected) 2-arg 형태 사용:
+    // .then(...).catch(...) 체이닝하면 callback 내부 throw가 .catch로 흘러
+    // callback이 두 번 호출되는 버그 발생. 2-arg .then은 onFulfilled의 throw가
+    // 다음 onRejected로 넘어가지 않으므로 안전.
+    this.redisService.set(key, '1', STATE_TTL_SECONDS).then(
+      () => callback(null, state),
+      (err: unknown) =>
         callback(err instanceof Error ? err : new Error(String(err))),
-      );
+    );
   }
 
   /**
    * 콜백 단계: 클라이언트가 들고 온 state가 우리가 발급한 것과 일치하는지 검증.
    * 한 번 사용된 state는 즉시 폐기(replay 방지).
+   *
+   * 주의: get → del 사이에 미세한 TOCTOU 윈도우가 있으나 (state는 클라이언트만
+   * 알고 짧은 TTL이므로) 실제 공격 가능성은 매우 낮다. 더 엄격한 보장이 필요해지면
+   * Redis GETDEL (6.2+) 또는 Lua script로 원자화 가능.
    */
-  verify(
-    req: Request,
-    providedState: string,
-    callback: VerifyCallback,
-  ): void {
+  verify(req: Request, providedState: string, callback: VerifyCallback): void {
     if (!providedState || typeof providedState !== 'string') {
       callback(null, false, { message: 'Missing OAuth state parameter' });
       return;
@@ -78,23 +85,30 @@ export class RedisOAuthStateStore {
 
     const key = `${KEY_PREFIX}${this.providerKey}:${providedState}`;
 
-    this.redisService
-      .get(key)
-      .then(async (value) => {
-        if (value === null) {
-          // 만료됐거나 위조된 state
-          callback(null, false, { message: 'Invalid or expired OAuth state' });
-          return;
+    // 검증 성공 후 del → 그 이후에 callback. del 결과는 무시
+    // (state 검증 자체는 get으로 끝나며, del 실패해도 TTL이 곧 정리함).
+    const handle = async (): Promise<{ ok: boolean; reason?: string }> => {
+      const value = await this.redisService.get(key);
+      if (value === null) {
+        return { ok: false, reason: 'Invalid or expired OAuth state' };
+      }
+      // 일회용 처리: best-effort, 실패해도 TTL이 정리
+      await this.redisService.del(key).catch(() => {
+        /* del 실패는 무시 (TTL fallback) */
+      });
+      return { ok: true };
+    };
+
+    handle().then(
+      (result) => {
+        if (result.ok) {
+          callback(null, true, providedState);
+        } else {
+          callback(null, false, { message: result.reason ?? 'Invalid state' });
         }
-        // 일회용: 검증 성공 즉시 삭제
-        await this.redisService.del(key);
-        callback(null, true, providedState);
-      })
-      .catch((err: unknown) =>
-        callback(
-          err instanceof Error ? err : new Error(String(err)),
-          false,
-        ),
-      );
+      },
+      (err: unknown) =>
+        callback(err instanceof Error ? err : new Error(String(err)), false),
+    );
   }
 }

@@ -8,37 +8,47 @@ import 'winston-daily-rotate-file';
 // 외부 라이브러리 에러나 객체 로깅 시 password/token/cookie 같은 필드가
 // 평문으로 로그파일에 기록되는 것을 방지한다.
 // 키 이름은 대소문자 무시 매칭.
+//
+// 중요: in-place mutation을 사용한다.
+// Winston의 info 객체는 Symbol(LEVEL), Symbol(MESSAGE), Symbol(SPLAT) 같은
+// 심볼 키 메타데이터를 들고 있다. Object.entries / spread로 새 객체를 만들면
+// 이 심볼들이 사라져서 후속 format이 로그 메시지를 렌더하지 못한다.
 const SENSITIVE_KEY_PATTERN =
   /^(password|passwd|pwd|token|accesstoken|refreshtoken|authorization|cookie|secret|apikey|api_key|jwt|sessionid|sessiontoken|otp|verificationcode|emailverificationtoken|passwordresettoken)$/i;
 const REDACTED = '[REDACTED]';
 const MAX_DEPTH = 6;
 
-function redactSensitive(value: unknown, depth = 0, seen = new WeakSet<object>()): unknown {
-  if (depth > MAX_DEPTH) return '[MAX_DEPTH]';
-  if (value === null || value === undefined) return value;
-  if (typeof value !== 'object') return value;
-  if (seen.has(value as object)) return '[Circular]';
-  seen.add(value as object);
+function redactInPlace(
+  value: unknown,
+  depth = 0,
+  seen = new WeakSet<object>(),
+): void {
+  if (depth > MAX_DEPTH) return;
+  if (value === null || typeof value !== 'object') return;
+  if (seen.has(value)) return;
+  seen.add(value);
 
   if (Array.isArray(value)) {
-    return value.map((item) => redactSensitive(item, depth + 1, seen));
+    for (const item of value) {
+      redactInPlace(item, depth + 1, seen);
+    }
+    return;
   }
 
-  const result: Record<string, unknown> = {};
-  for (const [key, v] of Object.entries(value as Record<string, unknown>)) {
+  const obj = value as Record<string, unknown>;
+  for (const key of Object.keys(obj)) {
     if (SENSITIVE_KEY_PATTERN.test(key)) {
-      result[key] = REDACTED;
+      obj[key] = REDACTED;
     } else {
-      result[key] = redactSensitive(v, depth + 1, seen);
+      redactInPlace(obj[key], depth + 1, seen);
     }
   }
-  return result;
 }
 
 const redactFormat = winston.format((info) => {
-  // info 자체를 깊이 순회하며 민감 키 마스킹
-  const cleaned = redactSensitive(info) as winston.Logform.TransformableInfo;
-  return cleaned;
+  // info 객체를 직접 변형 (Symbol 키 메타데이터 보존)
+  redactInPlace(info);
+  return info;
 })();
 
 // 일일 로그 로테이션 설정

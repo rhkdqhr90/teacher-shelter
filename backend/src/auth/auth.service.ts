@@ -60,9 +60,7 @@ export class AuthService {
 
     // 만 14세 이상 확인 (PIPA 22조의2 - 만 14세 미만은 법정대리인 동의 없이 가입 불가)
     if (!registerDto.agreedAge) {
-      throw new BadRequestException(
-        '만 14세 이상만 가입할 수 있습니다.',
-      );
+      throw new BadRequestException('만 14세 이상만 가입할 수 있습니다.');
     }
 
     // 이메일 중복 확인 - Email Enumeration 방지를 위해 일반적인 메시지 사용
@@ -195,6 +193,11 @@ export class AuthService {
 
     // 3. 신규 사용자 생성
     const now = new Date();
+    // ⚠️ TODO: OAuth는 약관/14세 동의 화면을 거치지 않고 자동 가입되는 구조다.
+    // 엄격한 PIPA 컴플라이언스를 위해 OAuth 콜백 후 동의 화면(intermediate consent
+    // page)을 거쳐 사용자가 명시적으로 동의한 경우에만 user.create를 호출하도록
+    // 리팩토링이 필요하다. 현재는 OAuth provider가 만 14세 미만 가입을 정책적으로
+    // 차단한다는 가정에 의존한다 (Google/Kakao/Naver 모두 정책상 14세 미만 가입 금지).
     user = await this.prisma.user.create({
       data: {
         email: data.email,
@@ -206,6 +209,7 @@ export class AuthService {
         isVerified: true, // OAuth는 이메일 인증 완료로 처리
         termsAgreedAt: now, // OAuth 가입 시 약관 동의 기록
         privacyAgreedAt: now, // 개인정보처리방침 동의 기록
+        ageVerifiedAt: now, // 만 14세 이상 (provider 정책 신뢰)
       },
     });
 
