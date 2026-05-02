@@ -39,7 +39,7 @@ export default async function HomePage() {
     '@type': 'WebSite',
     name: '교사쉼터',
     url: SITE_URL,
-    description: '특수교사, 보육교사를 위한 커뮤니티. 고민을 나누고 정보를 공유하세요.',
+    description: '특수교사, 보육교사, 어린이집 교사, 유치원교사를 위한 커뮤니티. 고민을 나누고 정보를 공유하세요.',
     potentialAction: {
       '@type': 'SearchAction',
       target: {
@@ -56,7 +56,7 @@ export default async function HomePage() {
     name: '교사쉼터',
     url: SITE_URL,
     logo: `${SITE_URL}/og-default.png`,
-    description: '특수교사, 보육교사를 위한 커뮤니티',
+    description: '특수교사, 보육교사, 어린이집 교사, 유치원교사를 위한 커뮤니티',
   };
 
   return (
