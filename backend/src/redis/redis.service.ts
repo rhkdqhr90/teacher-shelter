@@ -68,6 +68,15 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
+   * 원자적 GET + DEL (Redis 6.2+).
+   * 토큰 일회용 사용처(OAuth state, password reset 등)에서 race 차단용.
+   * 키가 없으면 null 반환.
+   */
+  async getDel(key: string): Promise<string | null> {
+    return this.redis.getdel(key);
+  }
+
+  /**
    * 키 존재 여부 확인
    */
   async exists(key: string): Promise<boolean> {

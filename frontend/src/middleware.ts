@@ -68,10 +68,12 @@ export function middleware(request: NextRequest) {
     : [
         // === 프로덕션 환경 CSP (nonce + strict-dynamic) ===
         "default-src 'self'",
-        // 'strict-dynamic'은 'self' 등 호스트 기반 허용을 무시하므로 nonce만 신뢰 source가 됨.
-        // 모던 브라우저는 'strict-dynamic' 적용 시 'unsafe-inline'을 무시하지만,
-        // 구형 브라우저 호환을 위해 'unsafe-inline' fallback 유지.
-        `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' https:`,
+        // 모던 브라우저는 'strict-dynamic'을 보고 'self'·'unsafe-inline'·호스트 source를
+        // 무시하고 nonce'd 스크립트와 그것이 로드한 스크립트만 허용한다.
+        // 'unsafe-inline'은 'strict-dynamic' 미지원 구형 브라우저(IE11, Safari < 15.4)
+        // fallback으로만 의미 있음. `https:`는 모든 HTTPS 출처를 허용해 사실상
+        // 보호 무력화이므로 제거. 구형 브라우저는 인라인 스크립트만 동작 가능.
+        `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline'`,
         // Tailwind/CSS-in-JS 인라인 style 호환 위해 style은 'unsafe-inline' 유지
         // (style XSS 위험은 script보다 훨씬 낮음 — JS 실행 불가)
         "style-src 'self' 'unsafe-inline'",

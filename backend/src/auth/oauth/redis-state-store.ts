@@ -71,11 +71,8 @@ export class RedisOAuthStateStore {
 
   /**
    * 콜백 단계: 클라이언트가 들고 온 state가 우리가 발급한 것과 일치하는지 검증.
-   * 한 번 사용된 state는 즉시 폐기(replay 방지).
-   *
-   * 주의: get → del 사이에 미세한 TOCTOU 윈도우가 있으나 (state는 클라이언트만
-   * 알고 짧은 TTL이므로) 실제 공격 가능성은 매우 낮다. 더 엄격한 보장이 필요해지면
-   * Redis GETDEL (6.2+) 또는 Lua script로 원자화 가능.
+   * Redis GETDEL (6.2+)로 조회와 삭제를 원자적으로 수행 → TOCTOU race 차단.
+   * 첫 콜백만 통과하고 동시 도착한 두 번째 콜백은 자연스럽게 invalid 처리됨.
    */
   verify(req: Request, providedState: string, callback: VerifyCallback): void {
     if (!providedState || typeof providedState !== 'string') {
@@ -85,27 +82,14 @@ export class RedisOAuthStateStore {
 
     const key = `${KEY_PREFIX}${this.providerKey}:${providedState}`;
 
-    // 검증 성공 후 del → 그 이후에 callback. del 결과는 무시
-    // (state 검증 자체는 get으로 끝나며, del 실패해도 TTL이 곧 정리함).
-    const handle = async (): Promise<{ ok: boolean; reason?: string }> => {
-      const value = await this.redisService.get(key);
-      if (value === null) {
-        return { ok: false, reason: 'Invalid or expired OAuth state' };
-      }
-      // 일회용 처리: best-effort, 실패해도 TTL이 정리
-      await this.redisService.del(key).catch(() => {
-        /* del 실패는 무시 (TTL fallback) */
-      });
-      return { ok: true };
-    };
-
-    handle().then(
-      (result) => {
-        if (result.ok) {
-          callback(null, true, providedState);
-        } else {
-          callback(null, false, { message: result.reason ?? 'Invalid state' });
+    this.redisService.getDel(key).then(
+      (value) => {
+        if (value === null) {
+          // 만료, 위조, 또는 이미 사용된 state
+          callback(null, false, { message: 'Invalid or expired OAuth state' });
+          return;
         }
+        callback(null, true, providedState);
       },
       (err: unknown) =>
         callback(err instanceof Error ? err : new Error(String(err)), false),
