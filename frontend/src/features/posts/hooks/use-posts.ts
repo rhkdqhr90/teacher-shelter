@@ -53,12 +53,13 @@ export function useInfinitePosts(options: Omit<UsePostsOptions, 'page'> = {}) {
   });
 }
 
-export function usePost(id: string) {
+export function usePost(id: string, initialData?: Post) {
   return useQuery({
     queryKey: queryKeys.posts.detail(id),
     queryFn: () => postsApi.getPost(id),
     enabled: !!id,
     staleTime: CACHE_TIME.POST_DETAIL,
+    ...(initialData && { initialData }),
   });
 }
 

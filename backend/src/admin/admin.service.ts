@@ -419,7 +419,15 @@ export class AdminService {
    */
   async createAutoContent(
     authorId: string,
-    dto: { title: string; content: string; category: PostCategory; status?: string; sourceUrl?: string; sourceName?: string; confidence?: string },
+    dto: {
+      title: string;
+      content: string;
+      category: PostCategory;
+      status?: string;
+      sourceUrl?: string;
+      sourceName?: string;
+      confidence?: string;
+    },
   ) {
     const post = await this.prisma.post.create({
       data: {

@@ -56,6 +56,7 @@ import { JOB_TYPE_LABELS } from '@/features/profile/types';
 import { AnswerList } from '@/features/legal-qa';
 import { ApplicationForm } from '@/features/applications';
 import {
+  type Post,
   PostCategory,
   JOB_SUB_CATEGORY_LABELS,
   REGION_LABELS,
@@ -69,14 +70,15 @@ import {
 
 interface PostDetailProps {
   postId: string;
+  initialPost?: Post;
 }
 
-export function PostDetail({ postId }: PostDetailProps) {
+export function PostDetail({ postId, initialPost }: PostDetailProps) {
   const router = useRouter();
   const user = useUser();
   const isAuthenticated = useIsAuthenticated();
   const { lastListUrl, setLastListUrl } = useAppStore();
-  const { data: post, isLoading, error } = usePost(postId);
+  const { data: post, isLoading, error } = usePost(postId, initialPost);
   const toggleLike = useToggleLike();
   const toggleBookmark = useToggleBookmark();
   const deletePost = useDeletePost();
@@ -507,15 +509,18 @@ export function PostDetail({ postId }: PostDetailProps) {
         {/* Content */}
         <div
           className={`post-detail__content prose prose-sm max-w-none prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0 ${!isHtmlContent(post.content) ? 'whitespace-pre-line' : ''}`}
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
-            __html: DOMPurify.sanitize(convertMarkdownImages(post.content), {
-              ADD_TAGS: ['img'],
-              ADD_ATTR: ['loading', 'class', 'target', 'rel'],
-              ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'loading', 'class', 'target', 'rel', 'style'],
-              ALLOW_DATA_ATTR: false,
-              FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form'],
-              FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover'],
-            }),
+            __html: typeof window !== 'undefined'
+              ? DOMPurify.sanitize(convertMarkdownImages(post.content), {
+                  ADD_TAGS: ['img'],
+                  ADD_ATTR: ['loading', 'class', 'target', 'rel'],
+                  ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'loading', 'class', 'target', 'rel', 'style'],
+                  ALLOW_DATA_ATTR: false,
+                  FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form'],
+                  FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover'],
+                })
+              : convertMarkdownImages(post.content),
           }}
         />
 

@@ -5,13 +5,15 @@ import { HomeDashboard } from '@/features/posts/components';
 import { PenSquare } from 'lucide-react';
 import Link from 'next/link';
 
-export function HomeContent() {
+interface HomeContentProps {
+  children?: React.ReactNode;
+}
+
+export function HomeContent({ children }: HomeContentProps) {
   return (
     <MainLayout>
-      {/* Dashboard Home */}
+      {children}
       <HomeDashboard />
-
-      {/* FAB Write Button - Mobile Only */}
       <Link href="/posts/new" className="write-fab lg:hidden">
         <PenSquare />
       </Link>

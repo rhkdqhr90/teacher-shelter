@@ -147,8 +147,7 @@ export default async function PostPage({ params }: PostPageProps) {
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: '홈', item: SITE_URL },
       { '@type': 'ListItem', position: 2, name: '게시판', item: `${SITE_URL}/posts` },
-      { '@type': 'ListItem', position: 3, name: categoryLabel, item: `${SITE_URL}/posts?category=${post.category}` },
-      { '@type': 'ListItem', position: 4, name: post.title, item: postUrl },
+      { '@type': 'ListItem', position: 3, name: post.title, item: postUrl },
     ],
   } : null;
 
@@ -169,7 +168,7 @@ export default async function PostPage({ params }: PostPageProps) {
         />
       )}
       <div className="max-w-4xl">
-        <PostDetail postId={id} />
+        <PostDetail postId={id} initialPost={post ?? undefined} />
       </div>
     </MainLayout>
   );

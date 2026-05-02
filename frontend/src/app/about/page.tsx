@@ -4,8 +4,8 @@ import { ChevronLeft, Users, MessageSquare, Briefcase, Shield, Heart, BookOpen }
 import { Button } from '@/components/ui/button';
 
 export const metadata: Metadata = {
-  title: '서비스 소개',
-  description: '교사쉼터 - 특수교사, 보육교사를 위한 커뮤니티 서비스를 소개합니다.',
+  title: '교사쉼터 소개',
+  description: '교사쉼터는 특수교사, 보육교사, 어린이집 교사, 유치원교사를 위한 커뮤니티입니다. 자유게시판, 구인구직, 수업자료, 노하우 공유.',
 };
 
 const features = [

@@ -1,9 +1,13 @@
-'use client';
-
+import { Metadata } from 'next';
 import Link from 'next/link';
-import { ChevronDown, HelpCircle } from 'lucide-react';
-import { useState } from 'react';
+import { HelpCircle, ChevronDown } from 'lucide-react';
 import { MainLayout } from '@/components/layout';
+
+export const metadata: Metadata = {
+  title: '자주 묻는 질문',
+  description:
+    '교사쉼터 이용 방법, 회원가입, 교사 인증, 구인공고, 게시판 이용에 관한 자주 묻는 질문과 답변.',
+};
 
 const faqs = [
   {
@@ -105,26 +109,32 @@ const faqs = [
   },
 ];
 
-function FAQItem({ question, answer }: { question: string; answer: string }) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div className="border-b last:border-b-0">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between p-1.5 py-4 text-left"
-      >
-        <span className="font-medium">{question}</span>
-        <ChevronDown className={`text-muted-foreground h-5 w-5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
-      {isOpen && <div className="text-muted-foreground pb-4 pl-2 text-sm">{answer}</div>}
-    </div>
-  );
+function serializeJsonLd(data: object): string {
+  return JSON.stringify(data).replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026');
 }
 
 export default function FAQPage() {
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.flatMap((category) =>
+      category.questions.map((q) => ({
+        '@type': 'Question',
+        name: q.q,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: q.a,
+        },
+      }))
+    ),
+  };
+
   return (
     <MainLayout showSidebar={false}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqJsonLd) }}
+      />
       <div className="mx-auto max-w-4xl">
         {/* 페이지 타이틀 */}
         <div className="mb-8 flex items-center gap-3">
@@ -137,14 +147,20 @@ export default function FAQPage() {
           </div>
         </div>
 
-        {/* FAQ 목록 */}
+        {/* FAQ 목록 — <details> 사용: JS 없이 토글 가능, 전체 내용이 SSR HTML에 포함됨 */}
         <div className="space-y-8">
           {faqs.map((category) => (
             <section key={category.category}>
               <h2 className="text-primary mb-4 p-1.5 text-lg font-semibold">{category.category}</h2>
               <div className="bg-card rounded-lg border">
                 {category.questions.map((faq, index) => (
-                  <FAQItem key={index} question={faq.q} answer={faq.a} />
+                  <details key={index} className="group border-b last:border-b-0">
+                    <summary className="flex cursor-pointer select-none list-none items-center justify-between p-1.5 py-4 font-medium [&::-webkit-details-marker]:hidden">
+                      {faq.q}
+                      <ChevronDown className="text-muted-foreground h-5 w-5 shrink-0 transition-transform group-open:rotate-180" />
+                    </summary>
+                    <div className="text-muted-foreground pb-4 pl-2 text-sm">{faq.a}</div>
+                  </details>
                 ))}
               </div>
             </section>
