@@ -10,6 +10,8 @@ export const validationSchema = Joi.object({
   JWT_EXPIRES_IN: Joi.string().default('15m'),
   REFRESH_TOKEN_SECRET: Joi.string().min(32).required(),
   REFRESH_TOKEN_EXPIRES_IN: Joi.string().default('7d'),
+  // OAuth state CSRF 방어용 세션 시크릿 (express-session)
+  SESSION_SECRET: Joi.string().min(32).required(),
   ALLOWED_ORIGINS: Joi.string().default('http://localhost:3000'),
   // Redis 설정
   REDIS_HOST: Joi.string().default('localhost'),

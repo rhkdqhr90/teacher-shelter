@@ -22,13 +22,22 @@ export default function PrivacyPage() {
 
         <article className="prose prose-gray dark:prose-invert max-w-none">
           <h1>개인정보처리방침</h1>
-          <p className="text-muted-foreground">시행일: 2025년 1월 1일</p>
+          <p className="text-muted-foreground">시행일: 2026년 4월 24일 (개정)</p>
 
           <p>
             교사쉼터(이하 &quot;회사&quot;)는 개인정보보호법, 정보통신망 이용촉진 및 정보보호 등에 관한 법률 등
             관련 법령에 따라 이용자의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록
             다음과 같이 개인정보 처리방침을 수립·공개합니다.
           </p>
+
+          <section className="rounded-md border border-amber-300 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-900/20">
+            <h2 className="!mt-0">만 14세 미만 가입 제한</h2>
+            <p className="!mb-0">
+              회사는 「개인정보 보호법」 제22조의2에 따라 <strong>만 14세 미만 아동의 회원가입을 받지 않습니다</strong>.
+              회원가입 시 만 14세 이상임을 확인하는 절차를 거치며, 만 14세 미만임이 확인되는 경우
+              회원자격이 즉시 정지되고 관련 정보는 지체없이 파기됩니다.
+            </p>
+          </section>
 
           <section>
             <h2>제1조 (개인정보의 수집 항목 및 수집 방법)</h2>
@@ -97,30 +106,64 @@ export default function PrivacyPage() {
           <section>
             <h2>제3조 (개인정보의 보유 및 이용 기간)</h2>
             <p>
-              회사는 개인정보 수집 및 이용목적이 달성된 후에는 해당 정보를 지체 없이 파기합니다.
-              단, 관련 법령에 의해 보존할 필요가 있는 경우 아래와 같이 일정 기간 보관합니다.
+              회사는 원칙적으로 개인정보 수집 및 이용목적이 달성된 후, 또는 회원이 탈퇴한 시점에
+              해당 정보를 지체 없이 파기합니다. 단, 관련 법령에 의해 보존할 필요가 있는 경우
+              아래 표와 같이 일정 기간 보관합니다.
             </p>
 
-            <h3>1. 회사 내부 방침에 의한 정보 보유</h3>
-            <ul>
-              <li>부정이용 기록: 1년</li>
-            </ul>
+            <h3>1. 보유 기간 요약</h3>
+            <table className="w-full border-collapse border">
+              <thead>
+                <tr className="bg-muted">
+                  <th className="border p-2 text-left">항목</th>
+                  <th className="border p-2 text-left">보유 기간</th>
+                  <th className="border p-2 text-left">근거</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="border p-2">회원 가입 정보 (이메일, 닉네임, 비밀번호 해시, 직종, 경력)</td>
+                  <td className="border p-2">회원 탈퇴 시까지</td>
+                  <td className="border p-2">서비스 제공</td>
+                </tr>
+                <tr>
+                  <td className="border p-2">소셜 로그인 식별자 (provider, providerId)</td>
+                  <td className="border p-2">회원 탈퇴 시까지</td>
+                  <td className="border p-2">서비스 제공</td>
+                </tr>
+                <tr>
+                  <td className="border p-2">교사 인증 서류 이미지 (암호화 저장)</td>
+                  <td className="border p-2">전문가 자격 검증 종료 또는 탈퇴 시</td>
+                  <td className="border p-2">서비스 제공</td>
+                </tr>
+                <tr>
+                  <td className="border p-2">접속 로그, 접속 IP 정보</td>
+                  <td className="border p-2">3개월</td>
+                  <td className="border p-2">통신비밀보호법</td>
+                </tr>
+                <tr>
+                  <td className="border p-2">계약 또는 청약철회 등에 관한 기록</td>
+                  <td className="border p-2">5년</td>
+                  <td className="border p-2">전자상거래법</td>
+                </tr>
+                <tr>
+                  <td className="border p-2">소비자 불만 또는 분쟁처리에 관한 기록</td>
+                  <td className="border p-2">3년</td>
+                  <td className="border p-2">전자상거래법</td>
+                </tr>
+                <tr>
+                  <td className="border p-2">부정이용(중복가입·도용 등) 기록</td>
+                  <td className="border p-2">1년</td>
+                  <td className="border p-2">회사 내부 방침</td>
+                </tr>
+              </tbody>
+            </table>
 
-            <h3>2. 관련 법령에 의한 정보 보유</h3>
+            <h3>2. 회원 탈퇴 시 처리</h3>
             <ul>
-              <li>
-                <strong>전자상거래 등에서의 소비자보호에 관한 법률</strong>
-                <ul>
-                  <li>계약 또는 청약철회 등에 관한 기록: 5년</li>
-                  <li>소비자의 불만 또는 분쟁처리에 관한 기록: 3년</li>
-                </ul>
-              </li>
-              <li>
-                <strong>통신비밀보호법</strong>
-                <ul>
-                  <li>서비스 이용 기록, 접속 로그, 접속 IP 정보: 3개월</li>
-                </ul>
-              </li>
+              <li>회원이 직접 탈퇴 시 모든 개인정보를 <strong>지체없이 파기</strong>합니다(법령 의무 보관 항목 제외).</li>
+              <li>익명 게시판에 작성된 게시글의 작성자 정보는 IP 해시로만 저장되어 탈퇴 후에도 식별이 불가능합니다.</li>
+              <li>법령 의무 보관 항목은 위 표의 보유 기간이 종료된 후 즉시 파기됩니다.</li>
             </ul>
           </section>
 
@@ -166,14 +209,30 @@ export default function PrivacyPage() {
             <h2>제6조 (이용자 및 법정대리인의 권리와 행사 방법)</h2>
             <p>이용자는 언제든지 다음 각 호의 개인정보 보호 관련 권리를 행사할 수 있습니다.</p>
             <ol>
-              <li>개인정보 열람 요구</li>
-              <li>오류 등이 있을 경우 정정 요구</li>
-              <li>삭제 요구</li>
-              <li>처리정지 요구</li>
+              <li><strong>개인정보 열람 요구</strong> — 본인의 개인정보 처리내역 확인</li>
+              <li><strong>오류 정정 요구</strong> — 닉네임·직종 등 잘못된 정보 수정</li>
+              <li><strong>삭제(탈퇴) 요구</strong> — 회원 자격 상실 및 정보 파기</li>
+              <li><strong>처리정지 요구</strong> — 일시적 서비스 이용 중지</li>
             </ol>
-            <p>
-              위 권리 행사는 서비스 내 &quot;프로필 설정&quot; 메뉴를 통해 직접 처리하거나,
-              고객센터를 통해 요청하실 수 있습니다.
+            <h3>권리 행사 방법</h3>
+            <ul>
+              <li>
+                <strong>본인 직접 처리</strong>: 로그인 후{' '}
+                <Link href="/profile" className="text-primary hover:underline">프로필 설정</Link>{' '}
+                메뉴에서 정보 열람/수정 가능. 탈퇴는 프로필 → 회원 탈퇴 메뉴.
+              </li>
+              <li>
+                <strong>이메일 요청</strong>: <a href="mailto:privacy@teacherlounge.co.kr" className="text-primary hover:underline">privacy@teacherlounge.co.kr</a>{' '}
+                으로 본인 확인 가능한 정보(가입 이메일)와 함께 요청 사항을 보내주시면
+                10일 이내 처리하여 회신해 드립니다.
+              </li>
+              <li>
+                <strong>법정대리인 요청</strong>: 만 14세 미만 자녀의 정보 처리에 관한 사항은
+                법정대리인이 위 이메일로 신분 증빙서류를 첨부하여 요청할 수 있습니다.
+              </li>
+            </ul>
+            <p className="text-sm text-muted-foreground">
+              요청 처리 거부 또는 제한 시 그 사유와 이의제기 방법을 함께 안내합니다.
             </p>
           </section>
 
@@ -263,11 +322,12 @@ export default function PrivacyPage() {
           <section>
             <h2>제12조 (개인정보 처리방침 변경)</h2>
             <p>
-              이 개인정보 처리방침은 2025년 1월 1일부터 적용됩니다.
-              이전의 개인정보 처리방침은 아래에서 확인하실 수 있습니다.
+              이 개인정보 처리방침은 2026년 4월 24일부터 적용됩니다.
+              개정 내역은 아래와 같습니다.
             </p>
             <ul>
-              <li>현재 버전: 2025년 1월 1일 시행</li>
+              <li>2026년 4월 24일: 만 14세 미만 가입 제한 명시, 보유 기간 표 정비, 권리 행사 방법 구체화</li>
+              <li>2025년 1월 1일: 최초 시행</li>
             </ul>
           </section>
 

@@ -58,6 +58,13 @@ export class AuthService {
       );
     }
 
+    // 만 14세 이상 확인 (PIPA 22조의2 - 만 14세 미만은 법정대리인 동의 없이 가입 불가)
+    if (!registerDto.agreedAge) {
+      throw new BadRequestException(
+        '만 14세 이상만 가입할 수 있습니다.',
+      );
+    }
+
     // 이메일 중복 확인 - Email Enumeration 방지를 위해 일반적인 메시지 사용
     const existingUser = await this.prisma.user.findUnique({
       where: { email: registerDto.email },
@@ -88,6 +95,7 @@ export class AuthService {
         isVerified: false, // 이메일 인증 전
         termsAgreedAt: now, // 이용약관 동의 일시
         privacyAgreedAt: now, // 개인정보처리방침 동의 일시
+        ageVerifiedAt: now, // 만 14세 이상 확인 일시 (PIPA)
       },
     });
 

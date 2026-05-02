@@ -45,6 +45,7 @@ export function useRegister() {
       career?: number;
       agreedTerms: boolean;
       agreedPrivacy: boolean;
+      agreedAge: boolean; // 만 14세 이상 확인 (PIPA)
     }) => {
       await apiRegister(data);
       router.replace('/dashboard');

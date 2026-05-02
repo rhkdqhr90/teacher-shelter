@@ -8,6 +8,7 @@ import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import helmet from 'helmet';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
+import session from 'express-session';
 import * as path from 'path';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -40,6 +41,27 @@ async function bootstrap() {
     }),
   );
   app.use(cookieParser());
+
+  // ========================================
+  // Session: OAuth state CSRF 방어 전용
+  // ========================================
+  // 사용자 인증은 JWT/Refresh Token 기반이며 세션을 사용하지 않음.
+  // 이 세션은 오직 passport-oauth2의 `state: true`가 OAuth flow 동안
+  // 임시 state 값을 저장하기 위함이며, 콜백 직후 폐기됨.
+  // 단일 인스턴스용 MemoryStore. 멀티 인스턴스 운영 시 connect-redis 등 도입 권장.
+  app.use(
+    session({
+      secret: configService.getOrThrow<string>('SESSION_SECRET'),
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: 'lax', // OAuth 리다이렉트 호환을 위해 lax (strict이면 OAuth 콜백에서 쿠키 누락)
+        maxAge: 10 * 60 * 1000, // 10분 (OAuth flow 충분)
+      },
+    }),
+  );
 
   // Compression: 응답 크기 1KB 이상일 때 gzip 압축
   app.use(compression({ threshold: 1024 }));

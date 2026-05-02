@@ -91,4 +91,11 @@ export class RegisterDto {
   @ApiProperty({ example: true, description: '개인정보처리방침 동의 여부' })
   @IsBoolean()
   agreedPrivacy: boolean;
+
+  @ApiProperty({
+    example: true,
+    description: '만 14세 이상 확인 (PIPA 22조의2 - 만 14세 미만 가입 불가)',
+  })
+  @IsBoolean()
+  agreedAge: boolean;
 }

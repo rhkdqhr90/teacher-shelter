@@ -14,6 +14,8 @@ export class NaverStrategy extends NaverStrategyBase {
       clientID: configService.getOrThrow<string>('NAVER_CLIENT_ID'),
       clientSecret: configService.getOrThrow<string>('NAVER_CLIENT_SECRET'),
       callbackURL: configService.getOrThrow<string>('NAVER_CALLBACK_URL'),
+      // CSRF 방어: state 파라미터 활성화
+      state: true,
     });
   }
 

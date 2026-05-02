@@ -47,7 +47,12 @@ export function middleware(request: NextRequest) {
 
   // CSP 설정: 개발 vs 프로덕션 분리
   // - 개발: 디버깅 편의를 위해 'unsafe-eval' 허용 (Next.js Fast Refresh, React DevTools 등)
-  // - 프로덕션: 엄격한 보안 정책 적용
+  // - 프로덕션: nonce + strict-dynamic 기반 엄격 정책
+  //   ('unsafe-inline'/'unsafe-eval' 제거 → XSS 페이로드가 인라인 스크립트로 실행되는 경로 차단)
+  //
+  // Next.js 13.4+는 응답의 CSP 헤더에 'nonce-...'가 포함되면
+  // 자체 인라인 부트스트랩 스크립트에 nonce를 자동 주입한다.
+  // 'strict-dynamic'은 nonce된 부트스트랩이 추가로 로드하는 chunk를 자동 신뢰시키는 용도.
   const csp = isDev
     ? [
         // === 개발 환경 CSP (느슨함) ===
@@ -61,9 +66,14 @@ export function middleware(request: NextRequest) {
         "object-src 'none'",
       ].join('; ')
     : [
-        // === 프로덕션 환경 CSP ===
+        // === 프로덕션 환경 CSP (nonce + strict-dynamic) ===
         "default-src 'self'",
-        `script-src 'self' 'unsafe-inline' 'unsafe-eval'`, // Next.js 호환성을 위해 임시 완화
+        // 'strict-dynamic'은 'self' 등 호스트 기반 허용을 무시하므로 nonce만 신뢰 source가 됨.
+        // 모던 브라우저는 'strict-dynamic' 적용 시 'unsafe-inline'을 무시하지만,
+        // 구형 브라우저 호환을 위해 'unsafe-inline' fallback 유지.
+        `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' https:`,
+        // Tailwind/CSS-in-JS 인라인 style 호환 위해 style은 'unsafe-inline' 유지
+        // (style XSS 위험은 script보다 훨씬 낮음 — JS 실행 불가)
         "style-src 'self' 'unsafe-inline'",
         `img-src 'self' data: blob: ${appUrl} ${apiOrigin} https://api.teacherlounge.co.kr https://images.unsplash.com https://lh3.googleusercontent.com https://avatars.githubusercontent.com`,
         "font-src 'self'",

@@ -14,6 +14,7 @@ interface RegisterRequest {
   career?: number;
   agreedTerms: boolean;
   agreedPrivacy: boolean;
+  agreedAge: boolean; // 만 14세 이상 확인 (PIPA 필수)
 }
 
 interface AuthResponse {

@@ -12,6 +12,9 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       clientSecret: configService.getOrThrow<string>('GOOGLE_CLIENT_SECRET'),
       callbackURL: configService.getOrThrow<string>('GOOGLE_CALLBACK_URL'),
       scope: ['email', 'profile'],
+      // CSRF 방어: state 파라미터 활성화
+      // Passport가 자동으로 무작위 state를 발급/검증함 (세션 저장 필요 → express-session 또는 self-encoded)
+      state: true,
     });
   }
 

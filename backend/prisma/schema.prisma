@@ -176,6 +176,7 @@ model User {
   // 약관 동의 기록 (법적 증거)
   termsAgreedAt   DateTime?  // 이용약관 동의 일시
   privacyAgreedAt DateTime?  // 개인정보처리방침 동의 일시
+  ageVerifiedAt   DateTime?  // 만 14세 이상 확인 일시 (PIPA 22조의2)
 
   posts                   Post[]
   comments                Comment[]         @relation("CommentAuthor")

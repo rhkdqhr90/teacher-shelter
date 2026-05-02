@@ -52,6 +52,7 @@ export function RegisterForm() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
+  const [agreedAge, setAgreedAge] = useState(false); // 만 14세 이상 확인 (PIPA)
 
   // 이메일 인증 관련 상태
   const [registeredEmail, setRegisteredEmail] = useState('');
@@ -87,7 +88,7 @@ export function RegisterForm() {
   }));
   const allPasswordRulesPassed = passwordValidation.every((rule) => rule.passed);
   const passwordsMatch = password === confirmPassword && confirmPassword.length > 0;
-  const allAgreementsChecked = agreedTerms && agreedPrivacy;
+  const allAgreementsChecked = agreedTerms && agreedPrivacy && agreedAge;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -110,6 +111,7 @@ export function RegisterForm() {
         career,
         agreedTerms,
         agreedPrivacy,
+        agreedAge,
       });
       // 회원가입 성공 → 이메일 인증 단계로 이동
       setRegisteredEmail(email);
@@ -423,8 +425,20 @@ export function RegisterForm() {
             </label>
           </div>
 
+          <div className="flex items-start gap-2">
+            <Checkbox
+              id="age"
+              checked={agreedAge}
+              onCheckedChange={(checked) => setAgreedAge(checked === true)}
+            />
+            <label htmlFor="age" className="text-sm leading-tight cursor-pointer">
+              <span className="text-destructive">*</span>{' '}
+              만 14세 이상입니다
+            </label>
+          </div>
+
           <p className="text-xs text-muted-foreground">
-            * 필수 동의 항목입니다
+            * 필수 동의 항목입니다. 만 14세 미만은 가입할 수 없습니다.
           </p>
         </div>
 
