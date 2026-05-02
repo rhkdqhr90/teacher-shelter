@@ -3,19 +3,25 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback, Profile } from 'passport-google-oauth20';
 import { ConfigService } from '@nestjs/config';
 import { OAuthUserDto } from '../dto/oauth-user.dto';
+import { RedisService } from '../../redis/redis.service';
+import { RedisOAuthStateStore } from '../oauth/redis-state-store';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    redisService: RedisService,
+  ) {
     super({
       clientID: configService.getOrThrow<string>('GOOGLE_CLIENT_ID'),
       clientSecret: configService.getOrThrow<string>('GOOGLE_CLIENT_SECRET'),
       callbackURL: configService.getOrThrow<string>('GOOGLE_CALLBACK_URL'),
       scope: ['email', 'profile'],
-      // CSRF 방어: state 파라미터 활성화
-      // Passport가 자동으로 무작위 state를 발급/검증함 (세션 저장 필요 → express-session 또는 self-encoded)
-      state: true,
-    });
+      // CSRF 방어: state를 Redis 기반 store로 발급/검증 (세션 미들웨어 불필요)
+      // @types/passport-google-oauth20에 store 옵션 누락되어 있어 타입 캐스트.
+      // 런타임에서는 passport-oauth2 부모가 store 옵션을 정상 처리.
+      store: new RedisOAuthStateStore(redisService, 'google'),
+    } as unknown as ConstructorParameters<typeof Strategy>[0]);
   }
 
   validate(
