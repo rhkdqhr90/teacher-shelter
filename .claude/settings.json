@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/gwang-kyo/.ssh/**)",
+      "Bash(ssh -i ~/.ssh/teacher-shelter-deploy -o StrictHostKeyChecking=no -o ConnectTimeout=10 root@175.106.96.135 \"docker ps -a --format 'table {{.Names}}\\\\t{{.Status}}\\\\t{{.Ports}}'\")",
+      "Bash(ssh -i ~/.ssh/teacher-shelter-deploy -o StrictHostKeyChecking=no -o ConnectTimeout=10 ubuntu@175.106.96.135 \"docker ps -a --format 'table {{.Names}}\\\\t{{.Status}}\\\\t{{.Ports}}'\")",
+      "Bash(ssh -i ~/.ssh/teacher-shelter-deploy -p 2222 -o StrictHostKeyChecking=no -o ConnectTimeout=10 ubuntu@175.106.96.135 \"echo connected && docker ps -a --format 'table {{.Names}}\\\\t{{.Status}}\\\\t{{.Ports}}'\")",
+      "Bash(ssh -i ~/.ssh/teacher-shelter-deploy -p 2222 -o StrictHostKeyChecking=no -o ConnectTimeout=10 root@175.106.96.135 \"echo connected\")",
+      "Bash(ssh -i ~/.ssh/id_rsa -p 2222 -o StrictHostKeyChecking=no -o ConnectTimeout=10 ubuntu@175.106.96.135 \"echo connected\")",
+      "Bash(ssh -i ~/.ssh/teacher-shelter-deploy -p 2222 -o StrictHostKeyChecking=no -o ConnectTimeout=30 root@175.106.96.135 \"du -sh /var/lib/docker /app /var/log 2>/dev/null; docker system df\")",
+      "Bash(ssh -i ~/.ssh/teacher-shelter-deploy -p 2222 -o StrictHostKeyChecking=no -o ConnectTimeout=15 root@175.106.96.135 \"docker system df 2>&1 && echo '---' && ls -lah /app/ 2>&1\")",
+      "Bash(ssh -i ~/.ssh/teacher-shelter-deploy -p 2222 -o StrictHostKeyChecking=no -o ConnectTimeout=15 -o ServerAliveInterval=5 root@175.106.96.135 \"docker system df\")",
+      "Bash(ssh -i ~/.ssh/teacher-shelter-deploy -p 2222 -o StrictHostKeyChecking=no -o ConnectTimeout=15 root@175.106.96.135 \"ls -lah /app/ 2>/dev/null; du -sh /var/log/ /app/backend/logs/ 2>/dev/null\")",
+      "Bash(cat .env.production)",
+      "Bash(cat .env.local)",
+      "Bash(npx vercel *)",
+      "Bash(openssl s_client -connect api.teacherlounge.co.kr:443 -servername api.teacherlounge.co.kr)",
+      "Bash(openssl x509 *)",
+      "Bash(ssh -i '~/.ssh/teacher-shelter-deploy' -p 2222 -o StrictHostKeyChecking=no -o ConnectTimeout=10 root@175.106.96.135 ' *)",
+      "Bash(ssh -i '~/.ssh/teacher-shelter-deploy' -p 2222 -o StrictHostKeyChecking=no -o ConnectTimeout=15 root@175.106.96.135 ' *)",
+      "Bash(ssh -i ~/.ssh/teacher-shelter-deploy -p 2222 -o StrictHostKeyChecking=no -o ConnectTimeout=30 root@175.106.96.135 'docker logs teacher-shelter-certbot 2>&1 | tail -20')",
+      "Bash(ssh -i ~/.ssh/teacher-shelter-deploy -p 2222 -o StrictHostKeyChecking=no -o ConnectTimeout=15 root@175.106.96.135 'docker exec teacher-shelter-certbot cat /etc/letsencrypt/renewal/api.teacherlounge.co.kr.conf')",
+      "Bash(ssh -i ~/.ssh/teacher-shelter-deploy -p 2222 -o StrictHostKeyChecking=no -o ConnectTimeout=15 root@175.106.96.135 'docker ps --filter name=teacher-shelter-certbot --format \"{{.Names}}\\\\t{{.Status}}\\\\t{{.RunningFor}}\"')"
+    ]
+  }
+}

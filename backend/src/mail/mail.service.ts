@@ -1,6 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { LoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { empty } from '@prisma/client/runtime/library';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import * as nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
@@ -22,7 +23,7 @@ function escapeHtml(text: string): string {
 @Injectable()
 export class MailService {
   private transporter: Transporter;
-  private readonly fromEmail: string;
+  private readonly fromEmail: string | undefined;
   private readonly fromName: string;
   private readonly frontendUrl: string;
 
@@ -32,8 +33,7 @@ export class MailService {
     private readonly logger: LoggerService,
   ) {
     // 환경변수에서 메일 설정 로드 (하드코딩 제거)
-    this.fromEmail =
-      this.configService.get<string>('MAIL_FROM') || 'noreply@example.com';
+    this.fromEmail = this.configService.get<string>('MAIL_FROM');
     this.fromName =
       this.configService.get<string>('MAIL_FROM_NAME') || 'Service';
     this.frontendUrl =
