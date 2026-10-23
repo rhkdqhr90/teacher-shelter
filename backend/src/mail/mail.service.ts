@@ -32,7 +32,8 @@ export class MailService {
     private readonly logger: LoggerService,
   ) {
     // 환경변수에서 메일 설정 로드 (하드코딩 제거)
-    this.fromEmail = this.configService.get<string>('MAIL_FROM');
+    // 운영(docker-compose.yml)에는 MAIL_FROM이 아니라 SMTP_FROM이 전달됨
+    this.fromEmail = this.configService.get<string>('SMTP_FROM');
     this.fromName =
       this.configService.get<string>('MAIL_FROM_NAME') || 'Service';
     this.frontendUrl =
