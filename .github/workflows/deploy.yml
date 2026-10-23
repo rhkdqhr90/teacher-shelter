@@ -146,4 +146,9 @@ jobs:
             sleep 10
             docker compose exec -T backend wget -q --spider http://localhost:3000/api/health || exit 1
 
+            # nginx의 upstream backend:3000은 시작/리로드 시점에만 DNS를 해석해서 캐싱한다.
+            # backend 컨테이너가 재생성되면 내부 IP가 바뀌므로, 매 배포마다 reload해서
+            # nginx가 새 IP를 다시 찾도록 해야 함 (안 하면 502 Connection refused)
+            docker compose exec -T nginx nginx -s reload
+
             echo "Backend deployment completed successfully!"
