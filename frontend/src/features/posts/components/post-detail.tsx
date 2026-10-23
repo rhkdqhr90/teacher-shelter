@@ -2,7 +2,7 @@
 
 import { Eye, Flag, Heart, Share2, Pencil, Trash2, MoreVertical, Bookmark, MapPin, Building2, Clock, Users, Calendar, Phone, Mail, MessageCircle, Briefcase, Banknote, CheckCircle, List, FileText, Download, Loader2 } from 'lucide-react';
 import { PostDetailSkeleton } from '@/components/ui/skeleton';
-import DOMPurify from 'dompurify';
+import DOMPurify from 'isomorphic-dompurify';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { ReportModal } from '@/features/reports/components/report-modal';
@@ -14,34 +14,33 @@ import { SERVER_URL } from '@/lib/constants';
 // text-align만 허용하는 안전한 style 값 목록
 const ALLOWED_STYLE_VALUES = /^text-align:\s*(left|center|right|justify);?$/;
 
-if (typeof window !== 'undefined') {
-  // style 속성: text-align만 허용, 나머지는 제거 (CSS 인젝션 방지)
-  DOMPurify.addHook('uponSanitizeAttribute', (_node, data) => {
-    if (data.attrName === 'style') {
-      const value = data.attrValue.trim();
-      if (!ALLOWED_STYLE_VALUES.test(value)) {
-        data.attrValue = '';
-        data.keepAttr = false;
-      }
+// isomorphic-dompurify는 서버(jsdom)/클라이언트 양쪽에서 동작하므로
+// SSR에서도 반드시 sanitize를 거치도록 가드 없이 등록한다
+DOMPurify.addHook('uponSanitizeAttribute', (_node, data) => {
+  if (data.attrName === 'style') {
+    const value = data.attrValue.trim();
+    if (!ALLOWED_STYLE_VALUES.test(value)) {
+      data.attrValue = '';
+      data.keepAttr = false;
     }
-  });
+  }
+});
 
-  // 위험한 URI 스키마 차단
-  DOMPurify.addHook('afterSanitizeAttributes', (node) => {
-    if (node.hasAttribute('href')) {
-      const href = (node.getAttribute('href') || '').trim().toLowerCase();
-      if (href.startsWith('javascript:') || href.startsWith('data:')) {
-        node.removeAttribute('href');
-      }
+// 위험한 URI 스키마 차단
+DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+  if (node.hasAttribute('href')) {
+    const href = (node.getAttribute('href') || '').trim().toLowerCase();
+    if (href.startsWith('javascript:') || href.startsWith('data:')) {
+      node.removeAttribute('href');
     }
-    if (node.hasAttribute('src')) {
-      const src = (node.getAttribute('src') || '').trim().toLowerCase();
-      if (src.startsWith('javascript:') || src.startsWith('data:text/html')) {
-        node.removeAttribute('src');
-      }
+  }
+  if (node.hasAttribute('src')) {
+    const src = (node.getAttribute('src') || '').trim().toLowerCase();
+    if (src.startsWith('javascript:') || src.startsWith('data:text/html')) {
+      node.removeAttribute('src');
     }
-  });
-}
+  }
+});
 import { usePost, useToggleLike, useDeletePost, useToggleBookmark, useBookmarkStatus, useLikeStatus, useUpdatePost } from '../hooks/use-posts';
 import { CommentSection } from './comment-section';
 import { CategoryBadge } from '@/components/ui/badge';
@@ -511,16 +510,14 @@ export function PostDetail({ postId, initialPost }: PostDetailProps) {
           className={`post-detail__content prose prose-sm max-w-none prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0 ${!isHtmlContent(post.content) ? 'whitespace-pre-line' : ''}`}
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
-            __html: typeof window !== 'undefined'
-              ? DOMPurify.sanitize(convertMarkdownImages(post.content), {
-                  ADD_TAGS: ['img'],
-                  ADD_ATTR: ['loading', 'class', 'target', 'rel'],
-                  ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'loading', 'class', 'target', 'rel', 'style'],
-                  ALLOW_DATA_ATTR: false,
-                  FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form'],
-                  FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover'],
-                })
-              : convertMarkdownImages(post.content),
+            __html: DOMPurify.sanitize(convertMarkdownImages(post.content), {
+              ADD_TAGS: ['img'],
+              ADD_ATTR: ['loading', 'class', 'target', 'rel'],
+              ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'loading', 'class', 'target', 'rel', 'style'],
+              ALLOW_DATA_ATTR: false,
+              FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form'],
+              FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover'],
+            }),
           }}
         />
 

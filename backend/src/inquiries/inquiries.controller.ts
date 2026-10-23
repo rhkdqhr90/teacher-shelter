@@ -22,6 +22,7 @@ import { CreateInquiryDto } from './dto/create-inquiry.dto';
 import { RespondInquiryDto } from './dto/respond-inquiry.dto';
 import { UpdateInquiryStatusDto } from './dto/update-inquiry-status.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 
@@ -31,6 +32,7 @@ export class InquiriesController {
   constructor(private readonly inquiriesService: InquiriesService) {}
 
   @Post()
+  @UseGuards(OptionalJwtAuthGuard)
   @ApiOperation({
     summary: '문의 접수',
     description: '고객 문의를 접수합니다. 비회원도 가능합니다.',
@@ -41,11 +43,8 @@ export class InquiriesController {
     @Body() createInquiryDto: CreateInquiryDto,
     @Request() req: { user?: { sub: string } },
   ) {
-    // JWT 토큰이 있으면 userId 추출 (선택)
-    if (req.user?.sub) {
-      createInquiryDto.userId = req.user.sub;
-    }
-    return this.inquiriesService.create(createInquiryDto);
+    // userId는 클라이언트 입력을 신뢰하지 않고 검증된 토큰에서만 추출
+    return this.inquiriesService.create(createInquiryDto, req.user?.sub);
   }
 
   @Get()

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { formatDistanceToNow, isValid } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import DOMPurify from 'dompurify';
+import DOMPurify from 'isomorphic-dompurify';
 import { Award, Edit2, Trash2, Check, X, Loader2, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PostEditor } from '@/components/editor';

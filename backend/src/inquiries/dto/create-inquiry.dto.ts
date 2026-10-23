@@ -4,9 +4,8 @@ import {
   IsEnum,
   MinLength,
   MaxLength,
-  IsOptional,
 } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { InquiryType } from '@prisma/client';
 
 export class CreateInquiryDto {
@@ -30,9 +29,4 @@ export class CreateInquiryDto {
   @MinLength(10)
   @MaxLength(2000)
   content: string;
-
-  @ApiPropertyOptional({ description: '회원 ID (로그인 상태)' })
-  @IsOptional()
-  @IsString()
-  userId?: string;
 }

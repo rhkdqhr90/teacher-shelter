@@ -15,14 +15,14 @@ export class InquiriesService {
     private readonly logger: LoggerService,
   ) {}
 
-  async create(createInquiryDto: CreateInquiryDto) {
+  async create(createInquiryDto: CreateInquiryDto, userId?: string) {
     const inquiry = await this.prisma.inquiry.create({
       data: {
         type: createInquiryDto.type,
         email: createInquiryDto.email,
         subject: createInquiryDto.subject,
         content: createInquiryDto.content,
-        userId: createInquiryDto.userId,
+        userId,
         status: InquiryStatus.PENDING,
       },
     });
