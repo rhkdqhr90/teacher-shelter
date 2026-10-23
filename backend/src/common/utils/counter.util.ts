@@ -19,7 +19,7 @@ export async function safeDecrementCommentCount(
   decrementBy: number,
 ): Promise<void> {
   await tx.$executeRaw`
-    UPDATE "Post"
+    UPDATE "posts"
     SET "commentCount" = GREATEST(0, "commentCount" - ${decrementBy})
     WHERE "id" = ${postId}
   `;
@@ -34,7 +34,7 @@ export async function safeDecrementLikeCount(
   decrementBy: number,
 ): Promise<void> {
   await tx.$executeRaw`
-    UPDATE "Post"
+    UPDATE "posts"
     SET "likeCount" = GREATEST(0, "likeCount" - ${decrementBy})
     WHERE "id" = ${postId}
   `;
