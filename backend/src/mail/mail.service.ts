@@ -1,7 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { LoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { empty } from '@prisma/client/runtime/library';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import * as nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
