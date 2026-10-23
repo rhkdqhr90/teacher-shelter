@@ -78,6 +78,41 @@ export class InquiriesService {
     });
   }
 
+  async findMyInquiries(userId: string, page = 1, limit = 20) {
+    const skip = (page - 1) * limit;
+    const where = { userId };
+
+    const [data, total] = await Promise.all([
+      this.prisma.inquiry.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          type: true,
+          subject: true,
+          content: true,
+          status: true,
+          response: true,
+          respondedAt: true,
+          createdAt: true,
+        },
+      }),
+      this.prisma.inquiry.count({ where }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
   async respond(id: string, response: string, respondedById: string) {
     const inquiry = await this.prisma.inquiry.update({
       where: { id },

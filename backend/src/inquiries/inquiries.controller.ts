@@ -69,6 +69,27 @@ export class InquiriesController {
     );
   }
 
+  @Get('my')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: '내 문의 목록 조회' })
+  @ApiResponse({ status: 200, description: '내 문의 목록' })
+  async findMy(
+    @Request() req: { user: { sub: string } },
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const parsedPage = page ? Math.max(1, parseInt(page, 10) || 1) : 1;
+    const parsedLimit = limit
+      ? Math.min(100, Math.max(1, parseInt(limit, 10) || 20))
+      : 20;
+    return this.inquiriesService.findMyInquiries(
+      req.user.sub,
+      parsedPage,
+      parsedLimit,
+    );
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')

@@ -1,7 +1,7 @@
 'use client';
 
 import { ProfileCard } from '@/features/profile/components';
-import { Key, LogOut, FileText, MessageSquare, ChevronRight, Bookmark, Flag, LayoutDashboard, ShieldCheck } from 'lucide-react';
+import { Key, LogOut, FileText, MessageSquare, ChevronRight, Bookmark, Flag, LayoutDashboard, ShieldCheck, HelpCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { logout } from '@/lib/auth-api';
@@ -76,6 +76,16 @@ export default function ProfilePage() {
             <div className="flex items-center gap-3">
               <Flag className="w-5 h-5 text-foreground-muted" />
               <span>신고 내역</span>
+            </div>
+            <ChevronRight className="w-5 h-5 text-foreground-muted" />
+          </Link>
+          <Link
+            href="/profile/inquiries"
+            className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <HelpCircle className="w-5 h-5 text-foreground-muted" />
+              <span>문의 내역</span>
             </div>
             <ChevronRight className="w-5 h-5 text-foreground-muted" />
           </Link>
